@@ -1,0 +1,7 @@
+https://github.com/gbr-ufs/pf
+https://github.com/gbr-ufs/cses
+https://github.com/gbr-ufs/notes
+https://github.com/gbr-ufs/ies
+https://github.com/gbr-ufs/hack-ia-mockup
+https://github.com/gbr-ufs/probabilidade-detran-se
+https://github.com/gbr-ufs/hello-r-markdown

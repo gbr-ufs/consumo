@@ -1,0 +1,80 @@
+[build-system]
+build-backend = "uv_build"
+requires = ["uv_build>=0.9.11,<0.10.0"]
+
+[dependency-groups]
+build = [
+    "pyinstaller>=6.19.0",
+]
+dev = [
+    "commitizen>=4.13.8",
+    "pre-commit>=4.5.1",
+    "ruff>=0.15.2",
+    "ty>=0.0.17",
+]
+docs = [
+    "zensical>=0.0.23",
+]
+tests = [
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+]
+
+[project]
+authors = [
+    { name = "Gabriel Santos de Souza", email = "gabriel.santosdesouza@dcomp.ufs.br" }
+]
+dependencies = [
+    "av>=16.1.0",
+    "brotli>=1.2.0",
+    "bs4>=0.0.2",
+    "lxml>=6.0.2",
+    "pydantic>=2.12.5",
+    "pymupdf>=1.27.1",
+    "python-magic>=0.4.27; sys_platform != 'win32'",
+    "python-magic-bin>=0.4.14; sys_platform == 'win32'",
+    "trafilatura>=2.0.0",
+    "typer>=0.24.0",
+    "yt-dlp>=2026.2.21",
+    "zstandard>=0.25.0",
+]
+description = "Content consumption analyzer CLI"
+license = "GPL-3.0-or-later"
+license-files = [
+  "LICENSE"
+]
+name = "consumo"
+readme = "README.md"
+requires-python = ">=3.12"
+version = "0.1.0"
+
+[project.scripts]
+consumo = "consumo.cli.main:app"
+
+[project.urls]
+"Bug Tracker" = "https://github.com/gs-101/consumo/issues"
+"Source Code" = "https://github.com/gbr-ufs/consumo"
+
+[tool.commitizen]
+breaking_change_exclamation_in_title = true
+major_version_zero = true
+name = "cz_conventional_commits"
+tag_format = "$version"
+update_changelog_on_bump = true
+version_files = [
+  "src/consumo/__init__.py:__version__"
+]
+version_scheme = "pep440"
+version_provider = "uv"
+
+[tool.pytest.ini_options]
+addopts = "--cov --cov-report term-missing --import-mode=importlib --maxfail=1"
+
+[tool.ruff]
+fix = true
+
+[tool.ruff.lint]
+extend-select = ["ANN", "D", "I"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"

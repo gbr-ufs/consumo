@@ -1,0 +1,15 @@
+{
+  "name": "consumo",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": ".venv/bin/python",
+        "python.testing.pytestEnabled": true
+      }
+    }
+  },
+  "postCreateCommand": "uv sync"
+}
