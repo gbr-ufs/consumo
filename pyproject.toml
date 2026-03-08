@@ -24,6 +24,22 @@ tests = [
 authors = [
     { name = "Gabriel Santos de Souza", email = "gabriel.santosdesouza@dcomp.ufs.br" }
 ]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Framework::Pydantic",
+  "Framework::Pytest",
+  "Intended Audience :: End Users/Desktop",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Internet",
+  "Topic :: Multimedia",
+  "Topic :: Terminals",
+  "Topic :: Text Processing",
+  "Topic :: Utilities",
+  "Typing :: Typed",
+]
 dependencies = [
     "av>=16.1.0",
     "brotli>=1.2.0",
@@ -40,9 +56,6 @@ dependencies = [
 ]
 description = "Content consumption analyzer CLI"
 license = "GPL-3.0-or-later"
-license-files = [
-  "LICENSE"
-]
 name = "consumo"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -52,8 +65,8 @@ version = "0.1.1"
 consumo = "consumo.cli.main:app"
 
 [project.urls]
-"Bug Tracker" = "https://github.com/gs-101/consumo/issues"
-"Source Code" = "https://github.com/gbr-ufs/consumo"
+"Tracker" = "https://github.com/gs-101/consumo/issues"
+"Source" = "https://github.com/gbr-ufs/consumo"
 
 [tool.commitizen]
 breaking_change_exclamation_in_title = true
