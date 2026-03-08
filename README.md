@@ -90,7 +90,7 @@ By developing this project, I demonstrate that I know:
 
 - Dependency Injection.[^1]
 - [Parse, don't validate](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/).
-- Test Driven Development.[^1]
+- Test Driven Development.[^2]
 
 [^1]: Used for the HTML variant of `calculate_consumption_time` so the URL variant can reuse it. This is done in the `video_duration_resolver` parameter.
 [^2]: Beck, K. (2003) Test-driven development: By example. Boston: Addison-Wesley (The Addison-Wesley signature series).
