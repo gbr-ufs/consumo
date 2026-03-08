@@ -2,6 +2,7 @@
 __pycache__/
 *.py[oc]
 build/
+coverage.xml
 dist/
 docs/source/api/
 junit.xml
