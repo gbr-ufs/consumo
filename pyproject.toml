@@ -68,7 +68,7 @@ version_scheme = "pep440"
 version_provider = "uv"
 
 [tool.pytest.ini_options]
-addopts = "--cov --cov-report term-missing --import-mode=importlib --maxfail=1"
+addopts = "--cov --cov-branch --cov-report=xml --import-mode=importlib --junitxml=junit.xml --maxfail=1 -o junit_family=legacy"
 
 [tool.ruff]
 fix = true

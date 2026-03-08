@@ -21,5 +21,13 @@ jobs:
         ref: ${{ github.event.pull_request.head.sha }}
     - name: Test
       uses: ./.github/actions/tests
+    - name: Codecov Coverage
+      uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+    - name: Codecov Tests
+      uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
     - name: Build
       uses: ./.github/actions/build
