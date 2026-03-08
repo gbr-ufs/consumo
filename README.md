@@ -4,7 +4,7 @@
 [![Python Versions](https://img.shields.io/pypi/pyversions/consumo.svg)](https://pypi.python.org/pypi/trafilatura)
 [![Codecov](https://codecov.io/gh/gbr-ufs/consumo/graph/badge.svg?token=IIRDADQH1Q)](https://codecov.io/gh/gbr-ufs/consumo)
 [[!Downloads](https://static.pepy.tech/badge/consumo/month)](https://pepy.tech/project/consumo)
-[![License](https://img.shields.io/badge/License?style=flat-square&logo=GNU&logoColor=black&labelColor=white)](LICENSE)
+[![License](https://img.shields.io/badge/_-license-822422?style=flat-square&logo=GNU&logoColor=black&labelColor=white)](LICENSE)
 
 ## Introduction
 
