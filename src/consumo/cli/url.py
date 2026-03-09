@@ -8,10 +8,10 @@ from pydantic import HttpUrl, PositiveInt, validate_call
 from typer import Typer
 from yt_dlp.utils import DownloadError
 
+from consumo.cli.state import configuration
 from consumo.lib.cli.core import (
     execute_concurrent_command,
 )
-from consumo.lib.cli.state import configuration
 from consumo.lib.exceptions import MissingMetadataError
 from consumo.lib.file.multimedia import get_duration as get_multimedia_duration
 from consumo.lib.file.video import get_video_platform_video_duration

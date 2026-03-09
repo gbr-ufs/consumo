@@ -4,8 +4,8 @@ from unittest.mock import Mock, patch
 
 from pytest import CaptureFixture, MonkeyPatch
 
+from consumo.cli.state import configuration
 from consumo.lib.cli.core import execute_concurrent_command
-from consumo.lib.cli.state import configuration
 from consumo.lib.types import Second
 
 

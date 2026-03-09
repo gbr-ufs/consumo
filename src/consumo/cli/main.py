@@ -8,9 +8,9 @@ from typer import Typer
 
 from consumo.cli.file import app as file_app
 from consumo.cli.list import app as list_app
+from consumo.cli.state import configuration
 from consumo.cli.url import app as url_app
 from consumo.cli.version import app as version_app
-from consumo.lib.cli.state import configuration
 
 app: Typer = Typer()
 

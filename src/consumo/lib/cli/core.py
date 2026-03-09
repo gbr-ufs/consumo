@@ -5,7 +5,7 @@ from typing import Any, Callable, Iterator
 
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-from consumo.lib.cli.state import configuration
+from consumo.cli.state import configuration
 from consumo.lib.types import Second
 
 
