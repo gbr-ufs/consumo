@@ -7,7 +7,12 @@
 [![License](https://img.shields.io/badge/_-license-822422?style=flat-square&logo=GNU&logoColor=black&labelColor=white)](LICENSE)
 
 ![GIF showicasing the program being used, by revealing it would take 21 minutes and 18 seconds to read the entire license at the standard 265 words per minute.](https://vhs.charm.sh/vhs-1mimEmoE9cISfgnplgT7xA.gif)
-[[!VHS](https://stuff.charm.sh/vhs/badge.svg)](https://vhs.charm.sh)
+
+<p align="center">
+  <a href="https://vhs.charm.sh">
+    <img alt="VHS" src="https://stuff.charm.sh/vhs/badge.svg">
+  </a>
+</p>
 
 ## Introduction
 
