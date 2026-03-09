@@ -6,6 +6,9 @@
 [[!Downloads](https://static.pepy.tech/badge/consumo/month)](https://pepy.tech/project/consumo)
 [![License](https://img.shields.io/badge/_-license-822422?style=flat-square&logo=GNU&logoColor=black&labelColor=white)](LICENSE)
 
+![GIF showicasing the program being used, by revealing it would take 21 minutes and 18 seconds to read the entire license at the standard 265 words per minute.](https://vhs.charm.sh/vhs-1mimEmoE9cISfgnplgT7xA.gif)
+[[!VHS](https://stuff.charm.sh/vhs/badge.svg)](https://vhs.charm.sh)
+
 ## Introduction
 
 `consumo` is a command-line interface (CLI) built with [Typer](https://typer.tiangolo.com/) that **calculates the time to consume either online or offline media**. It can be used for sorting media by duration for later consumption or by deciding if something can be viewed today or at a later date.
