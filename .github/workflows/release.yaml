@@ -18,6 +18,8 @@ jobs:
           - windows-latest
     runs-on: ${{ matrix.os }}
     steps:
+    - name: Checkout Repository
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
     - name: Build
       uses: ./.github/actions/build
     - name: Release
