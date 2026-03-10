@@ -3,7 +3,8 @@
 """Module for processing multimedia files."""
 
 import math
-from typing import Any
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Iterator
 
 import av
 from pydantic import FilePath, HttpUrl, validate_call
@@ -11,6 +12,23 @@ from yt_dlp import DownloadError, YoutubeDL
 
 from consumo.lib.classes import SilentLogger
 from consumo.lib.exceptions import MissingMetadataError
+
+
+def duration_resolver(entry: dict[str, Any]) -> int:
+    """Get the duration of multimedia from a dictionary.
+
+    Args:
+        entry: Dictionary potentially containing a duration entry.
+
+    Returns:
+        The duration of the content in seconds.
+    """
+    raw_duration: float | None = entry.get("duration")
+
+    if raw_duration is None:
+        raise MissingMetadataError("duration not found")
+
+    return math.ceil(raw_duration)
 
 
 @validate_call
@@ -40,28 +58,18 @@ def get_hosted_multimedia_duration(url: HttpUrl) -> int:
         info: dict[str, Any] = ytdl.extract_info(str(url), download=False)
 
         # This means that the link points to a playlist.
-        if info["entries"]:
-            entries = info["entries"]
+        if info.get("entries"):
+            entries: list[dict[str, Any]] = info["entries"]
             total_duration: int = 0
 
-            for entry in entries:
-                raw_duration: list[float | None] = entry.get("duration")
+            with ThreadPoolExecutor() as e:
+                resolved_durations: Iterator[int] = e.map(duration_resolver, entries)
 
-                if raw_duration is None:
-                    raise MissingMetadataError("duration not found")
+                total_duration += sum(resolved_durations)
 
-                total_duration += math.ceil(raw_duration)
+                return total_duration
 
-            return total_duration
-
-        raw_duration: float | None = info.get("duration")
-
-        if raw_duration is None:
-            raise MissingMetadataError("duration not found")
-
-        duration: int = math.ceil(raw_duration)
-
-        return duration
+        return duration_resolver(info)
 
 
 @validate_call
