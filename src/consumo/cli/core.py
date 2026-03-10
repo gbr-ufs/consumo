@@ -8,32 +8,8 @@ from typing import Any, Callable, Iterator
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from consumo.cli.state import configuration
+from consumo.lib.formatting import format_time
 from consumo.lib.types import Second
-
-
-def format_time(total_seconds: int) -> str:
-    """Format the duration/consumption time given in seconds in a *h *m *s format.
-
-    Args:
-        seconds: The duration/consumption time in seconds of the content.
-
-    Returns:
-        The duration/consumption time in a *h *m *s format.
-    """
-    minutes, seconds = divmod(total_seconds, 60)
-    hours, minutes = divmod(minutes, 60)
-    hours %= 24
-
-    parts: list[str] = []
-
-    if hours:
-        parts.append(f"{hours}h")
-    if minutes:
-        parts.append(f"{minutes}m")
-
-    parts.append(f"{seconds}s")
-
-    return " ".join(parts)
 
 
 def handle_multiple_args(
