@@ -8,7 +8,6 @@ from typing import Annotated, Callable
 import magic
 import typer
 from pydantic import PositiveInt, validate_call
-from rich import print
 from typer import Typer
 
 from consumo.cli.state import configuration
@@ -112,9 +111,4 @@ def process_file(
     def duration_resolver(file: Path) -> Second:
         return get_duration(file, configuration.words_per_minute)
 
-    try:
-        execute_concurrent_command(files, duration_resolver, "Processing files...")
-    except IsADirectoryError:
-        print("[bold red]Directories are unsupported.[/bold red]")
-
-        raise typer.Exit(1)
+    execute_concurrent_command(files, duration_resolver, "Processing file(s)...")
