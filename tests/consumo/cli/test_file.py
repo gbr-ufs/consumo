@@ -4,6 +4,7 @@
 
 from pathlib import Path
 
+from pytest import mark
 from typer.testing import CliRunner, Result
 
 from consumo.cli.file import app
@@ -12,48 +13,27 @@ from tests import FIXTURES_DIR
 runner: CliRunner = CliRunner()
 
 
-def test_process_file_get_multimedia_duration() -> None:
-    actual_result: Result = runner.invoke(app, [str(FIXTURES_DIR / "audio.mp3")])
-    expected_exit_code: int = 0
-    expected_result: str = "1s"
-
-    assert actual_result.exit_code == expected_exit_code
-    assert expected_result in actual_result.output
-
-
-def test_process_file_get_multimedia_duration_no_extension() -> None:
-    actual_result: Result = runner.invoke(
-        app, [str(FIXTURES_DIR / "audio_no_extension")]
-    )
-    expected_exit_code: int = 0
-    expected_result: str = "1s"
-
-    assert actual_result.exit_code == expected_exit_code
-    assert expected_result in actual_result.output
-
-
-def test_process_file_calculate_html_consumption_time() -> None:
-    actual_result: Result = runner.invoke(app, [str(FIXTURES_DIR / "blog_post.html")])
-    expected_exit_code: int = 0
-    expected_result: str = "28s"
-
-    assert actual_result.exit_code == expected_exit_code
-    assert expected_result in actual_result.output
-
-
-def test_process_file_calculate_viewing_time() -> None:
-    actual_result: Result = runner.invoke(app, [str(FIXTURES_DIR / "cool.png")])
-    expected_exit_code: int = 0
-    expected_result: str = "12s"
-
-    assert actual_result.exit_code == expected_exit_code
-    assert expected_result in actual_result.output
-
-
-def test_process_file_calculate_mass_media_consumption_time() -> None:
-    actual_result: Result = runner.invoke(app, [str(FIXTURES_DIR / "empty.epub")])
-    expected_exit_code: int = 0
-    expected_result: str = "0s"
+@mark.parametrize(
+    "filename, expected_exit_code, expected_result",
+    [
+        ("audio.mp3", 0, "1s"),
+        ("audio_no_extension", 0, "1s"),
+        ("blog_post.html", 0, "28s"),
+        ("cool.png", 0, "12s"),
+        ("empty.epub", 0, "0s"),
+    ],
+    ids=[
+        "get_multimedia_duration",
+        "get_multimedia_duration_no_extension",
+        "calculate_html_consumption_time",
+        "calculate_viewing_time",
+        "calculate_mass_media_consumption_time",
+    ],
+)
+def test_process_file_get_standard_files(
+    filename: str, expected_exit_code: int, expected_result: str
+) -> None:
+    actual_result: Result = runner.invoke(app, [str(FIXTURES_DIR / filename)])
 
     assert actual_result.exit_code == expected_exit_code
     assert expected_result in actual_result.output
