@@ -14,7 +14,7 @@ from consumo.cli.state import configuration
 from consumo.cli.url import app as url_app
 from consumo.cli.version import app as version_app
 
-app: Typer = Typer()
+app: Typer = Typer(no_args_is_help=True)
 
 app.add_typer(file_app)
 app.add_typer(list_app)
