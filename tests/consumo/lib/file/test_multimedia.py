@@ -8,7 +8,6 @@ from pytest import mark
 
 from consumo.lib.exceptions import MissingMetadataError
 from consumo.lib.file.multimedia import get_duration
-from consumo.lib.types import Second
 from tests import FIXTURES_DIR
 
 
@@ -20,9 +19,9 @@ from tests import FIXTURES_DIR
         ("audio_no_extension", 1),
     ],
 )
-def test_get_duration(filename: str, expected_duration: Second) -> None:
+def test_get_duration(filename: str, expected_duration: int) -> None:
     container: FilePath = FIXTURES_DIR / filename
-    actual_duration: Second = get_duration(container)
+    actual_duration: int = get_duration(container)
 
     assert actual_duration == expected_duration
 

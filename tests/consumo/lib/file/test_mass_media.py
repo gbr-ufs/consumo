@@ -2,11 +2,10 @@
 
 """Test suite of the lib/file/mass_media module."""
 
-from pydantic import FilePath, PositiveInt
+from pydantic import FilePath
 from pytest import mark
 
 from consumo.lib.file.mass_media import calculate_consumption_time, extract_text
-from consumo.lib.types import Second
 from tests import FIXTURES_DIR
 
 
@@ -33,9 +32,9 @@ def test_extract_text(filename: str, expected_text: str) -> None:
     [("single_char.pdf", 265, 1), ("empty.epub", 265, 0), ("jumbled.mobi", 1000, 1)],
 )
 def test_calculate_consumption_time(
-    filename: str, words_per_minute: int, expected_time: Second
+    filename: str, words_per_minute: int, expected_time: int
 ) -> None:
     container: FilePath = FIXTURES_DIR / filename
-    actual_time: Second = calculate_consumption_time(container, words_per_minute)
+    actual_time: int = calculate_consumption_time(container, words_per_minute)
 
     assert actual_time == expected_time

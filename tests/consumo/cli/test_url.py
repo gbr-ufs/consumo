@@ -12,7 +12,6 @@ from yt_dlp.utils import DownloadError
 
 from consumo.cli.url import app
 from consumo.lib.exceptions import MissingMetadataError
-from consumo.lib.types import Second
 
 runner: CliRunner = CliRunner()
 
@@ -27,11 +26,11 @@ def test_process_urls_downloaderror(
     mock_calculate_consumption_time: MagicMock,
     mock_get_video_platform_video_duration: MagicMock,
     url: HttpUrl,
-    consumption_time: Second,
+    consumption_time: int,
     expected_result: str,
 ) -> None:
     mock_get_video_platform_video_duration.side_effect = DownloadError("")
-    mock_calculate_consumption_time.return_value: Second = consumption_time
+    mock_calculate_consumption_time.return_value = consumption_time
     actual_result: Result = runner.invoke(app, [str(url)])
     expected_exit_code: int = 0
 
@@ -55,7 +54,7 @@ def test_process_urls_missingmetadataerror(
     mock_get_video_platform_video_duration: MagicMock,
     mock_get_multimedia_duration: MagicMock,
     url: HttpUrl,
-    consumption_time: Second,
+    consumption_time: int,
     expected_result: str,
 ) -> None:
     mock_get_video_platform_video_duration.side_effect: MissingMetadataError = (
@@ -87,7 +86,7 @@ def test_process_urls_invaliddataerror(
     mock_get_multimedia_duration: MagicMock,
     mock_get_video_platform_video_duration: MagicMock,
     url: HttpUrl,
-    consumption_time: Second,
+    consumption_time: int,
     expected_result: str,
 ) -> None:
     mock_get_video_platform_video_duration.side_effect: MissingMetadataError = (
@@ -96,7 +95,7 @@ def test_process_urls_invaliddataerror(
     mock_get_multimedia_duration.side_effect: InvalidDataError = InvalidDataError(
         1094995529, "Invalid data found when processing input", str(url)
     )
-    mock_calculate_consumption_time.return_value: Second = consumption_time
+    mock_calculate_consumption_time.return_value = consumption_time
     actual_result: Result = runner.invoke(app, [str(url)])
     expected_exit_code: int = 0
 
@@ -112,10 +111,10 @@ def test_process_urls_invaliddataerror(
 def test_process_urls_video_platform(
     mock_get_video_platform_video_duration: MagicMock,
     url: HttpUrl,
-    consumption_time: Second,
+    consumption_time: int,
     expected_result: str,
 ) -> None:
-    mock_get_video_platform_video_duration.return_value: Second = consumption_time
+    mock_get_video_platform_video_duration.return_value = consumption_time
     actual_result: Result = runner.invoke(app, [str(url)])
     expected_exit_code: int = 0
 

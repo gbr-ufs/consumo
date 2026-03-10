@@ -16,7 +16,6 @@ from consumo.lib.file.html import (
     get_image_count,
     get_relative_path_video_duration,
 )
-from consumo.lib.types import Second
 from tests import FIXTURES_DIR
 
 
@@ -72,8 +71,8 @@ def test_get_image_count(filename: FilePath, expected_image_count: int) -> None:
 def test_get_relative_path_video_duration() -> None:
     html: FilePath = FIXTURES_DIR / "video.html"
     video: FilePath = Path("video.mkv")
-    actual_duration: Second = get_relative_path_video_duration(html, video)
-    expected_duration: Second = 1
+    actual_duration: int = get_relative_path_video_duration(html, video)
+    expected_duration: int = 1
 
     assert actual_duration == expected_duration
 
@@ -103,11 +102,9 @@ def test_get_relative_path_video_duration() -> None:
         ),
     ],
 )
-def test_get_custom_player_duration(
-    filename: FilePath, expected_duration: Second
-) -> None:
+def test_get_custom_player_duration(filename: FilePath, expected_duration: int) -> None:
     html: FilePath = FIXTURES_DIR / filename
-    actual_duration: Second = get_custom_player_duration(html)
+    actual_duration: int = get_custom_player_duration(html)
 
     assert actual_duration == expected_duration
 
@@ -120,9 +117,9 @@ def test_get_custom_player_duration(
         ("video.html", 1),
     ],
 )
-def test_calculate_consumption_time(filename: FilePath, expected_time: Second) -> None:
+def test_calculate_consumption_time(filename: FilePath, expected_time: int) -> None:
     html: FilePath = FIXTURES_DIR / filename
-    actual_time: Second = calculate_consumption_time(html)
+    actual_time: int = calculate_consumption_time(html)
 
     assert actual_time == expected_time
 
@@ -133,7 +130,7 @@ def test_calculate_consumption_time_online_video(
 ) -> None:
     mock_get_absolute_path_video_duration.return_value = 213
     html: FilePath = FIXTURES_DIR / "iframe.html"
-    actual_time: Second = calculate_consumption_time(html)
-    expected_time: Second = 213
+    actual_time: int = calculate_consumption_time(html)
+    expected_time: int = 213
 
     assert actual_time == expected_time

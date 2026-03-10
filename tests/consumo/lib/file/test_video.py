@@ -14,7 +14,6 @@ from consumo.lib.file.video import (
     get_duration,
     get_video_platform_video_duration,
 )
-from consumo.lib.types import DecimalSecond, Second
 
 
 @mark.parametrize(
@@ -26,13 +25,13 @@ from consumo.lib.types import DecimalSecond, Second
 )
 @patch("consumo.lib.file.video.YoutubeDL")
 def test_get_video_platform_video_duration(
-    MockYTDLP: MagicMock, url: str, expected_duration: Second
+    MockYTDLP: MagicMock, url: str, expected_duration: int
 ) -> None:
     mock_yt_dlp: MagicMock = MockYTDLP.return_value.__enter__.return_value
-    mock_yt_dlp.extract_info.return_value: dict[str, DecimalSecond] = {
+    mock_yt_dlp.extract_info.return_value: dict[str, float] = {
         "duration": expected_duration
     }
-    actual_duration: Second = get_video_platform_video_duration(url)
+    actual_duration: int = get_video_platform_video_duration(HttpUrl(url))
 
     assert actual_duration == expected_duration
 
@@ -58,10 +57,10 @@ def test_get_video_platform_video_duration_unsupported_site(
 def test_get_duration_video_platform(
     mock_get_video_platform_video_duration: MagicMock,
     url: HttpUrl,
-    expected_duration: Second,
+    expected_duration: int,
 ) -> None:
     mock_get_video_platform_video_duration.return_value = expected_duration
-    actual_duration: Second = get_duration(url)
+    actual_duration: int = get_duration(url)
 
     assert actual_duration == expected_duration
 
@@ -81,11 +80,11 @@ def test_get_duration_media_container(
     mock_get_multimedia_duration: MagicMock,
     mock_get_video_platform_video_duration: MagicMock,
     url: HttpUrl,
-    expected_duration: Second,
+    expected_duration: int,
 ) -> None:
     mock_get_video_platform_video_duration.side_effect = MissingMetadataError
     mock_get_multimedia_duration.return_value = expected_duration
-    actual_duration: Second = get_duration(url)
+    actual_duration: int = get_duration(url)
 
     assert actual_duration == expected_duration
 

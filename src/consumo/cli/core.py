@@ -6,23 +6,22 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import Annotated, Any, Callable, Iterator
 
 import typer
-from pydantic import PositiveInt
+from pydantic import NonNegativeInt
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from consumo.lib.formatting import format_time
-from consumo.lib.types import Second
 
 SortOption = Annotated[
     bool, typer.Option(help="Sort the output by duration in ascending order.")
 ]
 WordsPerMinuteOption = Annotated[
-    PositiveInt, typer.Option(help="Reading speed in words per minute.")
+    NonNegativeInt, typer.Option(help="Reading speed in words per minute.")
 ]
 
 
 def handle_multiple_args(
-    args: list[Any], duration_resolver: Callable[[Any], Second]
-) -> dict[Any, Second]:
+    args: list[Any], duration_resolver: Callable[[Any], int]
+) -> dict[Any, int]:
     """Get the duration/consumption time of multiple command-line arguments.
 
     Args:
@@ -34,14 +33,14 @@ def handle_multiple_args(
         A dictionary of argument-duration pairs.
     """
     with ThreadPoolExecutor() as e:
-        resolved_durations: Iterator[Second] = e.map(duration_resolver, args)
+        resolved_durations: Iterator[int] = e.map(duration_resolver, args)
 
         return dict(zip(args, resolved_durations))
 
 
 def execute_concurrent_command(
     args: list[Any],
-    duration_resolver: Callable[[Any], Second],
+    duration_resolver: Callable[[Any], int],
     task_description: str = "Processing...",
     sort: bool = False,
 ) -> None:
@@ -61,10 +60,10 @@ def execute_concurrent_command(
         transient=True,
     ) as p:
         p.add_task(task_description, total=None)
-        results: dict[Any, Second] = handle_multiple_args(args, duration_resolver)
+        results: dict[Any, int] = handle_multiple_args(args, duration_resolver)
 
     if sort:
-        results: dict[Any, Second] = dict(
+        results: dict[Any, int] = dict(
             sorted(results.items(), key=lambda item: item[1])
         )
 

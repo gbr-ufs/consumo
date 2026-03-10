@@ -4,9 +4,7 @@
 
 import math
 
-from pydantic import FilePath, PositiveInt, validate_call
-
-from consumo.lib.types import DecimalSecond, Second
+from pydantic import FilePath, NonNegativeInt, validate_call
 
 
 def get_word_count(text: str) -> int:
@@ -23,8 +21,8 @@ def get_word_count(text: str) -> int:
 
 @validate_call
 def calculate_reading_time(
-    word_count: int, words_per_minute: PositiveInt = 265
-) -> Second:
+    word_count: int, words_per_minute: NonNegativeInt = 265
+) -> int:
     """Calculate the reading time in seconds based on word count.
 
     Args:
@@ -34,18 +32,16 @@ def calculate_reading_time(
     Returns:
         How long in seconds it would take to read the text.
     """
-    minutes_to_seconds: Second = 60
-    raw_reading_time: DecimalSecond = (
-        word_count / words_per_minute
-    ) * minutes_to_seconds
-    reading_time: Second = math.ceil(raw_reading_time)
+    minutes_to_seconds: int = 60
+    raw_reading_time: int | float = (word_count / words_per_minute) * minutes_to_seconds
+    reading_time: int = math.ceil(raw_reading_time)
 
     return reading_time
 
 
 def calculate_consumption_time(
-    container: FilePath, words_per_minute: PositiveInt = 265
-) -> Second:
+    container: FilePath, words_per_minute: NonNegativeInt = 265
+) -> int:
     """Calculate the consumption time of a plain text file in seconds.
 
     Args:

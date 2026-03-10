@@ -8,11 +8,10 @@ import av
 from pydantic import FilePath, HttpUrl, validate_call
 
 from consumo.lib.exceptions import MissingMetadataError
-from consumo.lib.types import DecimalSecond, Second
 
 
 @validate_call
-def get_duration(container: FilePath | HttpUrl) -> Second:
+def get_duration(container: FilePath | HttpUrl) -> int:
     """Get the duration from a multimedia container or URL.
 
     Args:
@@ -34,7 +33,7 @@ def get_duration(container: FilePath | HttpUrl) -> Second:
     }
 
     with av.open(str(container), options=av_options) as c:
-        duration: Second | None = c.duration
+        duration: int | None = c.duration
 
         if duration is None:
             raise MissingMetadataError("duration not found")
@@ -42,6 +41,6 @@ def get_duration(container: FilePath | HttpUrl) -> Second:
         # PyAV stores the duration as an integer with more precision than we
         # need (for example, 1 second is equivalent to 1000000).
         # PyAV provides the time_base value to correct this.
-        raw_seconds: DecimalSecond = duration / av.time_base
+        raw_seconds: float = duration / av.time_base
 
         return math.ceil(raw_seconds)

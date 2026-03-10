@@ -6,18 +6,22 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from urllib.parse import urljoin
 
-from pydantic import HttpUrl, PositiveInt, ValidationError, validate_call
+from pydantic import (
+    HttpUrl,
+    NonNegativeInt,
+    ValidationError,
+    validate_call,
+)
 from trafilatura import fetch_url
 
 from consumo.lib.file.html import (
     calculate_consumption_time as calculate_html_consumption_time,
 )
 from consumo.lib.file.video import get_duration as get_absolute_path_video_duration
-from consumo.lib.types import Second
 
 
 @validate_call
-def get_relative_path_video_duration(url: HttpUrl, video: Path) -> Second:
+def get_relative_path_video_duration(url: HttpUrl, video: Path) -> int:
     """Resolve a URL to get the duration of a video with a relative path.
 
     Args:
@@ -33,7 +37,7 @@ def get_relative_path_video_duration(url: HttpUrl, video: Path) -> Second:
 
 
 @validate_call
-def get_video_duration(url: HttpUrl, video: str) -> Second:
+def get_video_duration(url: HttpUrl, video: str) -> int:
     """Get the duration of a video hosted online.
 
     Tries to treat the video as if it had an absolute path, then tries to
@@ -56,8 +60,8 @@ def get_video_duration(url: HttpUrl, video: str) -> Second:
 
 @validate_call
 def calculate_consumption_time(
-    url: HttpUrl, words_per_minute: PositiveInt = 265
-) -> Second:
+    url: HttpUrl, words_per_minute: NonNegativeInt = 265
+) -> int:
     """Calculate the consumption time of a URL in seconds.
 
     Avoids code duplication by downloading the HTML of the URL to a temporary

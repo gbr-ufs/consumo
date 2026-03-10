@@ -13,7 +13,7 @@ from bs4.element import AttributeValueList
 from pydantic import (
     FilePath,
     HttpUrl,
-    PositiveInt,
+    NonNegativeInt,
     TypeAdapter,
     ValidationError,
     validate_call,
@@ -26,7 +26,6 @@ from consumo.lib.file.text import calculate_reading_time, get_word_count
 from consumo.lib.file.video import (
     get_duration as get_absolute_path_video_duration,
 )
-from consumo.lib.types import Second
 
 DURATION_ADAPTER: TypeAdapter[timedelta] = TypeAdapter(timedelta)
 
@@ -100,7 +99,7 @@ def get_image_count(html: FilePath) -> int:
 
 
 @validate_call
-def get_relative_path_video_duration(html: FilePath, video: Path) -> Second:
+def get_relative_path_video_duration(html: FilePath, video: Path) -> int:
     """Get the duration of a video with a relative path.
 
     Args:
@@ -115,7 +114,7 @@ def get_relative_path_video_duration(html: FilePath, video: Path) -> Second:
 
 
 @validate_call
-def get_video_duration(html: FilePath, video: str) -> Second:
+def get_video_duration(html: FilePath, video: str) -> int:
     """Get the duration of a video in an HTML file.
 
     Tries to treat the video as if it was hosted online, then tries to resolve
@@ -137,7 +136,7 @@ def get_video_duration(html: FilePath, video: str) -> Second:
 
 
 @validate_call
-def get_custom_player_duration(html: FilePath) -> Second:
+def get_custom_player_duration(html: FilePath) -> int:
     """Parse the JSON data in an HTML file provided for SEO to get video duration.
 
     Designed with videos using custom players like the BBC's smp-toucan-player
@@ -182,9 +181,9 @@ def get_custom_player_duration(html: FilePath) -> Second:
 @validate_call
 def calculate_consumption_time(
     html: FilePath,
-    words_per_minute: PositiveInt = 265,
-    video_duration_resolver: Optional[Callable[[str], Second]] = None,
-) -> Second:
+    words_per_minute: NonNegativeInt = 265,
+    video_duration_resolver: Optional[Callable[[str], int]] = None,
+) -> int:
     """Calculate the consumption time of an HTML file in seconds.
 
     Uses concurrency to get the duration of any videos in the file to avoid any
@@ -203,21 +202,21 @@ def calculate_consumption_time(
     # function parameters in Python.
     if video_duration_resolver is None:
 
-        def video_duration_resolver(video: str) -> Second:
+        def video_duration_resolver(video: str) -> int:
             return get_video_duration(html, video)
 
     text: str = extract_text(html)
     word_count: int = get_word_count(text)
-    reading_time: Second = calculate_reading_time(word_count, words_per_minute)
+    reading_time: int = calculate_reading_time(word_count, words_per_minute)
 
     image_count: int = get_image_count(html)
-    image_time: Second = calculate_viewing_time(image_count)
+    image_time: int = calculate_viewing_time(image_count)
 
     videos: list[str] = extract_videos(html)
-    video_time: Second = 0
+    video_time: int = 0
 
     with ThreadPoolExecutor() as e:
-        resolved_durations: Iterator[Second] = e.map(video_duration_resolver, videos)
+        resolved_durations: Iterator[int] = e.map(video_duration_resolver, videos)
 
         for resolved_duration in resolved_durations:
             video_time += resolved_duration

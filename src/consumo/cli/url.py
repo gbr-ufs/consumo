@@ -6,7 +6,11 @@ from typing import Annotated
 
 import typer
 from av.error import InvalidDataError
-from pydantic import HttpUrl, PositiveInt, validate_call
+from pydantic import (
+    HttpUrl,
+    NonNegativeInt,
+    validate_call,
+)
 from typer import Typer
 from yt_dlp.utils import DownloadError
 
@@ -18,14 +22,13 @@ from consumo.cli.core import (
 from consumo.lib.exceptions import MissingMetadataError
 from consumo.lib.file.multimedia import get_duration as get_multimedia_duration
 from consumo.lib.file.video import get_video_platform_video_duration
-from consumo.lib.types import Second
 from consumo.lib.url import calculate_consumption_time
 
 app: Typer = Typer()
 
 
 @validate_call
-def get_duration(url: HttpUrl, words_per_minute: PositiveInt = 265) -> Second:
+def get_duration(url: HttpUrl, words_per_minute: NonNegativeInt = 265) -> int:
     """Get the duration or calculate the consumption time of a URL in seconds.
 
     Gets the duration of audio or videos from hosting platforms or direct file
@@ -72,7 +75,7 @@ def process_urls(
         words_per_minute: Reading speed in words per minute.
     """
 
-    def duration_resolver(url: str) -> Second:
+    def duration_resolver(url: str) -> int:
         return get_duration(HttpUrl(url), words_per_minute)
 
     execute_concurrent_command(

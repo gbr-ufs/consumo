@@ -3,10 +3,9 @@
 """Module for processing mass media files."""
 
 import pymupdf
-from pydantic import FilePath, PositiveInt, validate_call
+from pydantic import FilePath, NonNegativeInt, validate_call
 
 from consumo.lib.file.text import calculate_reading_time, get_word_count
-from consumo.lib.types import Second
 
 
 @validate_call
@@ -28,8 +27,8 @@ def extract_text(container: FilePath) -> str:
 
 @validate_call
 def calculate_consumption_time(
-    container: FilePath, words_per_minute: PositiveInt = 265
-) -> Second:
+    container: FilePath, words_per_minute: NonNegativeInt = 265
+) -> int:
     """Calculate the consumption time of a text container file in seconds.
 
     Args:
@@ -42,6 +41,6 @@ def calculate_consumption_time(
     """
     text: str = extract_text(container)
     word_count: int = get_word_count(text)
-    reading_time: Second = calculate_reading_time(word_count, words_per_minute)
+    reading_time: int = calculate_reading_time(word_count, words_per_minute)
 
     return reading_time

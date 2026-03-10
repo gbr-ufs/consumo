@@ -7,7 +7,6 @@ from unittest.mock import Mock, patch
 from pytest import CaptureFixture, MonkeyPatch
 
 from consumo.cli.core import execute_concurrent_command
-from consumo.lib.types import Second
 
 
 @patch("consumo.cli.core.handle_multiple_args")
@@ -16,7 +15,7 @@ def test_execute_concurrent_command_sorted(
     monkeypatch: MonkeyPatch,
     capsys: CaptureFixture,
 ) -> None:
-    mock_handle_multiple_args.return_value: dict[str, Second] = {
+    mock_handle_multiple_args.return_value: dict[str, int] = {
         "https://info.cern.ch/hypertext/WWW/TheProject.html": 43,
         "https://dn710704.ca.archive.org/0/items/night_of_the_living_dead_dvd/Night.mp4": 5732,
         "https://www.bbc.com/news/articles/c4g0dzg6e4mo": 297,

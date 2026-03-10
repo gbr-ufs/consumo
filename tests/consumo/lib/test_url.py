@@ -8,7 +8,6 @@ from unittest.mock import MagicMock, patch
 import pytest
 from pydantic import FilePath, HttpUrl, ValidationError
 
-from consumo.lib.types import Second
 from consumo.lib.url import (
     calculate_consumption_time,
     get_relative_path_video_duration,
@@ -24,8 +23,8 @@ def test_get_relative_path_video_duration(
     mock_get_absolute_path_video_duration.return_value = 11
     url: HttpUrl = HttpUrl("https://www.w3schools.com/html/html5_video.asp")
     video: FilePath = Path("mov_bbb.mp4")
-    actual_duration: Second = get_relative_path_video_duration(url, video)
-    expected_duration: Second = 11
+    actual_duration: int = get_relative_path_video_duration(url, video)
+    expected_duration: int = 11
 
     assert actual_duration == expected_duration
 
@@ -40,8 +39,8 @@ def test_get_video_duration(
     mock_get_relative_path_video_duration.return_value = 11
     url: HttpUrl = HttpUrl("https://www.w3schools.com/html/html5_video.asp")
     video: FilePath = Path("mov_bbb.mp4")
-    actual_duration: Second = get_video_duration(url, str(video))
-    expected_duration: Second = 11
+    actual_duration: int = get_video_duration(url, str(video))
+    expected_duration: int = 11
 
     assert actual_duration == expected_duration
 
@@ -57,10 +56,10 @@ def test_calculate_consumption_time(
     url: HttpUrl = HttpUrl("https://example.com/url")
     html: FilePath = FIXTURES_DIR / "url.html"
     mock_fetch_url.return_value: str = html.read_text("utf-8")
-    mock_get_absolute_path_video_duration.return_value: Second = 211
-    mock_get_relative_path_video_duration.return_value: Second = 1
-    actual_time: Second = calculate_consumption_time(url)
-    expected_time: Second = 260
+    mock_get_absolute_path_video_duration.return_value: int = 211
+    mock_get_relative_path_video_duration.return_value: int = 1
+    actual_time: int = calculate_consumption_time(url)
+    expected_time: int = 260
 
     assert actual_time == expected_time
 

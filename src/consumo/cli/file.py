@@ -7,7 +7,7 @@ from typing import Annotated, Callable
 
 import magic
 import typer
-from pydantic import PositiveInt, validate_call
+from pydantic import NonNegativeInt, validate_call
 from typer import Typer
 
 from consumo.cli.core import (
@@ -27,13 +27,12 @@ from consumo.lib.file.multimedia import get_duration as get_multimedia_duration
 from consumo.lib.file.text import (
     calculate_consumption_time as calculate_text_consumption_time,
 )
-from consumo.lib.types import Second
 
 app: Typer = Typer()
 
 
 @validate_call()
-def get_duration(file: Path, words_per_minute: PositiveInt = 265) -> Second:
+def get_duration(file: Path, words_per_minute: NonNegativeInt = 265) -> int:
     """Get the duration or calculate the consumption time of a file in seconds.
 
     Support is based on MIME type.
@@ -81,7 +80,7 @@ def get_duration(file: Path, words_per_minute: PositiveInt = 265) -> Second:
     if type in multimedia_types:
         return get_multimedia_duration(file)
 
-    mime_type_handler: dict[str, Callable[[Path, PositiveInt], Second]] = {
+    mime_type_handler: dict[str, Callable[[Path, NonNegativeInt], int]] = {
         "application/epub+zip": calculate_mass_media_consumption_time,
         "application/pdf": calculate_mass_media_consumption_time,
         "application/x-mobipocket-ebook": calculate_mass_media_consumption_time,
@@ -89,7 +88,7 @@ def get_duration(file: Path, words_per_minute: PositiveInt = 265) -> Second:
         "text/plain": calculate_text_consumption_time,
     }
 
-    handler: Callable[[Path, PositiveInt], Second] | None = mime_type_handler.get(
+    handler: Callable[[Path, NonNegativeInt], int] | None = mime_type_handler.get(
         mime_type
     )
 
@@ -116,7 +115,7 @@ def process_files(
         words_per_minute: Reading speed in words per minute.
     """
 
-    def duration_resolver(file: Path) -> Second:
+    def duration_resolver(file: Path) -> int:
         return get_duration(file, words_per_minute)
 
     execute_concurrent_command(
