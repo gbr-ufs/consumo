@@ -11,22 +11,29 @@ from consumo.cli.state import configuration
 from consumo.lib.types import Second
 
 
-def format_time(seconds: int) -> str:
-    minutes: int = seconds // 60
-    seconds %= 60
-    hours: int = (minutes // 60) % 24
-    minutes %= 60
-    time: str = ""
+def format_time(total_seconds: int) -> str:
+    """Format the duration/consumption time given in seconds in a *h *m *s format.
+
+    Args:
+        seconds: The duration/consumption time in seconds of the content.
+
+    Returns:
+        The duration/consumption time in a *h *m *s format.
+    """
+    minutes, seconds = divmod(total_seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    hours %= 24
+
+    parts: list[str] = []
 
     if hours:
-        time += f"{hours}h "
-
+        parts.append(f"{hours}h")
     if minutes:
-        time += f"{minutes}m "
+        parts.append(f"{minutes}m")
 
-    time += f"{seconds}s"
+    parts.append(f"{seconds}s")
 
-    return time
+    return " ".join(parts)
 
 
 def handle_multiple_args(
