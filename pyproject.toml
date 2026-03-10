@@ -70,9 +70,6 @@ major_version_zero = true
 name = "cz_conventional_commits"
 tag_format = "$version"
 update_changelog_on_bump = true
-version_files = [
-  "src/consumo/__init__.py:__version__"
-]
 version_scheme = "pep440"
 version_provider = "uv"
 
