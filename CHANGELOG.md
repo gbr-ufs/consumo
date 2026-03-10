@@ -1,3 +1,9 @@
+## 0.3.0 (2026-03-10)
+
+### Feat
+
+- **__init__.py**: expose public api
+
 ## 0.2.0 (2026-03-10)
 
 ### BREAKING CHANGE
