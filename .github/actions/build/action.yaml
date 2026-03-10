@@ -8,9 +8,6 @@ runs:
       with:
         enable-cache: true
         version: "0.9.14"
-    - name: Install Dependencies
-      shell: bash
-      run: uv sync
     - name: Build
       shell: bash
       run: uv build
