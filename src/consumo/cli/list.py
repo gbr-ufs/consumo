@@ -9,8 +9,8 @@ import magic
 import typer
 from typer import Typer
 
+from consumo.cli.core import unsupported_mime_type_error
 from consumo.cli.url import process_url
-from consumo.lib.cli.core import unsupported_mime_type_error
 
 app: Typer = Typer()
 

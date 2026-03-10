@@ -123,7 +123,7 @@ def test_process_url_video_platform(
     assert expected_result in actual_result.output
 
 
-@patch("consumo.lib.cli.core.handle_multiple_args")
+@patch("consumo.cli.core.handle_multiple_args")
 def test_process_url_multiple(mock_handle_multiple_args: MagicMock) -> None:
     mock_handle_multiple_args.return_value: dict[HttpUrl, int] = {
         "https://info.cern.ch/hypertext/WWW/TheProject.html": 43,

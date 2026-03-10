@@ -10,8 +10,8 @@ import typer
 from pydantic import PositiveInt, validate_call
 from typer import Typer
 
+from consumo.cli.core import execute_concurrent_command, unsupported_mime_type_error
 from consumo.cli.state import configuration
-from consumo.lib.cli.core import execute_concurrent_command, unsupported_mime_type_error
 from consumo.lib.file.html import (
     calculate_consumption_time as calculate_html_consumption_time,
 )

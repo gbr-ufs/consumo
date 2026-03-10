@@ -13,7 +13,7 @@ from tests import FIXTURES_DIR
 runner: CliRunner = CliRunner()
 
 
-@patch("consumo.lib.cli.core.handle_multiple_args")
+@patch("consumo.cli.core.handle_multiple_args")
 def test_process_list(mock_handle_multiple_args: MagicMock) -> None:
     mock_handle_multiple_args.return_value = {
         "https://github.com/gbr-ufs/pf": 13,

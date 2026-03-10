@@ -1,17 +1,17 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""Test suite of the lib/cli/core module."""
+"""Test suite of the cli/core module."""
 
 from unittest.mock import Mock, patch
 
 from pytest import CaptureFixture, MonkeyPatch
 
+from consumo.cli.core import execute_concurrent_command
 from consumo.cli.state import configuration
-from consumo.lib.cli.core import execute_concurrent_command
 from consumo.lib.types import Second
 
 
-@patch("consumo.lib.cli.core.handle_multiple_args")
+@patch("consumo.cli.core.handle_multiple_args")
 def test_execute_concurrent_command_sorted(
     mock_handle_multiple_args: Mock,
     monkeypatch: MonkeyPatch,
