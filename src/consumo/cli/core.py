@@ -3,13 +3,21 @@
 """Core interface and runtime functions for the program."""
 
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Callable, Iterator
+from typing import Annotated, Any, Callable, Iterator
 
+import typer
+from pydantic import PositiveInt
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-from consumo.cli.state import configuration
 from consumo.lib.formatting import format_time
 from consumo.lib.types import Second
+
+SortOption = Annotated[
+    bool, typer.Option(help="Sort the output by duration in ascending order.")
+]
+WordsPerMinuteOption = Annotated[
+    PositiveInt, typer.Option(help="Reading speed in words per minute.")
+]
 
 
 def handle_multiple_args(
@@ -35,6 +43,7 @@ def execute_concurrent_command(
     args: list[Any],
     duration_resolver: Callable[[Any], Second],
     task_description: str = "Processing...",
+    sort: bool = False,
 ) -> None:
     """Provide a generic interface to process command-line arguments concurrently.
 
@@ -44,6 +53,7 @@ def execute_concurrent_command(
             time of the arguments.
         task_description: Description of what's being done. Generally
             "Processing ARG_TYPE(s)...".
+        sort: Whether to sort output in ascending order.
     """
     with Progress(
         SpinnerColumn(),
@@ -53,7 +63,7 @@ def execute_concurrent_command(
         p.add_task(task_description, total=None)
         results: dict[Any, Second] = handle_multiple_args(args, duration_resolver)
 
-    if configuration.sort:
+    if sort:
         results: dict[Any, Second] = dict(
             sorted(results.items(), key=lambda item: item[1])
         )

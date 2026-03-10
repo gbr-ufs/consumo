@@ -10,8 +10,12 @@ import typer
 from pydantic import PositiveInt, validate_call
 from typer import Typer
 
-from consumo.cli.core import execute_concurrent_command, unsupported_mime_type_error
-from consumo.cli.state import configuration
+from consumo.cli.core import (
+    SortOption,
+    WordsPerMinuteOption,
+    execute_concurrent_command,
+    unsupported_mime_type_error,
+)
 from consumo.lib.file.html import (
     calculate_consumption_time as calculate_html_consumption_time,
 )
@@ -100,15 +104,21 @@ def get_duration(file: Path, words_per_minute: PositiveInt = 265) -> Second:
 @app.command("file")
 def process_files(
     files: Annotated[list[Path], typer.Argument(exists=True, readable=True)],
+    sort: SortOption = False,
+    words_per_minute: WordsPerMinuteOption = 265,
 ) -> None:
     """Calculate the consumption time of files concurrently in a *h *m *s format.
 
     Args:
         files: The paths to one or multiple files whose consumption time will be
             analyzed.
+        sort: Whether to sort output in ascending order.
+        words_per_minute: Reading speed in words per minute.
     """
 
     def duration_resolver(file: Path) -> Second:
-        return get_duration(file, configuration.words_per_minute)
+        return get_duration(file, words_per_minute)
 
-    execute_concurrent_command(files, duration_resolver, "Processing file(s)...")
+    execute_concurrent_command(
+        files, duration_resolver, "Processing file(s)...", sort=sort
+    )

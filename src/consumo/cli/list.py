@@ -9,18 +9,28 @@ import magic
 import typer
 from typer import Typer
 
-from consumo.cli.core import unsupported_mime_type_error
+from consumo.cli.core import (
+    SortOption,
+    WordsPerMinuteOption,
+    unsupported_mime_type_error,
+)
 from consumo.cli.url import process_urls
 
 app: Typer = Typer()
 
 
 @app.command("list")
-def process_list(file: Annotated[Path, typer.Argument()]) -> None:
+def process_list(
+    file: Annotated[Path, typer.Argument()],
+    sort: SortOption = False,
+    words_per_minute: WordsPerMinuteOption = 265,
+) -> None:
     """Calculate the consumption time of all the links in a link list file in a *h *m *s format.
 
     Args:
         file: The path to the file containing the list of links.
+        sort: Whether to sort output in ascending order.
+        words_per_minute: Reading speed in words per minute.
 
     Example:
         A "file with a list of links" is a plain text file that looks like this:
@@ -56,7 +66,7 @@ def process_list(file: Annotated[Path, typer.Argument()]) -> None:
         # Filter out empty lines to prevent processing errors.
         urls: list[str] = [url.strip() for url in urls if url.strip()]
 
-        process_urls(urls)
+        process_urls(urls, sort, words_per_minute)
     else:
         unsupported_mime_type_error(mime_type)
 

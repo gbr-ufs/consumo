@@ -11,9 +11,10 @@ from typer import Typer
 from yt_dlp.utils import DownloadError
 
 from consumo.cli.core import (
+    SortOption,
+    WordsPerMinuteOption,
     execute_concurrent_command,
 )
-from consumo.cli.state import configuration
 from consumo.lib.exceptions import MissingMetadataError
 from consumo.lib.file.multimedia import get_duration as get_multimedia_duration
 from consumo.lib.file.video import get_video_platform_video_duration
@@ -59,19 +60,21 @@ def get_duration(url: HttpUrl, words_per_minute: PositiveInt = 265) -> Second:
 @app.command("url")
 def process_urls(
     urls: Annotated[list[str], typer.Argument()],
+    sort: SortOption = False,
+    words_per_minute: WordsPerMinuteOption = 265,
 ) -> None:
     """Calculate the consumption time of URLs concurrently in a *h *m *s format.
 
     Args:
         urls: A list of URLs pointing to the content whose consumption time
             will be analyzed.
+        sort: Whether to sort output in ascending order.
+        words_per_minute: Reading speed in words per minute.
     """
 
     def duration_resolver(url: str) -> Second:
-        return get_duration(HttpUrl(url), configuration.words_per_minute)
+        return get_duration(HttpUrl(url), words_per_minute)
 
     execute_concurrent_command(
-        urls,
-        duration_resolver,
-        "Processing URL(s)...",
+        urls, duration_resolver, "Processing URL(s)...", sort=sort
     )

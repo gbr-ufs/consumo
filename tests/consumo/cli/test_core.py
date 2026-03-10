@@ -7,7 +7,6 @@ from unittest.mock import Mock, patch
 from pytest import CaptureFixture, MonkeyPatch
 
 from consumo.cli.core import execute_concurrent_command
-from consumo.cli.state import configuration
 from consumo.lib.types import Second
 
 
@@ -17,7 +16,6 @@ def test_execute_concurrent_command_sorted(
     monkeypatch: MonkeyPatch,
     capsys: CaptureFixture,
 ) -> None:
-    monkeypatch.setattr(configuration, "sort", True)
     mock_handle_multiple_args.return_value: dict[str, Second] = {
         "https://info.cern.ch/hypertext/WWW/TheProject.html": 43,
         "https://dn710704.ca.archive.org/0/items/night_of_the_living_dead_dvd/Night.mp4": 5732,
@@ -27,7 +25,7 @@ def test_execute_concurrent_command_sorted(
     mock_args: list[str] = list(mock_handle_multiple_args.return_value.keys())
     duration_resolver: Mock = Mock()
 
-    execute_concurrent_command(mock_args, duration_resolver)
+    execute_concurrent_command(mock_args, duration_resolver, sort=True)
 
     captured = capsys.readouterr()
 
