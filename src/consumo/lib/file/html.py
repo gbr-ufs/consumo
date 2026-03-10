@@ -230,8 +230,7 @@ def calculate_consumption_time(
             multimedia_duration_resolver, multimedias
         )
 
-        for resolved_duration in resolved_durations:
-            multimedia_time += resolved_duration
+        multimedia_time += sum(resolved_durations)
 
     multimedia_time += get_custom_player_duration(html)
 
