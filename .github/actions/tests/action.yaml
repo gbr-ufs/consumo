@@ -4,11 +4,13 @@ runs:
   using: "composite"
   steps:
     - name: Install macOS External Dependencies
+      shell: bash
       if: runner.os == 'macOS'
       run: |
         brew install \
         libmagic
     - name: Install Linux External Dependencies
+      shell: bash
       if: runner.os == 'Linux'
       run: |
         sudo apt update
