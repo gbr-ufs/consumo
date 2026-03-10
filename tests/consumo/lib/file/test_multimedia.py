@@ -2,6 +2,7 @@
 
 """Test suite of the lib/file/multimedia module."""
 
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -48,6 +49,26 @@ def test_get_hosted_multimedia_duration_unsupported_host(
         url: HttpUrl = HttpUrl("https://en.wikipedia.org/wiki/Me_at_the_zoo")
 
         get_hosted_multimedia_duration(url)
+
+
+@patch("consumo.lib.file.multimedia.YoutubeDL")
+def test_get_hosted_multimedia_duration_playlist(MockYTDLP: MagicMock) -> None:
+    url: HttpUrl = HttpUrl(
+        "https://www.youtube.com/playlist?list=OLAK5uy_mh1h77B5MWPheIzdy3mA_PtEr8yC-JorI"
+    )
+    mock_yt_dlp: MagicMock = MockYTDLP.return_value.__enter__.return_value
+    mock_yt_dlp.extract_info.return_value: dict[str, Any] = {
+        "entries": [
+            {"duration": 1360},
+            {"duration": 1270},
+            {"duration": 710},
+            {"duration": 990},
+        ]
+    }
+    actual_duration: int = get_hosted_multimedia_duration(url)
+    expected_duration: int = 4330
+
+    assert actual_duration == expected_duration
 
 
 @pytest.mark.parametrize(
