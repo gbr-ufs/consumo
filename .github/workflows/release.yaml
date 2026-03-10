@@ -1,0 +1,29 @@
+name: Release
+
+on:
+  push:
+     tags:
+       - "*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    strategy:
+      matrix:
+        os:
+          - macos-latest
+          - windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Build
+      uses: ./.github/actions/build
+    - name: Release
+      uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b
+      with:
+        body_path: CHANGELOG.md
+        files: |
+          dist/consumo-${{ runner.os }}.zip
+        token: ${{ secrets.GITHUB_TOKEN }}

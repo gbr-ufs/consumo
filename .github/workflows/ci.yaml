@@ -22,5 +22,3 @@ jobs:
       uses: ./.github/actions/tests
     - name: Codecov
       uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de
-    - name: Build
-      uses: ./.github/actions/build
