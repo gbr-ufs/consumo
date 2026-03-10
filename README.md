@@ -148,6 +148,16 @@ Repeat until you get over **a hundred** links (and multiple websites other than 
 
 I tried multiple models, but none where able to do that. Maybe there's something like this out there already, but I forgot to search for it. But thankfully that sparkled a great idea for a project: consumo!
 
+### Configuration file
+
+consumo supports a [TOML](https://toml.io/en/) under your system's default configuration directory (on Linux, `$XDG_CONFIG/HOME/config.toml`). It has these default values:
+
+```toml
+[general]
+sort = false
+words_per_minute = 265
+```
+
 ## Philosophies
 
 - Dependency Injection.
