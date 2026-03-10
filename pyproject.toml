@@ -27,8 +27,8 @@ authors = [
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Environment :: Console",
-  "Framework::Pydantic",
-  "Framework::Pytest",
+  "Framework :: Pydantic",
+  "Framework :: Pytest",
   "Intended Audience :: End Users/Desktop",
   "Intended Audience :: Science/Research",
   "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
@@ -63,10 +63,6 @@ version = "0.1.1"
 
 [project.scripts]
 consumo = "consumo.cli.main:app"
-
-[project.urls]
-"Tracker" = "https://github.com/gs-101/consumo/issues"
-"Source" = "https://github.com/gbr-ufs/consumo"
 
 [tool.commitizen]
 breaking_change_exclamation_in_title = true
