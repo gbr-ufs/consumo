@@ -10,7 +10,7 @@ import typer
 from typer import Typer
 
 from consumo.cli.core import unsupported_mime_type_error
-from consumo.cli.url import process_url
+from consumo.cli.url import process_urls
 
 app: Typer = Typer()
 
@@ -56,7 +56,7 @@ def process_list(file: Annotated[Path, typer.Argument()]) -> None:
         # Filter out empty lines to prevent processing errors.
         urls: list[str] = [url.strip() for url in urls if url.strip()]
 
-        process_url(urls)
+        process_urls(urls)
     else:
         unsupported_mime_type_error(mime_type)
 

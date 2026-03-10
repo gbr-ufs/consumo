@@ -98,7 +98,7 @@ def get_duration(file: Path, words_per_minute: PositiveInt = 265) -> Second:
 
 
 @app.command("file")
-def process_file(
+def process_files(
     files: Annotated[list[Path], typer.Argument(exists=True, readable=True)],
 ) -> None:
     """Calculate the consumption time of files concurrently in a *h *m *s format.

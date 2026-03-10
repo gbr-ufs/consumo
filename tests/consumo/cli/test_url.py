@@ -23,7 +23,7 @@ runner: CliRunner = CliRunner()
 )
 @patch("consumo.cli.url.get_video_platform_video_duration")
 @patch("consumo.cli.url.calculate_consumption_time")
-def test_process_url_downloaderror(
+def test_process_urls_downloaderror(
     mock_calculate_consumption_time: MagicMock,
     mock_get_video_platform_video_duration: MagicMock,
     url: HttpUrl,
@@ -51,7 +51,7 @@ def test_process_url_downloaderror(
 )
 @patch("consumo.cli.url.get_multimedia_duration")
 @patch("consumo.cli.url.get_video_platform_video_duration")
-def test_process_url_missingmetadataerror(
+def test_process_urls_missingmetadataerror(
     mock_get_video_platform_video_duration: MagicMock,
     mock_get_multimedia_duration: MagicMock,
     url: HttpUrl,
@@ -82,7 +82,7 @@ def test_process_url_missingmetadataerror(
 @patch("consumo.cli.url.get_video_platform_video_duration")
 @patch("consumo.cli.url.get_multimedia_duration")
 @patch("consumo.cli.url.calculate_consumption_time")
-def test_process_url_invaliddataerror(
+def test_process_urls_invaliddataerror(
     mock_calculate_consumption_time: MagicMock,
     mock_get_multimedia_duration: MagicMock,
     mock_get_video_platform_video_duration: MagicMock,
@@ -109,7 +109,7 @@ def test_process_url_invaliddataerror(
     [("https://www.youtube.com/watch?v=H91BxkBXttE", 5717, "1h 35m 17s")],
 )
 @patch("consumo.cli.url.get_video_platform_video_duration")
-def test_process_url_video_platform(
+def test_process_urls_video_platform(
     mock_get_video_platform_video_duration: MagicMock,
     url: HttpUrl,
     consumption_time: Second,
@@ -124,7 +124,7 @@ def test_process_url_video_platform(
 
 
 @patch("consumo.cli.core.handle_multiple_args")
-def test_process_url_multiple(mock_handle_multiple_args: MagicMock) -> None:
+def test_process_urls_multiple(mock_handle_multiple_args: MagicMock) -> None:
     mock_handle_multiple_args.return_value: dict[HttpUrl, int] = {
         "https://info.cern.ch/hypertext/WWW/TheProject.html": 43,
         "https://www.bbc.com/news/articles/c4g0dzg6e4mo": 297,

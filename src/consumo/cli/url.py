@@ -57,7 +57,7 @@ def get_duration(url: HttpUrl, words_per_minute: PositiveInt = 265) -> Second:
 
 
 @app.command("url")
-def process_url(
+def process_urls(
     urls: Annotated[list[str], typer.Argument()],
 ) -> None:
     """Calculate the consumption time of URLs concurrently in a *h *m *s format.

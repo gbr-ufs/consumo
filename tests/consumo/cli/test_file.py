@@ -30,7 +30,7 @@ runner: CliRunner = CliRunner()
         "calculate_mass_media_consumption_time",
     ],
 )
-def test_process_file_get_standard_files(
+def test_process_files_get_standard_files(
     filename: str, expected_exit_code: int, expected_result: str
 ) -> None:
     actual_result: Result = runner.invoke(app, [str(FIXTURES_DIR / filename)])
@@ -39,7 +39,7 @@ def test_process_file_get_standard_files(
     assert expected_result in actual_result.output
 
 
-def test_process_file_unsupported_file_type(tmp_path: Path) -> None:
+def test_process_files_unsupported_file_type(tmp_path: Path) -> None:
     mock_executable: Path = tmp_path / "executable"
 
     # Standard magic bytes for a Unix executable.
@@ -55,7 +55,7 @@ def test_process_file_unsupported_file_type(tmp_path: Path) -> None:
     assert expected_result in actual_result.output
 
 
-def test_process_file_directory_error() -> None:
+def test_process_files_directory_error() -> None:
     actual_result: Result = runner.invoke(app, [str(FIXTURES_DIR)])
     expected_exit_code: int = 1
 
