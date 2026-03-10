@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from unittest.mock import patch
+"""Test suite of the cli/url module."""
+
+from unittest.mock import MagicMock, patch
 
 from av.error import InvalidDataError
 from pydantic import HttpUrl
@@ -16,29 +18,29 @@ runner: CliRunner = CliRunner()
 
 
 @mark.parametrize(
-    "url, consumption_time, expected_time",
+    "url, consumption_time, expected_result",
     [("https://info.cern.ch/hypertext/WWW/TheProject.html", 43, "43s")],
 )
 @patch("consumo.cli.url.get_video_platform_video_duration")
 @patch("consumo.cli.url.calculate_consumption_time")
 def test_process_url_downloaderror(
-    mock_calculate_consumption_time,
-    mock_get_video_platform_video_duration,
+    mock_calculate_consumption_time: MagicMock,
+    mock_get_video_platform_video_duration: MagicMock,
     url: HttpUrl,
     consumption_time: Second,
-    expected_time: str,
+    expected_result: str,
 ) -> None:
     mock_get_video_platform_video_duration.side_effect = DownloadError("")
     mock_calculate_consumption_time.return_value: Second = consumption_time
-    actual_time: Result = runner.invoke(app, [str(url)])
+    actual_result: Result = runner.invoke(app, [str(url)])
     expected_exit_code: int = 0
 
-    assert actual_time.exit_code == expected_exit_code
-    assert expected_time in actual_time.output
+    assert actual_result.exit_code == expected_exit_code
+    assert expected_result in actual_result.output
 
 
 @mark.parametrize(
-    "url, consumption_time, expected_time",
+    "url, consumption_time, expected_result",
     [
         (
             "https://dn710704.ca.archive.org/0/items/night_of_the_living_dead_dvd/Night.mp4",
@@ -50,25 +52,25 @@ def test_process_url_downloaderror(
 @patch("consumo.cli.url.get_multimedia_duration")
 @patch("consumo.cli.url.get_video_platform_video_duration")
 def test_process_url_missingmetadataerror(
-    mock_calculate_consumption_time,
-    mock_get_multimedia_duration,
+    mock_get_video_platform_video_duration: MagicMock,
+    mock_get_multimedia_duration: MagicMock,
     url: HttpUrl,
     consumption_time: Second,
-    expected_time: str,
+    expected_result: str,
 ) -> None:
-    mock_get_multimedia_duration.side_effect: MissingMetadataError = (
+    mock_get_video_platform_video_duration.side_effect: MissingMetadataError = (
         MissingMetadataError
     )
-    mock_calculate_consumption_time.return_value: Second = consumption_time
-    actual_time: Result = runner.invoke(app, [str(url)])
+    mock_get_multimedia_duration.return_value = consumption_time
+    actual_result: Result = runner.invoke(app, [str(url)])
     expected_exit_code: int = 0
 
-    assert actual_time.exit_code == expected_exit_code
-    assert expected_time in actual_time.output
+    assert actual_result.exit_code == expected_exit_code
+    assert expected_result in actual_result.output
 
 
 @mark.parametrize(
-    "url, consumption_time, expected_time",
+    "url, consumption_time, expected_result",
     [
         (
             "https://www.bbc.com/news/articles/c4g0dzg6e4mo",
@@ -81,12 +83,12 @@ def test_process_url_missingmetadataerror(
 @patch("consumo.cli.url.get_multimedia_duration")
 @patch("consumo.cli.url.calculate_consumption_time")
 def test_process_url_invaliddataerror(
-    mock_calculate_consumption_time,
-    mock_get_multimedia_duration,
-    mock_get_video_platform_video_duration,
+    mock_calculate_consumption_time: MagicMock,
+    mock_get_multimedia_duration: MagicMock,
+    mock_get_video_platform_video_duration: MagicMock,
     url: HttpUrl,
     consumption_time: Second,
-    expected_time: str,
+    expected_result: str,
 ) -> None:
     mock_get_video_platform_video_duration.side_effect: MissingMetadataError = (
         MissingMetadataError
@@ -95,39 +97,39 @@ def test_process_url_invaliddataerror(
         1094995529, "Invalid data found when processing input", str(url)
     )
     mock_calculate_consumption_time.return_value: Second = consumption_time
-    actual_time: Result = runner.invoke(app, [str(url)])
+    actual_result: Result = runner.invoke(app, [str(url)])
     expected_exit_code: int = 0
 
-    assert actual_time.exit_code == expected_exit_code
-    assert expected_time in actual_time.output
+    assert actual_result.exit_code == expected_exit_code
+    assert expected_result in actual_result.output
 
 
 @mark.parametrize(
-    "url, consumption_time, expected_time",
+    "url, consumption_time, expected_result",
     [("https://www.youtube.com/watch?v=H91BxkBXttE", 5717, "1h 35m 17s")],
 )
 @patch("consumo.cli.url.get_video_platform_video_duration")
 def test_process_url_video_platform(
-    mock_get_video_platform_video_duration,
+    mock_get_video_platform_video_duration: MagicMock,
     url: HttpUrl,
     consumption_time: Second,
-    expected_time: str,
+    expected_result: str,
 ) -> None:
     mock_get_video_platform_video_duration.return_value: Second = consumption_time
-    actual_time: Result = runner.invoke(app, [str(url)])
+    actual_result: Result = runner.invoke(app, [str(url)])
     expected_exit_code: int = 0
 
-    assert actual_time.exit_code == expected_exit_code
-    assert expected_time in actual_time.output
+    assert actual_result.exit_code == expected_exit_code
+    assert expected_result in actual_result.output
 
 
 @patch("consumo.lib.cli.core.handle_multiple_args")
-def test_process_url_multiple(mock_handle_multiple_args) -> None:
+def test_process_url_multiple(mock_handle_multiple_args: MagicMock) -> None:
     mock_handle_multiple_args.return_value: dict[HttpUrl, int] = {
         "https://info.cern.ch/hypertext/WWW/TheProject.html": 43,
         "https://www.bbc.com/news/articles/c4g0dzg6e4mo": 297,
     }
-    result: Result = runner.invoke(
+    actual_result: Result = runner.invoke(
         app,
         [
             "https://info.cern.ch/hypertext/WWW/TheProject.html",
@@ -136,7 +138,7 @@ def test_process_url_multiple(mock_handle_multiple_args) -> None:
     )
     expected_exit_code: int = 0
 
-    assert result.exit_code == expected_exit_code
+    assert actual_result.exit_code == expected_exit_code
 
-    assert "43s" in result.output
-    assert "4m 57s" in result.output
+    assert "43s" in actual_result.output
+    assert "4m 57s" in actual_result.output

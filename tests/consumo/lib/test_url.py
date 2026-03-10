@@ -1,7 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+"""Test suite of the lib/url module."""
+
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from pydantic import FilePath, HttpUrl, ValidationError
@@ -17,9 +19,9 @@ from tests import FIXTURES_DIR
 
 @patch("consumo.lib.url.get_absolute_path_video_duration")
 def test_get_relative_path_video_duration(
-    get_absolute_path_video_duration: Mock,
+    mock_get_absolute_path_video_duration: MagicMock,
 ) -> None:
-    get_absolute_path_video_duration.return_value = 11
+    mock_get_absolute_path_video_duration.return_value = 11
     url: HttpUrl = HttpUrl("https://www.w3schools.com/html/html5_video.asp")
     video: FilePath = Path("mov_bbb.mp4")
     actual_duration: Second = get_relative_path_video_duration(url, video)
@@ -31,11 +33,11 @@ def test_get_relative_path_video_duration(
 @patch("consumo.lib.url.get_absolute_path_video_duration")
 @patch("consumo.lib.url.get_relative_path_video_duration")
 def test_get_video_duration(
-    get_relative_path_video_duration: Mock,
-    get_absolute_path_video_duration: Mock,
+    mock_get_relative_path_video_duration: MagicMock,
+    mock_get_absolute_path_video_duration: MagicMock,
 ) -> None:
-    get_absolute_path_video_duration.side_effect = ValidationError
-    get_relative_path_video_duration.return_value = 11
+    mock_get_absolute_path_video_duration.side_effect = ValidationError
+    mock_get_relative_path_video_duration.return_value = 11
     url: HttpUrl = HttpUrl("https://www.w3schools.com/html/html5_video.asp")
     video: FilePath = Path("mov_bbb.mp4")
     actual_duration: Second = get_video_duration(url, str(video))
@@ -48,15 +50,15 @@ def test_get_video_duration(
 @patch("consumo.lib.url.get_relative_path_video_duration")
 @patch("consumo.lib.url.get_absolute_path_video_duration")
 def test_calculate_consumption_time(
-    get_absolute_path_video_duration: Mock,
-    get_relative_path_video_duration: Mock,
-    fetch_url: Mock,
+    mock_get_absolute_path_video_duration: MagicMock,
+    mock_get_relative_path_video_duration: MagicMock,
+    mock_fetch_url: MagicMock,
 ) -> None:
     url: HttpUrl = HttpUrl("https://example.com/url")
     html: FilePath = FIXTURES_DIR / "url.html"
-    fetch_url.return_value: str = html.read_text("utf-8")
-    get_absolute_path_video_duration.return_value: Second = 211
-    get_relative_path_video_duration.return_value: Second = 1
+    mock_fetch_url.return_value: str = html.read_text("utf-8")
+    mock_get_absolute_path_video_duration.return_value: Second = 211
+    mock_get_relative_path_video_duration.return_value: Second = 1
     actual_time: Second = calculate_consumption_time(url)
     expected_time: Second = 260
 
@@ -64,9 +66,9 @@ def test_calculate_consumption_time(
 
 
 @patch("consumo.lib.url.fetch_url")
-def test_calculate_consumption_time_connectionerror(fetch_url: Mock) -> None:
+def test_calculate_consumption_time_connectionerror(mock_fetch_url: MagicMock) -> None:
     url: HttpUrl = HttpUrl("https://example.com/url")
-    fetch_url.return_value: None = None
+    mock_fetch_url.return_value: None = None
 
     with pytest.raises(ConnectionError):
         calculate_consumption_time(url)

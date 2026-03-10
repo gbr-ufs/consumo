@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+"""Module for processing HTML files."""
+
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import timedelta
@@ -31,6 +33,17 @@ DURATION_ADAPTER: TypeAdapter[timedelta] = TypeAdapter(timedelta)
 
 @validate_call
 def extract_text(html: FilePath) -> str:
+    """Extract the main text content of an HTML file.
+
+    This strips boilerplate content such as headers and footers, and unrelated
+    content such as sidebars.
+
+    Args:
+        html: Path to the HTML file whose main text content will be extracted.
+
+    Returns:
+        The main text content of the HTML file, if any.
+    """
     raw_html: str = html.read_text("utf-8")
     text: str | None = extract(raw_html)
 
@@ -42,6 +55,14 @@ def extract_text(html: FilePath) -> str:
 
 @validate_call
 def extract_videos(html: FilePath) -> list[str]:
+    """Get all the video sources from an HTML file.
+
+    Args:
+        html: Path to the HTML file which we'll get the videos from.
+
+    Returns:
+        A list of all the video sources.
+    """
     raw_html: str = html.read_text("utf-8")
     soup: BeautifulSoup = BeautifulSoup(raw_html, "lxml")
     iframes: ResultSet[Tag] = soup("iframe")
@@ -64,6 +85,14 @@ def extract_videos(html: FilePath) -> list[str]:
 
 @validate_call
 def get_image_count(html: FilePath) -> int:
+    """Get the number of images in an HTML file.
+
+    Args:
+        html: Path to the HTML file whose number of images will be counted.
+
+    Returns:
+        The number of images in the file.
+    """
     raw_html: str = html.read_text("utf-8")
     soup: BeautifulSoup = BeautifulSoup(raw_html, "lxml")
 
@@ -72,19 +101,58 @@ def get_image_count(html: FilePath) -> int:
 
 @validate_call
 def get_relative_path_video_duration(html: FilePath, video: Path) -> Second:
+    """Get the duration of a video with a relative path.
+
+    Args:
+        html: Path to the original HTML file containing the video.
+        video: Relative path to the video, to be resolved based on the HTML
+            file's path.
+
+    Returns:
+        The duration of the video.
+    """
     return get_multimedia_duration(html.parent / video)
 
 
 @validate_call
 def get_video_duration(html: FilePath, video: str) -> Second:
+    """Get the duration of a video in an HTML file.
+
+    Tries to treat the video as if it was hosted online, then tries to resolve
+    its path if that fails.
+
+    Args:
+        html: Path to the HTML file where the video was found.
+        video: Path used for the video's "src" attribute.
+
+    Returns:
+        The duration of the video in seconds.
+    """
     try:
         return get_absolute_path_video_duration(HttpUrl(video))
     except ValidationError:
+        # If HttpUrl(video) fails validation, the "src" is likely a relative
+        # path rather than a URL.
         return get_relative_path_video_duration(html, Path(video))
 
 
 @validate_call
 def get_custom_player_duration(html: FilePath) -> Second:
+    """Parse the JSON data in an HTML file provided for SEO to get video duration.
+
+    Designed with videos using custom players like the BBC's smp-toucan-player
+    in mind.
+
+    The supported format for duration is ISO 8601.
+
+    Args:
+        html: Path to the HTML file whose content will be parsed for JSON data
+            containing duration information.
+
+    Returns:
+        The duration reported by the JSON data as an integer representing
+        seconds.
+    """
     raw_html: str = html.read_text("utf-8")
     soup: BeautifulSoup = BeautifulSoup(raw_html, "lxml")
     script_attrs = {"data-schema": "video-object"}
@@ -117,7 +185,19 @@ def calculate_consumption_time(
     words_per_minute: PositiveInt = 265,
     video_duration_resolver: Optional[Callable[[str], Second]] = None,
 ) -> Second:
+    """Calculate the consumption time of an HTML file in seconds.
 
+    Uses concurrency to get the duration of any videos in the file to avoid any
+    possible throttling.
+
+    Args:
+        html: Path to the HTML file whose consumption time will be calculated.
+        words_per_minute: Reading speed in words per minute.
+        video_duration_resolver: Function used to get the duration of a video.
+
+    Returns:
+        The time in seconds to consume the content of the HTML file.
+    """
     # This is the default video duration resolver. It can't be set as the
     # default in the function parameters because it seems like you can't reuse
     # function parameters in Python.

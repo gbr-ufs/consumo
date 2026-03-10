@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+"""Link list file handler command module."""
+
 from pathlib import Path
 from typing import Annotated
 
@@ -15,7 +17,34 @@ app: Typer = Typer()
 
 @app.command("list")
 def process_list(file: Annotated[Path, typer.Argument()]) -> None:
+    """Calculate the consumption time of all the links in a link list file in a *h *m *s format.
 
+    Args:
+        file: The path to the file containing the list of links.
+
+    Example:
+        A "file with a list of links" is a plain text file that looks like this:
+
+        ```text
+        https://en.wikipedia.org/wiki/Python_(programming_language)
+        https://en.wikipedia.org/wiki/High-level_programming_language
+        https://en.wikipedia.org/wiki/General-purpose_programming_language
+        https://en.wikipedia.org/wiki/Code_readability
+        https://en.wikipedia.org/wiki/Significant_indentation
+        https://en.wikipedia.org/wiki/Type_system#DYNAMIC
+        https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)
+        https://en.wikipedia.org/wiki/Programming_paradigm
+        https://en.wikipedia.org/wiki/Structured_programming
+        https://en.wikipedia.org/wiki/Procedural_programming
+        https://en.wikipedia.org/wiki/Object-oriented_programming
+        https://en.wikipedia.org/wiki/Functional_programming
+        ...
+        ```
+
+    Raises:
+        IsADirectoryError: If the file path points to a directory.
+        typer.Exit: Raised with exit code 1 if the file isn't a plain text file.
+    """
     if file.is_dir():
         raise IsADirectoryError
 
@@ -23,8 +52,9 @@ def process_list(file: Annotated[Path, typer.Argument()]) -> None:
 
     if mime_type == "text/plain":
         urls: list[str] = file.read_text("utf-8").splitlines()
-        # Remove blank lines.
-        urls = [url.strip() for url in urls if url.strip()]
+
+        # Filter out empty lines to prevent processing errors.
+        urls: list[str] = [url.strip() for url in urls if url.strip()]
 
         process_url(urls)
     else:

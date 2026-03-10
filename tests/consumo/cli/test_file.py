@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+"""Test suite of the cli/file module."""
+
 from pathlib import Path
 
 from typer.testing import CliRunner, Result
@@ -67,13 +69,13 @@ def test_process_file_unsupported_file_type(tmp_path: Path) -> None:
 
     actual_result: Result = runner.invoke(app, [str(mock_executable)])
     expected_exit_code: int = 1
-    expected_result: str = "Unsupported file type"
+    expected_result: str = "Unsupported MIME type"
 
     assert actual_result.exit_code == expected_exit_code
     assert expected_result in actual_result.output
 
 
-def test_process_file_directory() -> None:
+def test_process_file_directory_error() -> None:
     actual_result: Result = runner.invoke(app, [str(FIXTURES_DIR)])
     expected_exit_code: int = 1
 

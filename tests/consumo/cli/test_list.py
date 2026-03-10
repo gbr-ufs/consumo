@@ -1,7 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+"""Test suite of the cli/list module."""
+
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from typer.testing import CliRunner, Result
 
@@ -12,7 +14,7 @@ runner: CliRunner = CliRunner()
 
 
 @patch("consumo.lib.cli.core.handle_multiple_args")
-def test_process_list(mock_handle_multiple_args) -> None:
+def test_process_list(mock_handle_multiple_args: MagicMock) -> None:
     mock_handle_multiple_args.return_value = {
         "https://github.com/gbr-ufs/pf": 13,
         "https://github.com/gbr-ufs/cses": 4,
@@ -22,13 +24,13 @@ def test_process_list(mock_handle_multiple_args) -> None:
         "https://github.com/gbr-ufs/probabilidade-detran-se": 14,
         "https://github.com/gbr-ufs/hello-r-markdown": 4,
     }
-    actual_time: Result = runner.invoke(app, [str(FIXTURES_DIR / "links.txt")])
+    actual_result: Result = runner.invoke(app, [str(FIXTURES_DIR / "links.txt")])
     expected_exit_code: int = 0
     expected_results: list[str] = ["13s", "4s", "16s", "21s", "31s", "14s", "4s"]
 
-    assert actual_time.exit_code == expected_exit_code
+    assert actual_result.exit_code == expected_exit_code
     for expected_result in expected_results:
-        assert expected_result in actual_time.output
+        assert expected_result in actual_result.output
 
 
 def test_process_list_unsupported_file_type(tmp_path: Path) -> None:
@@ -41,13 +43,13 @@ def test_process_list_unsupported_file_type(tmp_path: Path) -> None:
 
     actual_result: Result = runner.invoke(app, [str(mock_executable)])
     expected_exit_code: int = 1
-    expected_result: str = "Unsupported file type"
+    expected_result: str = "Unsupported MIME type"
 
     assert actual_result.exit_code == expected_exit_code
     assert expected_result in actual_result.output
 
 
-def test_process_list_directory() -> None:
+def test_process_list_directory_error() -> None:
     actual_result: Result = runner.invoke(app, [str(FIXTURES_DIR)])
     expected_exit_code: int = 1
 

@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+"""Module for processing mass media files."""
+
 import pymupdf
 from pydantic import FilePath, PositiveInt, validate_call
 
@@ -9,6 +11,15 @@ from consumo.lib.types import Second
 
 @validate_call
 def extract_text(container: FilePath) -> str:
+    """Extract text from a text container file.
+
+    Args:
+        container: Path to a file primarily meant for text. Supported types
+            are EPUB, MOBI and PDF.
+
+    Returns:
+        All the text content in the container.
+    """
     with pymupdf.open(container) as c:
         raw_text: str = " ".join(page.get_text() for page in c)
 
@@ -19,6 +30,16 @@ def extract_text(container: FilePath) -> str:
 def calculate_consumption_time(
     container: FilePath, words_per_minute: PositiveInt = 265
 ) -> Second:
+    """Calculate the consumption time of a text container file in seconds.
+
+    Args:
+        container: Path to a file primarily meant for text. Supported types
+            are EPUB, MOBI and PDF.
+        words_per_minute: Reading speed in words per minute.
+
+    Returns:
+        The time in seconds to consume the content of the file.
+    """
     text: str = extract_text(container)
     word_count: int = get_word_count(text)
     reading_time: Second = calculate_reading_time(word_count, words_per_minute)

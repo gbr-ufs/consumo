@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+"""Test suite of the lib/cli/core module."""
+
 from unittest.mock import Mock, patch
 
 from pytest import CaptureFixture, MonkeyPatch
@@ -11,21 +13,21 @@ from consumo.lib.types import Second
 
 @patch("consumo.lib.cli.core.handle_multiple_args")
 def test_execute_concurrent_command_sorted(
-    handle_multiple_args: Mock,
+    mock_handle_multiple_args: Mock,
     monkeypatch: MonkeyPatch,
     capsys: CaptureFixture,
 ) -> None:
     monkeypatch.setattr(configuration, "sort", True)
-    handle_multiple_args.return_value: dict[str, Second] = {
+    mock_handle_multiple_args.return_value: dict[str, Second] = {
         "https://info.cern.ch/hypertext/WWW/TheProject.html": 43,
         "https://dn710704.ca.archive.org/0/items/night_of_the_living_dead_dvd/Night.mp4": 5732,
         "https://www.bbc.com/news/articles/c4g0dzg6e4mo": 297,
     }
 
-    mock_args: list[str] = list(handle_multiple_args.return_value.keys())
-    resolver: Mock = Mock()
+    mock_args: list[str] = list(mock_handle_multiple_args.return_value.keys())
+    duration_resolver: Mock = Mock()
 
-    execute_concurrent_command(mock_args, resolver)
+    execute_concurrent_command(mock_args, duration_resolver)
 
     captured = capsys.readouterr()
 

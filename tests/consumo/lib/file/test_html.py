@@ -1,9 +1,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from pathlib import Path
-from unittest.mock import Mock, patch
+"""Test suite of the lib/file/html module."""
 
-from pydantic import FilePath, HttpUrl
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+
+from pydantic import FilePath
 from pytest import mark
 
 from consumo.lib.file.html import (
@@ -30,7 +32,7 @@ from tests import FIXTURES_DIR
         ("video.html", ""),
     ],
 )
-def test_extract_text(filename: FilePath, expected_text: str) -> None:
+def test_extract_text(filename: str, expected_text: str) -> None:
     html: FilePath = FIXTURES_DIR / filename
     actual_text: str = extract_text(html)
 
@@ -49,7 +51,7 @@ def test_extract_text(filename: FilePath, expected_text: str) -> None:
         ("video.html", ["video.mkv"]),
     ],
 )
-def test_extract_videos(filename: FilePath, expected_videos: list[HttpUrl]) -> None:
+def test_extract_videos(filename: FilePath, expected_videos: list[str]) -> None:
     html: FilePath = FIXTURES_DIR / filename
     actual_videos: list[str] = extract_videos(html)
 
@@ -127,9 +129,9 @@ def test_calculate_consumption_time(filename: FilePath, expected_time: Second) -
 
 @patch("consumo.lib.file.html.get_absolute_path_video_duration")
 def test_calculate_consumption_time_online_video(
-    get_absolute_path_video_duration: Mock,
+    mock_get_absolute_path_video_duration: MagicMock,
 ) -> None:
-    get_absolute_path_video_duration.return_value = 213
+    mock_get_absolute_path_video_duration.return_value = 213
     html: FilePath = FIXTURES_DIR / "iframe.html"
     actual_time: Second = calculate_consumption_time(html)
     expected_time: Second = 213

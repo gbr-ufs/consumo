@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+"""Test suite of the lib/file/multimedia module."""
+
 import pytest
 from pydantic import FilePath
 from pytest import mark
@@ -18,7 +20,7 @@ from tests import FIXTURES_DIR
         ("audio_no_extension", 1),
     ],
 )
-def test_get_duration(filename: FilePath, expected_duration: Second) -> None:
+def test_get_duration(filename: str, expected_duration: Second) -> None:
     container: FilePath = FIXTURES_DIR / filename
     actual_duration: Second = get_duration(container)
 

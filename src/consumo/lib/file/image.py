@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+"""Module for processing images."""
+
 import math
 
 from pydantic import NonNegativeInt, validate_call
@@ -9,6 +11,14 @@ from consumo.lib.types import DecimalSecond, Second
 
 @validate_call
 def calculate_viewing_time(image_count: NonNegativeInt) -> Second:
+    """Calculate the time for viewing images based on count.
+
+    Args:
+        image_count: The number of images.
+
+    Returns:
+        The time in seconds to view all the images.
+    """
     first_ten_images_time: Second = 75
 
     if image_count > 10:

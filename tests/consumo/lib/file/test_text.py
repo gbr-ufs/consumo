@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from coverage.types import FilePath
+"""Test suite of the lib/file/text module."""
+
+from pydantic import FilePath
 from pytest import mark
 
 from consumo.lib.file.text import (
@@ -23,7 +25,7 @@ from tests import FIXTURES_DIR
         ),
     ],
 )
-def test_get_word_count(text: str, expected_word_count: str) -> None:
+def test_get_word_count(text: str, expected_word_count: int) -> None:
     actual_word_count: int = get_word_count(text)
 
     assert actual_word_count == expected_word_count

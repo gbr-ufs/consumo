@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+"""Global CLI state management module."""
+
 from typing import Annotated
 
 import typer
@@ -20,7 +22,7 @@ app.add_typer(version_app)
 app.add_typer(url_app)
 
 
-@app.callback()
+@app.callback(help="Content consumption analyzer CLI.")
 def main(
     sort: Annotated[
         bool, typer.Option(help="Sort the output by duration in ascending order.")
@@ -29,6 +31,11 @@ def main(
         PositiveInt, typer.Option(help="Reading speed in words per minute.")
     ] = 265,
 ) -> None:
-    """Content consumption analyzer CLI."""
+    """Configure the global state of the application with CLI options.
+
+    Args:
+        sort: Whether to sort the output in ascending order before printing.
+        words_per_minute: Reading speed in words per minute.
+    """
     configuration.sort = sort
     configuration.words_per_minute = words_per_minute

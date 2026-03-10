@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import Any
-from unittest.mock import Mock, patch
+"""Test suite of the lib/file/video module."""
+
+from unittest.mock import MagicMock, patch
 
 import pytest
 from pydantic import HttpUrl
@@ -25,9 +26,9 @@ from consumo.lib.types import DecimalSecond, Second
 )
 @patch("consumo.lib.file.video.YoutubeDL")
 def test_get_video_platform_video_duration(
-    MockYTDLP: Mock, url: HttpUrl, expected_duration: Second
+    MockYTDLP: MagicMock, url: str, expected_duration: Second
 ) -> None:
-    mock_yt_dlp: Any = MockYTDLP.return_value.__enter__.return_value
+    mock_yt_dlp: MagicMock = MockYTDLP.return_value.__enter__.return_value
     mock_yt_dlp.extract_info.return_value: dict[str, DecimalSecond] = {
         "duration": expected_duration
     }
@@ -37,8 +38,10 @@ def test_get_video_platform_video_duration(
 
 
 @patch("consumo.lib.file.video.YoutubeDL")
-def test_get_video_platform_video_duration_unsupported_site(MockYTDLP) -> None:
-    mock_yt_dlp: MockYTDLP = MockYTDLP.return_value.__enter__.return_value
+def test_get_video_platform_video_duration_unsupported_site(
+    MockYTDLP: MagicMock,
+) -> None:
+    mock_yt_dlp: MagicMock = MockYTDLP.return_value.__enter__.return_value
     mock_yt_dlp.extract_info.return_value: dict[str, None] = {"duration": None}
 
     with pytest.raises(MissingMetadataError):
@@ -53,7 +56,9 @@ def test_get_video_platform_video_duration_unsupported_site(MockYTDLP) -> None:
 )
 @patch("consumo.lib.file.video.get_video_platform_video_duration")
 def test_get_duration_video_platform(
-    mock_get_video_platform_video_duration, url: HttpUrl, expected_duration: Second
+    mock_get_video_platform_video_duration: MagicMock,
+    url: HttpUrl,
+    expected_duration: Second,
 ) -> None:
     mock_get_video_platform_video_duration.return_value = expected_duration
     actual_duration: Second = get_duration(url)
@@ -73,8 +78,8 @@ def test_get_duration_video_platform(
 @patch("consumo.lib.file.video.get_video_platform_video_duration")
 @patch("consumo.lib.file.video.get_multimedia_duration")
 def test_get_duration_media_container(
-    mock_get_multimedia_duration,
-    mock_get_video_platform_video_duration,
+    mock_get_multimedia_duration: MagicMock,
+    mock_get_video_platform_video_duration: MagicMock,
     url: HttpUrl,
     expected_duration: Second,
 ) -> None:
@@ -92,8 +97,8 @@ def test_get_duration_media_container(
 @patch("consumo.lib.file.video.get_video_platform_video_duration")
 @patch("consumo.lib.file.video.get_multimedia_duration")
 def test_get_duration_downloaderror(
-    mock_get_media_container_duration,
-    mock_get_video_platform_video_duration,
+    mock_get_media_container_duration: MagicMock,
+    mock_get_video_platform_video_duration: MagicMock,
     url: HttpUrl,
 ) -> None:
     mock_get_video_platform_video_duration.side_effect = DownloadError(

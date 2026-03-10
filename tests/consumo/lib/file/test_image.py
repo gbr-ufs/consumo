@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+"""Test suite of the lib/file/image module."""
+
 from pytest import mark
 
 from consumo.lib.file.image import calculate_viewing_time

@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+"""URL handler command module."""
+
 from typing import Annotated
 
 import typer
@@ -22,7 +24,23 @@ app: Typer = Typer()
 
 
 @validate_call
-def get_duration(url: HttpUrl, words_per_minute: PositiveInt) -> Second:
+def get_duration(url: HttpUrl, words_per_minute: PositiveInt = 265) -> Second:
+    """Get the duration or calculate the consumption time of a URL in seconds.
+
+    Gets the duration of audio or videos from hosting platforms or direct file
+    links, and calculates the consumption time otherwise.
+
+    Args:
+        url: The URL of the content whose duration or consumption time will be
+            analyzed.
+        words_per_minute: Reading speed in words per minute.
+
+    Returns:
+        The time in seconds to consume the content the URL points to.
+    """
+    # Fallback mechanism. First we try to get the duration as a hosted video,
+    # then as a hosted file, and when all else fails, we try to calculate the
+    # consumption time.
     try:
         return get_video_platform_video_duration(url)
     except DownloadError:
@@ -40,13 +58,20 @@ def get_duration(url: HttpUrl, words_per_minute: PositiveInt) -> Second:
 
 @app.command("url")
 def process_url(
-    urls: Annotated[list[str], typer.Argument(exists=True, readable=True)],
+    urls: Annotated[list[str], typer.Argument()],
 ) -> None:
+    """Calculate the consumption time of URLs concurrently in a *h *m *s format.
+
+    Args:
+        urls: A list of URLs pointing to the content whose consumption time
+            will be analyzed.
+    """
+
     def duration_resolver(url: str) -> Second:
         return get_duration(HttpUrl(url), configuration.words_per_minute)
 
     execute_concurrent_command(
         urls,
         duration_resolver,
-        "Processing URLs...",
+        "Processing URL(s)...",
     )

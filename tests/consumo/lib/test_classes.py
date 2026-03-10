@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+"""Test suite of the lib/classes module."""
+
 from consumo.lib.classes import SilentLogger
 
 
