@@ -10,7 +10,7 @@ from tomllib import TOMLDecodeError
 from typing import Annotated, Any
 
 import typer
-from pydantic import NonNegativeInt, PositiveInt
+from pydantic import NonNegativeInt
 
 DEFAULT_SORT: bool = False
 DEFAULT_WORDS_PER_MINUTE: NonNegativeInt = 265

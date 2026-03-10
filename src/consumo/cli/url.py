@@ -37,7 +37,7 @@ app: Typer = Typer()
 def get_duration(url: HttpUrl, words_per_minute: NonNegativeInt = 265) -> int:
     """Get the duration or calculate the consumption time of a URL in seconds.
 
-    Gets the duration of audio or videos from hosting platforms or direct file
+    Gets the duration of media from hosting platforms or direct file
     links, and calculates the consumption time otherwise.
 
     Args:

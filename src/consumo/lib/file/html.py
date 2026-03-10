@@ -22,9 +22,11 @@ from trafilatura import extract
 
 from consumo.lib.file.image import calculate_viewing_time
 from consumo.lib.file.multimedia import (
-    get_duration as get_absolute_path_video_duration,
+    get_duration as get_absolute_path_multimedia_duration,
 )
-from consumo.lib.file.multimedia import get_multimedia_duration
+from consumo.lib.file.multimedia import (
+    get_multimedia_duration as get_not_hosted_multimedia_duration,
+)
 from consumo.lib.file.text import calculate_reading_time, get_word_count
 
 DURATION_ADAPTER: TypeAdapter[timedelta] = TypeAdapter(timedelta)
@@ -53,20 +55,27 @@ def extract_text(html: FilePath) -> str:
 
 
 @validate_call
-def extract_videos(html: FilePath) -> list[str]:
-    """Get all the video sources from an HTML file.
+def extract_multimedias(html: FilePath) -> list[str]:
+    """Get all the multimedia sources from an HTML file.
 
     Args:
-        html: Path to the HTML file which we'll get the videos from.
+        html: Path to the HTML file which we'll get the multimedia files from.
 
     Returns:
-        A list of all the video sources.
+        A list of all the multimedia sources.
     """
     raw_html: str = html.read_text("utf-8")
     soup: BeautifulSoup = BeautifulSoup(raw_html, "lxml")
+    audios: ResultSet[Tag] = soup("audio")
     iframes: ResultSet[Tag] = soup("iframe")
     videos: ResultSet[Tag] = soup("video")
     result: list[str] = []
+
+    for audio in audios:
+        primary_source: Tag = audio("source")[0]
+        src: str | AttributeValueList | None = primary_source.get("src")
+
+        result.append(str(src))
 
     for iframe in iframes:
         src: str | AttributeValueList | None = iframe.get("src")
@@ -99,40 +108,40 @@ def get_image_count(html: FilePath) -> int:
 
 
 @validate_call
-def get_relative_path_video_duration(html: FilePath, video: Path) -> int:
-    """Get the duration of a video with a relative path.
+def get_relative_path_multimedia_duration(html: FilePath, container: Path) -> int:
+    """Get the duration of a multimedia file with a relative path.
 
     Args:
-        html: Path to the original HTML file containing the video.
-        video: Relative path to the video, to be resolved based on the HTML
-            file's path.
+        html: Path to the original HTML file containing the multimedia file.
+        container: Relative path to the multimedia file, to be resolved based
+            on the HTML file's path.
 
     Returns:
-        The duration of the video.
+        The duration of the content.
     """
-    return get_multimedia_duration(html.parent / video)
+    return get_not_hosted_multimedia_duration(html.parent / container)
 
 
 @validate_call
-def get_video_duration(html: FilePath, video: str) -> int:
-    """Get the duration of a video in an HTML file.
+def get_multimedia_duration(html: FilePath, src: str) -> int:
+    """Get the duration of a multimedia file in an HTML file.
 
-    Tries to treat the video as if it was hosted online, then tries to resolve
-    its path if that fails.
+    Tries to treat the multimedia file as if it was hosted online, then tries to
+    resolve its path if that fails.
 
     Args:
-        html: Path to the HTML file where the video was found.
-        video: Path used for the video's "src" attribute.
+        html: Path to the HTML file where the multimedia file was found.
+        src: Path used for the file's "src" attribute.
 
     Returns:
-        The duration of the video in seconds.
+        The duration of the content in seconds.
     """
     try:
-        return get_absolute_path_video_duration(HttpUrl(video))
+        return get_absolute_path_multimedia_duration(HttpUrl(src))
     except ValidationError:
-        # If HttpUrl(video) fails validation, the "src" is likely a relative
+        # If HttpUrl(src) fails validation, the src is likely a relative
         # path rather than a URL.
-        return get_relative_path_video_duration(html, Path(video))
+        return get_relative_path_multimedia_duration(html, Path(src))
 
 
 @validate_call
@@ -182,28 +191,29 @@ def get_custom_player_duration(html: FilePath) -> int:
 def calculate_consumption_time(
     html: FilePath,
     words_per_minute: NonNegativeInt = 265,
-    video_duration_resolver: Optional[Callable[[str], int]] = None,
+    multimedia_duration_resolver: Optional[Callable[[str], int]] = None,
 ) -> int:
     """Calculate the consumption time of an HTML file in seconds.
 
-    Uses concurrency to get the duration of any videos in the file to avoid any
+    Uses concurrency to get the duration of any multimedia in the file to avoid any
     possible throttling.
 
     Args:
         html: Path to the HTML file whose consumption time will be calculated.
         words_per_minute: Reading speed in words per minute.
-        video_duration_resolver: Function used to get the duration of a video.
+        multimedia_duration_resolver: Function used to get the duration of a
+            multimedia file.
 
     Returns:
         The time in seconds to consume the content of the HTML file.
     """
-    # This is the default video duration resolver. It can't be set as the
+    # This is the default multimedia duration resolver. It can't be set as the
     # default in the function parameters because it seems like you can't reuse
     # function parameters in Python.
-    if video_duration_resolver is None:
+    if multimedia_duration_resolver is None:
 
-        def video_duration_resolver(video: str) -> int:
-            return get_video_duration(html, video)
+        def multimedia_duration_resolver(src: str) -> int:
+            return get_multimedia_duration(html, src)
 
     text: str = extract_text(html)
     word_count: int = get_word_count(text)
@@ -212,15 +222,17 @@ def calculate_consumption_time(
     image_count: int = get_image_count(html)
     image_time: int = calculate_viewing_time(image_count)
 
-    videos: list[str] = extract_videos(html)
-    video_time: int = 0
+    multimedias: list[str] = extract_multimedias(html)
+    multimedia_time: int = 0
 
     with ThreadPoolExecutor() as e:
-        resolved_durations: Iterator[int] = e.map(video_duration_resolver, videos)
+        resolved_durations: Iterator[int] = e.map(
+            multimedia_duration_resolver, multimedias
+        )
 
         for resolved_duration in resolved_durations:
-            video_time += resolved_duration
+            multimedia_time += resolved_duration
 
-    video_time += get_custom_player_duration(html)
+    multimedia_time += get_custom_player_duration(html)
 
-    return reading_time + image_time + video_time
+    return reading_time + image_time + multimedia_time

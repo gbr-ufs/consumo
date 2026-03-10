@@ -18,46 +18,47 @@ from consumo.lib.file.html import (
     calculate_consumption_time as calculate_html_consumption_time,
 )
 from consumo.lib.file.multimedia import (
-    get_hosted_multimedia_duration as get_absolute_path_video_duration,
+    get_hosted_multimedia_duration as get_absolute_path_multimedia_duration,
 )
 
 
 @validate_call
-def get_relative_path_video_duration(url: HttpUrl, video: Path) -> int:
-    """Resolve a URL to get the duration of a video with a relative path.
+def get_relative_path_multimedia_duration(url: HttpUrl, src: Path) -> int:
+    """Resolve a URL to get the duration of a multimedia file with a relative path.
 
     Args:
-        url: URL where the video was originally found.
-        video: Relative path used for the video's "src" attribute.
+        url: URL where the multimedia file was originally found.
+        src: Relative path used for the multimedia file's "src" attribute.
 
     Returns:
-        The duration of the video in seconds.
+        The duration of the content in seconds.
     """
-    resolved: str = urljoin(str(url), str(video))
+    resolved: str = urljoin(str(url), str(src))
 
-    return get_absolute_path_video_duration(HttpUrl(resolved))
+    return get_absolute_path_multimedia_duration(HttpUrl(resolved))
 
 
 @validate_call
-def get_video_duration(url: HttpUrl, video: str) -> int:
-    """Get the duration of a video hosted online.
+def get_multimedia_duration(url: HttpUrl, src: str) -> int:
+    """Get the duration of a multimedia hosted online.
 
-    Tries to treat the video as if it had an absolute path, then tries to
+    Tries to treat the file as if it had an absolute path, then tries to
     resolve its path if that fails.
 
     Args:
-        url: URL where the video was originally found for path resolution.
-        video: Path used for the video's "src" attribute.
+        url: URL where the multimedia file was originally found for
+            path resolution.
+        src: Path used for the multimedia file's "src" attribute.
 
     Returns:
-        The duration of the video in seconds.
+        The duration of the content in seconds.
     """
     try:
-        return get_absolute_path_video_duration(HttpUrl(video))
+        return get_absolute_path_multimedia_duration(HttpUrl(src))
     except ValidationError:
-        # If HttpUrl(video) fails validation, the "src" is likely a relative
+        # If HttpUrl(src) fails validation, then src is likely a relative
         # path rather than a URL.
-        return get_relative_path_video_duration(url, Path(video))
+        return get_relative_path_multimedia_duration(url, Path(src))
 
 
 @validate_call
@@ -90,5 +91,5 @@ def calculate_consumption_time(
         html.write_text(html_content, "utf-8")
 
         return calculate_html_consumption_time(
-            html, words_per_minute, lambda video: get_video_duration(url, video)
+            html, words_per_minute, lambda src: get_multimedia_duration(url, src)
         )

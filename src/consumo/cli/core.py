@@ -5,8 +5,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Callable, Iterator
 
-import typer
-from pydantic import NonNegativeInt
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from consumo.lib.formatting import format_time
