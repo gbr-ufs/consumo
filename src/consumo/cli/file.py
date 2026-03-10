@@ -23,7 +23,7 @@ from consumo.lib.file.image import calculate_viewing_time
 from consumo.lib.file.mass_media import (
     calculate_consumption_time as calculate_mass_media_consumption_time,
 )
-from consumo.lib.file.multimedia import get_duration as get_multimedia_duration
+from consumo.lib.file.multimedia import get_multimedia_duration
 from consumo.lib.file.text import (
     calculate_consumption_time as calculate_text_consumption_time,
 )

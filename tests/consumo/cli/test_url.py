@@ -20,16 +20,16 @@ runner: CliRunner = CliRunner()
     "url, consumption_time, expected_result",
     [("https://info.cern.ch/hypertext/WWW/TheProject.html", 43, "43s")],
 )
-@patch("consumo.cli.url.get_video_platform_video_duration")
+@patch("consumo.cli.url.get_hosted_multimedia_duration")
 @patch("consumo.cli.url.calculate_consumption_time")
 def test_process_urls_downloaderror(
     mock_calculate_consumption_time: MagicMock,
-    mock_get_video_platform_video_duration: MagicMock,
+    mock_get_hosted_multimedia_duration: MagicMock,
     url: HttpUrl,
     consumption_time: int,
     expected_result: str,
 ) -> None:
-    mock_get_video_platform_video_duration.side_effect = DownloadError("")
+    mock_get_hosted_multimedia_duration.side_effect = DownloadError("")
     mock_calculate_consumption_time.return_value = consumption_time
     actual_result: Result = runner.invoke(app, [str(url)])
     expected_exit_code: int = 0
@@ -49,17 +49,15 @@ def test_process_urls_downloaderror(
     ],
 )
 @patch("consumo.cli.url.get_multimedia_duration")
-@patch("consumo.cli.url.get_video_platform_video_duration")
+@patch("consumo.cli.url.get_hosted_multimedia_duration")
 def test_process_urls_missingmetadataerror(
-    mock_get_video_platform_video_duration: MagicMock,
+    mock_get_hosted_multimedia_duration: MagicMock,
     mock_get_multimedia_duration: MagicMock,
     url: HttpUrl,
     consumption_time: int,
     expected_result: str,
 ) -> None:
-    mock_get_video_platform_video_duration.side_effect: MissingMetadataError = (
-        MissingMetadataError
-    )
+    mock_get_hosted_multimedia_duration.side_effect = MissingMetadataError
     mock_get_multimedia_duration.return_value = consumption_time
     actual_result: Result = runner.invoke(app, [str(url)])
     expected_exit_code: int = 0
@@ -78,20 +76,18 @@ def test_process_urls_missingmetadataerror(
         )
     ],
 )
-@patch("consumo.cli.url.get_video_platform_video_duration")
+@patch("consumo.cli.url.get_hosted_multimedia_duration")
 @patch("consumo.cli.url.get_multimedia_duration")
 @patch("consumo.cli.url.calculate_consumption_time")
 def test_process_urls_invaliddataerror(
     mock_calculate_consumption_time: MagicMock,
     mock_get_multimedia_duration: MagicMock,
-    mock_get_video_platform_video_duration: MagicMock,
+    mock_get_hosted_multimedia_duration: MagicMock,
     url: HttpUrl,
     consumption_time: int,
     expected_result: str,
 ) -> None:
-    mock_get_video_platform_video_duration.side_effect: MissingMetadataError = (
-        MissingMetadataError
-    )
+    mock_get_hosted_multimedia_duration.side_effect = MissingMetadataError
     mock_get_multimedia_duration.side_effect: InvalidDataError = InvalidDataError(
         1094995529, "Invalid data found when processing input", str(url)
     )
@@ -107,14 +103,14 @@ def test_process_urls_invaliddataerror(
     "url, consumption_time, expected_result",
     [("https://www.youtube.com/watch?v=H91BxkBXttE", 5717, "1h 35m 17s")],
 )
-@patch("consumo.cli.url.get_video_platform_video_duration")
-def test_process_urls_video_platform(
-    mock_get_video_platform_video_duration: MagicMock,
+@patch("consumo.cli.url.get_hosted_multimedia_duration")
+def test_process_urls_hosted(
+    mock_get_hosted_multimedia_duration: MagicMock,
     url: HttpUrl,
     consumption_time: int,
     expected_result: str,
 ) -> None:
-    mock_get_video_platform_video_duration.return_value = consumption_time
+    mock_get_hosted_multimedia_duration.return_value = consumption_time
     actual_result: Result = runner.invoke(app, [str(url)])
     expected_exit_code: int = 0
 

@@ -20,8 +20,10 @@ from consumo.cli.core import (
     execute_concurrent_command,
 )
 from consumo.lib.exceptions import MissingMetadataError
-from consumo.lib.file.multimedia import get_duration as get_multimedia_duration
-from consumo.lib.file.video import get_video_platform_video_duration
+from consumo.lib.file.multimedia import (
+    get_hosted_multimedia_duration,
+    get_multimedia_duration,
+)
 from consumo.lib.url import calculate_consumption_time
 
 app: Typer = Typer()
@@ -42,11 +44,11 @@ def get_duration(url: HttpUrl, words_per_minute: NonNegativeInt = 265) -> int:
     Returns:
         The time in seconds to consume the content the URL points to.
     """
-    # Fallback mechanism. First we try to get the duration as a hosted video,
-    # then as a hosted file, and when all else fails, we try to calculate the
-    # consumption time.
+    # Fallback mechanism. First we try to get the duration as if its was hosted
+    # on a platform, then as a hosted file, and when all else fails, we try to
+    # calculate the consumption time.
     try:
-        return get_video_platform_video_duration(url)
+        return get_hosted_multimedia_duration(url)
     except DownloadError:
         pass
     except MissingMetadataError:

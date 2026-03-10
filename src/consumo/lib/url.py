@@ -17,7 +17,9 @@ from trafilatura import fetch_url
 from consumo.lib.file.html import (
     calculate_consumption_time as calculate_html_consumption_time,
 )
-from consumo.lib.file.video import get_duration as get_absolute_path_video_duration
+from consumo.lib.file.multimedia import (
+    get_hosted_multimedia_duration as get_absolute_path_video_duration,
+)
 
 
 @validate_call
