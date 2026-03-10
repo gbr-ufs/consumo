@@ -3,10 +3,10 @@
 """Module for processing HTML files."""
 
 import json
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Any, Callable, Iterator, Optional
 
 from bs4 import BeautifulSoup, ResultSet, Tag
 from bs4.element import AttributeValueList
@@ -165,11 +165,11 @@ def get_custom_player_duration(html: FilePath) -> Second:
             continue
 
         try:
-            data = json.loads(tag.string)
+            data: Any = json.loads(tag.string)
             duration_str: str | None = data.get("duration")
 
             if duration_str:
-                duration = DURATION_ADAPTER.validate_python(duration_str)
+                duration: timedelta = DURATION_ADAPTER.validate_python(duration_str)
 
                 total_seconds += int(duration.total_seconds())
 
@@ -217,12 +217,10 @@ def calculate_consumption_time(
     video_time: Second = 0
 
     with ThreadPoolExecutor() as e:
-        future_to_video = {
-            e.submit(video_duration_resolver, video): video for video in videos
-        }
+        resolved_durations: Iterator[Second] = e.map(video_duration_resolver, videos)
 
-        for future in as_completed(future_to_video):
-            video_time += future.result()
+        for resolved_duration in resolved_durations:
+            video_time += resolved_duration
 
     video_time += get_custom_player_duration(html)
 
