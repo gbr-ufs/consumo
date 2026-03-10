@@ -17,6 +17,8 @@ from consumo.lib.exceptions import MissingMetadataError
 def get_hosted_multimedia_duration(url: HttpUrl) -> int:
     """Get the duration of a multimedia container from a hosting platform.
 
+    Supports playlists.
+
     Args:
         url: The URL pointing to where the multimedia container is hosted.
 
@@ -36,6 +38,22 @@ def get_hosted_multimedia_duration(url: HttpUrl) -> int:
     with YoutubeDL(ytdl_options) as ytdl:
         # Downloads are disabled so we only fetch metadata.
         info: dict[str, Any] = ytdl.extract_info(str(url), download=False)
+
+        # This means that the link points to a playlist.
+        if info["entries"]:
+            entries = info["entries"]
+            total_duration: int = 0
+
+            for entry in entries:
+                raw_duration: list[float | None] = entry.get("duration")
+
+                if raw_duration is None:
+                    raise MissingMetadataError("duration not found")
+
+                total_duration += math.ceil(raw_duration)
+
+            return total_duration
+
         raw_duration: float | None = info.get("duration")
 
         if raw_duration is None:
