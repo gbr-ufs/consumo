@@ -7,7 +7,7 @@ import tomllib
 from importlib.metadata import PackageMetadata
 from pathlib import Path
 from tomllib import TOMLDecodeError
-from typing import Any, Annotated
+from typing import Annotated, Any
 
 import typer
 from pydantic import NonNegativeInt, PositiveInt
