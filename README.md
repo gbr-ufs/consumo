@@ -71,7 +71,7 @@ Calculate the consumption time of all the links in a link list file in a *h *m *
 Example:
     A "file with a list of links" is a plain text file that looks like this:
 
-    ```text
+```text
     https://en.wikipedia.org/wiki/Python_(programming_language)
     https://en.wikipedia.org/wiki/High-level_programming_language
     https://en.wikipedia.org/wiki/General-purpose_programming_language
@@ -85,7 +85,7 @@ Example:
     https://en.wikipedia.org/wiki/Object-oriented_programming
     https://en.wikipedia.org/wiki/Functional_programming
     ...
-    ```
+```
 
 **Usage**:
 
