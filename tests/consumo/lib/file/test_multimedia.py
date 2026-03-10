@@ -6,7 +6,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from pydantic import FilePath, HttpUrl
-from pytest import mark
 from yt_dlp import DownloadError
 
 from consumo.lib.exceptions import MissingMetadataError
@@ -18,7 +17,7 @@ from consumo.lib.file.multimedia import (
 from tests import FIXTURES_DIR
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "url, expected_duration",
     [
         ("https://www.youtube.com/watch?v=dQw4w9WgXcQ", 213),
@@ -51,7 +50,7 @@ def test_get_hosted_multimedia_duration_unsupported_host(
         get_hosted_multimedia_duration(url)
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "filename, expected_duration",
     [
         ("audio.mp3", 1),
@@ -73,7 +72,7 @@ def test_get_multimedia_duration_no_duration() -> None:
         get_multimedia_duration(container)
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "url, expected_duration",
     [("https://www.youtube.com/watch?v=dQw4w9WgXcQ", 213)],
 )
@@ -89,7 +88,7 @@ def test_get_duration_hosted(
     assert actual_duration == expected_duration
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "url, expected_duration",
     [
         (
@@ -113,7 +112,7 @@ def test_get_duration_not_hosted(
     assert actual_duration == expected_duration
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "url",
     ["https://example.com/videos/video.mp4"],
 )

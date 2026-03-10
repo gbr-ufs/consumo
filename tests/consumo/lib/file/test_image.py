@@ -2,12 +2,14 @@
 
 """Test suite of the lib/file/image module."""
 
-from pytest import mark
+import pytest
 
 from consumo.lib.file.image import calculate_viewing_time
 
 
-@mark.parametrize("image_count, expected_image_time", [(10, 75), (11, 78), (0, 0)])
+@pytest.mark.parametrize(
+    "image_count, expected_image_time", [(10, 75), (11, 78), (0, 0)]
+)
 def test_calculate_viewing_time(image_count: int, expected_image_time: int) -> None:
     actual_image_time: int = calculate_viewing_time(image_count)
 

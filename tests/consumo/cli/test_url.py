@@ -4,9 +4,9 @@
 
 from unittest.mock import MagicMock, patch
 
+import pytest
 from av.error import InvalidDataError
 from pydantic import HttpUrl
-from pytest import mark
 from typer.testing import CliRunner, Result
 from yt_dlp.utils import DownloadError
 
@@ -16,7 +16,7 @@ from consumo.lib.exceptions import MissingMetadataError
 runner: CliRunner = CliRunner()
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "url, consumption_time, expected_result",
     [("https://info.cern.ch/hypertext/WWW/TheProject.html", 43, "43s")],
 )
@@ -38,7 +38,7 @@ def test_process_urls_downloaderror(
     assert expected_result in actual_result.output
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "url, consumption_time, expected_result",
     [
         (
@@ -66,7 +66,7 @@ def test_process_urls_missingmetadataerror(
     assert expected_result in actual_result.output
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "url, consumption_time, expected_result",
     [
         (
@@ -99,7 +99,7 @@ def test_process_urls_invaliddataerror(
     assert expected_result in actual_result.output
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "url, consumption_time, expected_result",
     [("https://www.youtube.com/watch?v=H91BxkBXttE", 5717, "1h 35m 17s")],
 )

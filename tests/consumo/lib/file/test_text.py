@@ -2,8 +2,8 @@
 
 """Test suite of the lib/file/text module."""
 
+import pytest
 from pydantic import FilePath
-from pytest import mark
 
 from consumo.lib.file.text import (
     calculate_consumption_time,
@@ -13,7 +13,7 @@ from consumo.lib.file.text import (
 from tests import FIXTURES_DIR
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "text, expected_word_count",
     [
         ("a", 1),
@@ -30,7 +30,7 @@ def test_get_word_count(text: str, expected_word_count: int) -> None:
     assert actual_word_count == expected_word_count
 
 
-@mark.parametrize("word_count, words_per_minute", [(265, 265), (1000, 1000)])
+@pytest.mark.parametrize("word_count, words_per_minute", [(265, 265), (1000, 1000)])
 def test_calculate_reading_time(word_count: int, words_per_minute: int) -> None:
     actual_reading_time: int = calculate_reading_time(word_count, words_per_minute)
     expected_reading_time: int = 60

@@ -4,7 +4,7 @@
 
 from pathlib import Path
 
-from pytest import mark
+import pytest
 from typer.testing import CliRunner, Result
 
 from consumo.cli.file import app
@@ -13,7 +13,7 @@ from tests import FIXTURES_DIR
 runner: CliRunner = CliRunner()
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "filename, expected_exit_code, expected_result",
     [
         ("audio.mp3", 0, "1s"),

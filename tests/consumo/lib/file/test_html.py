@@ -5,8 +5,8 @@
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import pytest
 from pydantic import FilePath
-from pytest import mark
 
 from consumo.lib.file.html import (
     calculate_consumption_time,
@@ -19,7 +19,7 @@ from consumo.lib.file.html import (
 from tests import FIXTURES_DIR
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "filename, expected_text",
     [
         (
@@ -38,7 +38,7 @@ def test_extract_text(filename: str, expected_text: str) -> None:
     assert actual_text == expected_text
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "filename, expected_videos",
     [
         ("blog_post.html", []),
@@ -57,7 +57,7 @@ def test_extract_videos(filename: FilePath, expected_videos: list[str]) -> None:
     assert actual_videos == expected_videos
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "filename, expected_image_count",
     [("blog_post.html", 2), ("iframe.html", 0), ("image.html", 1), ("video.html", 0)],
 )
@@ -77,7 +77,7 @@ def test_get_relative_path_video_duration() -> None:
     assert actual_duration == expected_duration
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "filename, expected_duration",
     [
         (
@@ -109,7 +109,7 @@ def test_get_custom_player_duration(filename: FilePath, expected_duration: int) 
     assert actual_duration == expected_duration
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "filename, expected_time",
     [
         ("blog_post.html", 28),

@@ -2,14 +2,14 @@
 
 """Test suite of the lib/file/mass_media module."""
 
+import pytest
 from pydantic import FilePath
-from pytest import mark
 
 from consumo.lib.file.mass_media import calculate_consumption_time, extract_text
 from tests import FIXTURES_DIR
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "filename, expected_text",
     [
         ("single_char.pdf", "a"),
@@ -27,7 +27,7 @@ def test_extract_text(filename: str, expected_text: str) -> None:
     assert actual_text == expected_text
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "filename, words_per_minute, expected_time",
     [("single_char.pdf", 265, 1), ("empty.epub", 265, 0), ("jumbled.mobi", 1000, 1)],
 )
