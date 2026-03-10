@@ -124,6 +124,16 @@ $ url [OPTIONS] URLS...
 * `--words-per-minute INTEGER`: Reading speed in words per minute.  [default: 265]
 * `--help`: Show this message and exit.
 
+### Configuration file
+
+consumo supports a [TOML](https://toml.io/en/) under your system's default configuration directory (on Linux, `$XDG_CONFIG/HOME/config.toml`). It has these default values:
+
+```toml
+[general]
+sort = false
+words_per_minute = 265
+```
+
 ## Context
 
 I'm pretty unorganized. No matter how much I try to tidy things up, I always manage to make a mess somewhere else. In this case, I host in my own machine a [FreshRSS](https://github.com/FreshRSS/FreshRSS) container which should **ideally** be my only source of online content and things should be saved there. However, after hoarding 30+ tabs on my phone with random links from the web, I decided to make a file like this on my computer:
@@ -147,16 +157,6 @@ https://en.wikipedia.org/wiki/Functional_programming
 Repeat until you get over **a hundred** links (and multiple websites other than Wikipedia). Needless to say, I felt overwhelmed and thought: "LLMs can view webpages. Maybe I can give this list of links to one so it can sort them by duration for a better experience?"
 
 I tried multiple models, but none where able to do that. Maybe there's something like this out there already, but I forgot to search for it. But thankfully that sparkled a great idea for a project: consumo!
-
-### Configuration file
-
-consumo supports a [TOML](https://toml.io/en/) under your system's default configuration directory (on Linux, `$XDG_CONFIG/HOME/config.toml`). It has these default values:
-
-```toml
-[general]
-sort = false
-words_per_minute = 265
-```
 
 ## Philosophies
 
