@@ -3,20 +3,13 @@
 """Core interface and runtime functions for the program."""
 
 from concurrent.futures import ThreadPoolExecutor
-from typing import Annotated, Any, Callable, Iterator
+from typing import Any, Callable, Iterator
 
 import typer
 from pydantic import NonNegativeInt
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from consumo.lib.formatting import format_time
-
-SortOption = Annotated[
-    bool, typer.Option(help="Sort the output by duration in ascending order.")
-]
-WordsPerMinuteOption = Annotated[
-    NonNegativeInt, typer.Option(help="Reading speed in words per minute.")
-]
 
 
 def handle_multiple_args(
@@ -82,4 +75,4 @@ def unsupported_mime_type_error(mime_type: str) -> None:
     Args:
         mime_type: The MIME type of the file.
     """
-    print(f"[bold red]Unsupported MIME type: {mime_type}[/bold red].")
+    print(f"[bold red]Unsupported MIME type: {mime_type}[/bold red]")

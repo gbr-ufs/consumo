@@ -10,9 +10,13 @@ import typer
 from pydantic import NonNegativeInt, validate_call
 from typer import Typer
 
-from consumo.cli.core import (
+from consumo.cli.config import (
+    DEFAULT_SORT,
+    DEFAULT_WORDS_PER_MINUTE,
     SortOption,
     WordsPerMinuteOption,
+)
+from consumo.cli.core import (
     execute_concurrent_command,
     unsupported_mime_type_error,
 )
@@ -103,8 +107,8 @@ def get_duration(file: Path, words_per_minute: NonNegativeInt = 265) -> int:
 @app.command("file")
 def process_files(
     files: Annotated[list[Path], typer.Argument(exists=True, readable=True)],
-    sort: SortOption = False,
-    words_per_minute: WordsPerMinuteOption = 265,
+    sort: SortOption = DEFAULT_SORT,
+    words_per_minute: WordsPerMinuteOption = DEFAULT_WORDS_PER_MINUTE,
 ) -> None:
     """Calculate the consumption time of files concurrently in a *h *m *s format.
 

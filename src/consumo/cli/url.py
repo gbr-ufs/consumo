@@ -14,9 +14,13 @@ from pydantic import (
 from typer import Typer
 from yt_dlp.utils import DownloadError
 
-from consumo.cli.core import (
+from consumo.cli.config import (
+    DEFAULT_SORT,
+    DEFAULT_WORDS_PER_MINUTE,
     SortOption,
     WordsPerMinuteOption,
+)
+from consumo.cli.core import (
     execute_concurrent_command,
 )
 from consumo.lib.exceptions import MissingMetadataError
@@ -65,8 +69,8 @@ def get_duration(url: HttpUrl, words_per_minute: NonNegativeInt = 265) -> int:
 @app.command("url")
 def process_urls(
     urls: Annotated[list[str], typer.Argument()],
-    sort: SortOption = False,
-    words_per_minute: WordsPerMinuteOption = 265,
+    sort: SortOption = DEFAULT_SORT,
+    words_per_minute: WordsPerMinuteOption = DEFAULT_WORDS_PER_MINUTE,
 ) -> None:
     """Calculate the consumption time of URLs concurrently in a *h *m *s format.
 

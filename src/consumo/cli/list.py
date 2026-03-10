@@ -9,9 +9,13 @@ import magic
 import typer
 from typer import Typer
 
-from consumo.cli.core import (
+from consumo.cli.config import (
+    DEFAULT_SORT,
+    DEFAULT_WORDS_PER_MINUTE,
     SortOption,
     WordsPerMinuteOption,
+)
+from consumo.cli.core import (
     unsupported_mime_type_error,
 )
 from consumo.cli.url import process_urls
@@ -22,8 +26,8 @@ app: Typer = Typer()
 @app.command("list")
 def process_list(
     file: Annotated[Path, typer.Argument()],
-    sort: SortOption = False,
-    words_per_minute: WordsPerMinuteOption = 265,
+    sort: SortOption = DEFAULT_SORT,
+    words_per_minute: WordsPerMinuteOption = DEFAULT_WORDS_PER_MINUTE,
 ) -> None:
     """Calculate the consumption time of all the links in a link list file in a *h *m *s format.
 
