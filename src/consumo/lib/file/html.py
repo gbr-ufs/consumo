@@ -10,9 +10,6 @@ from typing import Any, Callable, Iterator, Optional
 
 from bs4 import BeautifulSoup, ResultSet, Tag
 from bs4.element import AttributeValueList
-from consumo.lib.file.multimedia import (
-    get_duration as get_absolute_path_video_duration,
-)
 from pydantic import (
     FilePath,
     HttpUrl,
@@ -24,6 +21,9 @@ from pydantic import (
 from trafilatura import extract
 
 from consumo.lib.file.image import calculate_viewing_time
+from consumo.lib.file.multimedia import (
+    get_duration as get_absolute_path_video_duration,
+)
 from consumo.lib.file.multimedia import get_multimedia_duration
 from consumo.lib.file.text import calculate_reading_time, get_word_count
 
