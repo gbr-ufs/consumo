@@ -4,6 +4,6 @@ COPY --from=ghcr.io/astral-sh/uv:0.9.11@sha256:5aa820129de0a600924f166aec9cb5161
 # Install system dependencies for media processing and magic numbers.
 RUN apt update
 RUN apt install -y \
-    libmagic1 \
+    libmagic-dev \
     ffmpeg
 RUN apt clean
