@@ -4,11 +4,17 @@
 
 import math
 
+import regex
 from pydantic import FilePath, NonNegativeInt, validate_call
 
 
 def get_word_count(text: str) -> int:
     """Get the number of words from text.
+
+    Supports Chinese, Japanese, and Korean (CJK) by counting a CJK character as
+    a word. Note that this differs from the Medium formula as what it does
+    would be difficult to implement (it has 500 characters per minute by default
+    for CJK text).
 
     Args:
         text: Text where the number of words will be counted from.
@@ -16,7 +22,14 @@ def get_word_count(text: str) -> int:
     Returns:
         The number of words in the text.
     """
-    return len(text.split())
+    raw_result: float = len(text.split())
+    cjk = regex.compile(r"\p{Script=Han}|\p{Hiragana}|\p{Katakana}|\p{Script=Hangul}")
+
+    for char in text:
+        if cjk.match(char):
+            raw_result += 1
+
+    return math.ceil(raw_result)
 
 
 @validate_call
