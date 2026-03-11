@@ -21,15 +21,20 @@ runner: CliRunner = CliRunner()
     [("https://info.cern.ch/hypertext/WWW/TheProject.html", 43, "43s")],
 )
 @patch("consumo.cli.url.get_hosted_multimedia_duration")
+@patch("consumo.cli.url.get_multimedia_duration")
 @patch("consumo.cli.url.calculate_consumption_time")
 def test_process_urls_downloaderror(
     mock_calculate_consumption_time: MagicMock,
+    mock_get_multimedia_duration: MagicMock,
     mock_get_hosted_multimedia_duration: MagicMock,
     url: HttpUrl,
     consumption_time: int,
     expected_result: str,
 ) -> None:
     mock_get_hosted_multimedia_duration.side_effect = DownloadError("")
+    mock_get_multimedia_duration.side_effect: InvalidDataError = InvalidDataError(
+        1094995529, "Invalid data found when processing input", str(url)
+    )
     mock_calculate_consumption_time.return_value = consumption_time
     actual_result: Result = runner.invoke(app, [str(url)])
     expected_exit_code: int = 0
