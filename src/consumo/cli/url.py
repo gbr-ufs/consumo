@@ -5,7 +5,7 @@
 from typing import Annotated
 
 import typer
-from av.error import InvalidDataError
+from av.error import FFmpegError
 from pydantic import (
     HttpUrl,
     NonNegativeInt,
@@ -60,7 +60,7 @@ def get_duration(url: HttpUrl, words_per_minute: NonNegativeInt = 265) -> int:
 
     try:
         return get_multimedia_duration(url)
-    except InvalidDataError:
+    except FFmpegError:
         pass
 
     return calculate_consumption_time(url, words_per_minute)
