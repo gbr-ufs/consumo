@@ -3,6 +3,9 @@ build-backend = "uv_build"
 requires = ["uv_build>=0.9.11,<0.10.0"]
 
 [dependency-groups]
+build = [
+    "pyinstaller>=6.19.0",
+]
 dev = [
     "commitizen>=4.13.8",
     "prek>=0.3.4",
