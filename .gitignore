@@ -1,14 +1,14 @@
 # Python-generated files.
 __pycache__/
-*.py[oc]
 build/
-coverage.xml
 dist/
-docs/source/api/
-junit.xml
+site/
 wheels/
+*.py[oc]
 *.egg-info
 *.spec
+coverage.xml
+junit.xml
 
 # Ignore all dotfiles, except those under version control.
 .*
