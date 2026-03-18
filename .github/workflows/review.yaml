@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - "src/**"
+      - .github/actions/tests/action.yaml
+      - .github/workflows/review.yaml
 jobs:
   review:
     strategy:

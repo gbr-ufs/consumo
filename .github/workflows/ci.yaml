@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - "src/**"
+      - .github/actions/tests/action.yaml
+      - .github/workflows/ci.yaml
   workflow_dispatch:
 
 jobs:

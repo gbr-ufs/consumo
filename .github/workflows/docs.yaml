@@ -4,7 +4,8 @@ on:
     branches:
       - main
     paths:
-      - "docs/**"
+      - docs/**
+      - .github/workflows/docs.yaml
   workflow_dispatch:
 
 permissions:
