@@ -21,9 +21,6 @@ runs:
       with:
         enable-cache: true
         version: "0.9.14"
-    - name: Install Dependencies
-      shell: bash
-      run: uv sync --group tests
     - name: Test
       shell: bash
-      run: uv run pytest
+      run: uv run --no-dev --group tests pytest
