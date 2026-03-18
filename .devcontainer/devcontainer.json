@@ -11,5 +11,5 @@
       }
     }
   },
-  "postCreateCommand": "uv sync"
+  "postCreateCommand": "uv sync --dev"
 }
