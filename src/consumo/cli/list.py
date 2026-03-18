@@ -23,7 +23,10 @@ from consumo.cli.url import process_urls
 app: Typer = Typer()
 
 
-@app.command("list")
+@app.command(
+    "list",
+    help="Calculate the consumption time of all the links in a link list file in a *h *m *s format.",
+)
 def process_list(
     file: Annotated[Path, typer.Argument()],
     sort: SortOption = DEFAULT_SORT,

@@ -191,7 +191,7 @@ def get_custom_player_duration(html: FilePath) -> int:
 def calculate_consumption_time(
     html: FilePath,
     words_per_minute: NonNegativeInt = 265,
-    multimedia_duration_resolver: Optional[Callable[[str], int]] = None,
+    multimedia_duration_resolver=None,  # noqa: ANN001 (unsuppored by Typer)
 ) -> int:
     """Calculate the consumption time of an HTML file in seconds.
 

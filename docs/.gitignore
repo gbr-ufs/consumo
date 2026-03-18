@@ -1,2 +1,5 @@
 # We use the README of the project as the documentation index.
 index.md
+# CLI section is automatically generated with:
+# typer consumo.cli.main utils docs --name consumo --output docs/cli.md
+cli.md
