@@ -30,7 +30,9 @@ jobs:
           enable-cache: true
           version: "0.9.14"
       - name: Build
-        run: uv run --no-dev --only-group docs zensical build --clean
+        run: |
+          cp README.md docs/index.md
+          uv run --no-dev --only-group docs zensical build --clean
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
         with:
           path: site
