@@ -21,5 +21,7 @@ jobs:
       uses: astral-sh/setup-uv@ed21f2f24f8dd64503750218de024bcf64c7250a
       with:
         version: "0.9.14"
+    - name: Build
+      run: uv build
     - name: Publish
       run: uv publish
