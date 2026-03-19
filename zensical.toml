@@ -21,7 +21,10 @@ site_url = "https://gbr-ufs.github.io/consumo/"
   link = "https://app.codecov.io/gh/gbr-ufs/consumo"
 
 [project.plugins.mkdocstrings.handlers.python]
-inventories = ["https://docs.python.org/3/objects.inv"]
+inventories = [
+  "https://docs.python.org/3/objects.inv",
+  "https://docs.pydantic.dev/latest/objects.inv",
+]
 paths = ["src"]
 
 [project.plugins.mkdocstrings.handlers.python.options]
