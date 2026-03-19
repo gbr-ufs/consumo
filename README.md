@@ -21,6 +21,20 @@ It's designed with **broad support** in mind. When it comes to online media, it 
 
 For offline media, multiple backends are used to calculate the reading time. However, **by design**, local HTML files have **full feature parity** with online pages.
 
+## Installation
+
+### Python
+
+```text
+$ python3 -m pip install consumo # python -m pip install consumo
+```
+
+### pip
+
+```text
+$ pip3 install consumo # pip install consumo
+```
+
 ## Context
 
 I'm pretty unorganized. No matter how much I try to tidy things up, I always manage to make a mess somewhere else. In this case, I host in my own machine a [FreshRSS](https://github.com/FreshRSS/FreshRSS) container which should **ideally** be my only source of online content and things should be saved there. However, after hoarding 30+ tabs on my phone with random links from the web, I decided to make a file like this on my computer:
