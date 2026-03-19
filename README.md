@@ -1,4 +1,4 @@
-# consumo: Content Consumption Analyzer
+# [consumo: Content Consumption Analyzer](https://gbr-ufs.github.io/consumo/)
 
 [![PyPI Package](https://img.shields.io/pypi/v/consumo.svg)](https://pypi.python.org/pypi/consumo)
 [![Codecov](https://codecov.io/gh/gbr-ufs/consumo/graph/badge.svg?token=IIRDADQH1Q)](https://codecov.io/gh/gbr-ufs/consumo)
