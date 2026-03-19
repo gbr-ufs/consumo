@@ -1,3 +1,21 @@
+## 0.4.0 (2026-03-18)
+
+### Feat
+
+- **text**: add preliminary cjk support
+- **multimedia.py**: implement concurrency
+- **multimedia.py**: add playlist support
+- further generalize deprecated video module to support more file types
+
+### Fix
+
+- run "uv run zensical" instead of running "zensical" directly
+- **cli/url.py**: use baseline ffmpeg error
+
+### Refactor
+
+- **html.py**: use sum instead of unecessary loop
+
 ## 0.3.0 (2026-03-10)
 
 ### Feat
