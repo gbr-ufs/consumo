@@ -1,3 +1,9 @@
+## 0.4.1 (2026-03-18)
+
+### Fix
+
+- **config.tap**: minor fix to tag another version
+
 ## 0.4.0 (2026-03-18)
 
 ### Feat
