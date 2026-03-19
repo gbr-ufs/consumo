@@ -17,7 +17,12 @@
         in
         {
           default = pkgs.mkShell {
-            LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.lib.makeLibraryPath [ pkgs.ffmpeg pkgs.file ]}:$LD_LIBRARY_PATH";
+            LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib:${
+              pkgs.lib.makeLibraryPath [
+                pkgs.ffmpeg
+                pkgs.file
+              ]
+            }:$LD_LIBRARY_PATH";
             packages = with pkgs; [
               ffmpeg # For PyAV and yt-dlp.
               file # For libmagic1.

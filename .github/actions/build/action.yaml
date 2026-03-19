@@ -31,4 +31,4 @@ runs:
         export EXE_PATH
         ZIP_NAME="dist/consumo-${RUNNER_OS}.zip"
         export ZIP_NAME
-        uv run .github/actions/build/action.py
+        uv run scripts/dist.py

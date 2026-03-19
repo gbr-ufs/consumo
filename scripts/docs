@@ -1,0 +1,14 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Script for building the documentation. Run this from the root directory.
+
+zensical_command="serve"
+
+if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+    zensical_command="build --clean"
+fi
+
+export UV_NO_DEV=1
+cp README.md docs/index.md
+uv run --group docs typer consumo.cli.main utils docs --name consumo --output docs/cli.md
+uv run --only-group docs zensical $zensical_command
