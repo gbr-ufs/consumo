@@ -6,13 +6,13 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from urllib.parse import urljoin
 
+import trafilatura
 from pydantic import (
     HttpUrl,
     NonNegativeInt,
     ValidationError,
     validate_call,
 )
-from trafilatura import fetch_url
 
 from consumo.lib.file.html import (
     calculate_consumption_time as calculate_html_consumption_time,
@@ -80,7 +80,7 @@ def calculate_consumption_time(
     Raises:
         ConnectionError: If the HTML content of the URL wasn't downloaded.
     """
-    html_content: str | None = fetch_url(str(url))
+    html_content: str | None = trafilatura.fetch_url(str(url))
 
     if html_content is None:
         raise ConnectionError

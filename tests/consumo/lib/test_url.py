@@ -45,17 +45,17 @@ def test_get_multimedia_duration(
     assert actual_duration == expected_duration
 
 
-@patch("consumo.lib.url.fetch_url")
+@patch("consumo.lib.url.trafilatura.fetch_url")
 @patch("consumo.lib.url.get_relative_path_multimedia_duration")
 @patch("consumo.lib.url.get_absolute_path_multimedia_duration")
 def test_calculate_consumption_time(
     mock_get_absolute_path_multimedia_duration: MagicMock,
     mock_get_relative_path_multimedia_duration: MagicMock,
-    mock_fetch_url: MagicMock,
+    mock_trafilatura_fetch_url: MagicMock,
 ) -> None:
     url: HttpUrl = HttpUrl("https://example.com/url")
     html: FilePath = FIXTURES_DIR / "url.html"
-    mock_fetch_url.return_value: str = html.read_text("utf-8")
+    mock_trafilatura_fetch_url.return_value: str = html.read_text("utf-8")
     mock_get_absolute_path_multimedia_duration.return_value: int = 211
     mock_get_relative_path_multimedia_duration.return_value: int = 1
     actual_time: int = calculate_consumption_time(url)
@@ -64,10 +64,12 @@ def test_calculate_consumption_time(
     assert actual_time == expected_time
 
 
-@patch("consumo.lib.url.fetch_url")
-def test_calculate_consumption_time_connectionerror(mock_fetch_url: MagicMock) -> None:
+@patch("consumo.lib.url.trafilatura.fetch_url")
+def test_calculate_consumption_time_connectionerror(
+    mock_trafilatura_fetch_url: MagicMock,
+) -> None:
     url: HttpUrl = HttpUrl("https://example.com/url")
-    mock_fetch_url.return_value: None = None
+    mock_trafilatura_fetch_url.return_value: None = None
 
     with pytest.raises(ConnectionError):
         calculate_consumption_time(url)

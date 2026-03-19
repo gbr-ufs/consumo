@@ -8,6 +8,7 @@ from datetime import timedelta
 from pathlib import Path
 from typing import Any, Callable, Iterator, Optional
 
+import trafilatura
 from bs4 import BeautifulSoup, ResultSet, Tag
 from bs4.element import AttributeValueList
 from pydantic import (
@@ -18,7 +19,6 @@ from pydantic import (
     ValidationError,
     validate_call,
 )
-from trafilatura import extract
 
 from consumo.lib.file.image import calculate_viewing_time
 from consumo.lib.file.multimedia import (
@@ -46,7 +46,7 @@ def extract_text(html: FilePath) -> str:
         The main text content of the HTML file, if any.
     """
     raw_html: str = html.read_text("utf-8")
-    text: str | None = extract(raw_html)
+    text: str | None = trafilatura.extract(raw_html)
 
     if text is None:
         return ""
