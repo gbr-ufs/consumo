@@ -5,6 +5,7 @@ on:
       - main
     paths:
       - docs/**
+      - src/**
       - .github/workflows/docs.yaml
   workflow_dispatch:
 
