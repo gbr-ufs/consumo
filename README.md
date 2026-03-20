@@ -58,7 +58,7 @@ https://en.wikipedia.org/wiki/Functional_programming
 
 Repeat until you get over **a hundred** links (and multiple websites other than Wikipedia). Needless to say, I felt overwhelmed and thought: "LLMs can view webpages. Maybe I can give this list of links to one so it can sort them by duration for a better experience?"
 
-I tried multiple models, but none where able to do that. Maybe there's something like this out there already, but I forgot to search for it. But thankfully that sparkled a great idea for a project: consumo!
+I tried multiple models, but none were able to do that. Maybe there's something like this out there already, but I forgot to search for it. But thankfully that sparkled a great idea for a project: consumo!
 
 ## Philosophies
 
