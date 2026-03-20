@@ -1,3 +1,13 @@
+## 0.4.2 (2026-03-20)
+
+### Fix
+
+- **pyproject.toml**: update uv build
+
+### Refactor
+
+- use import instead of import-from for trafilatura functions
+
 ## 0.4.1 (2026-03-18)
 
 ### Fix
