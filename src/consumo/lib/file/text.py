@@ -24,14 +24,13 @@ def get_word_count(text: str) -> int:
     """
     raw_result: float = len(text.split())
     cjk = regex.compile(r"\p{Script=Han}|\p{Hiragana}|\p{Katakana}|\p{Script=Hangul}")
+    cjk_character_count: int = len(cjk.findall(text))
 
-    for char in text:
-        if cjk.match(char):
-            # The default reading speed for alphabetical languages in the Medium
-            # formula is 265 words per minute. In non-alphabetical ones, it's
-            # 500 characters per minute.
-            # 265 / 500 = 0.53
-            raw_result += 0.53
+    # The default reading speed for alphabetical languages in the Medium
+    # formula is 265 words per minute. In non-alphabetical ones, it's
+    # 500 characters per minute.
+    # 265 / 500 = 0.53
+    raw_result += cjk_character_count * 0.53
 
     return math.ceil(raw_result)
 
