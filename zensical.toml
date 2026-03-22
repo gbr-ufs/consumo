@@ -24,6 +24,7 @@ site_url = "https://gbr-ufs.github.io/consumo/"
 inventories = [
   "https://docs.python.org/3/objects.inv",
   "https://docs.pydantic.dev/latest/objects.inv",
+  "https://tedboy.github.io/bs4_doc/objects.inv",
 ]
 paths = ["src"]
 
