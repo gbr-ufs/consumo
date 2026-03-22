@@ -6,7 +6,7 @@ import json
 from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
 from pathlib import Path
-from typing import Any, Callable, Iterator, Optional
+from typing import Any, Iterator
 
 import trafilatura
 from bs4 import BeautifulSoup, ResultSet, Tag
@@ -32,40 +32,15 @@ from consumo.lib.file.text import calculate_reading_time, get_word_count
 DURATION_ADAPTER: TypeAdapter[timedelta] = TypeAdapter(timedelta)
 
 
-@validate_call
-def extract_text(html: FilePath) -> str:
-    """Extract the main text content of an HTML file.
-
-    This strips boilerplate content such as headers and footers, and unrelated
-    content such as sidebars.
-
-    Args:
-        html: Path to the HTML file whose main text content will be extracted.
-
-    Returns:
-        The main text content of the HTML file, if any.
-    """
-    raw_html: str = html.read_text("utf-8")
-    text: str | None = trafilatura.extract(raw_html)
-
-    if text is None:
-        return ""
-
-    return text
-
-
-@validate_call
-def extract_multimedias(html: FilePath) -> list[str]:
+def extract_multimedias(soup: BeautifulSoup) -> list[str]:
     """Get all the multimedia sources from an HTML file.
 
     Args:
-        html: Path to the HTML file which we'll get the multimedia files from.
+        soup: The HTML file as parsed by BeautifulSoup.
 
     Returns:
         A list of all the multimedia sources.
     """
-    raw_html: str = html.read_text("utf-8")
-    soup: BeautifulSoup = BeautifulSoup(raw_html, "lxml")
     audios: ResultSet[Tag] = soup("audio")
     iframes: ResultSet[Tag] = soup("iframe")
     videos: ResultSet[Tag] = soup("video")
@@ -89,22 +64,6 @@ def extract_multimedias(html: FilePath) -> list[str]:
         result.append(str(src))
 
     return result
-
-
-@validate_call
-def get_image_count(html: FilePath) -> int:
-    """Get the number of images in an HTML file.
-
-    Args:
-        html: Path to the HTML file whose number of images will be counted.
-
-    Returns:
-        The number of images in the file.
-    """
-    raw_html: str = html.read_text("utf-8")
-    soup: BeautifulSoup = BeautifulSoup(raw_html, "lxml")
-
-    return len(soup("img"))
 
 
 @validate_call
@@ -215,14 +174,16 @@ def calculate_consumption_time(
         def multimedia_duration_resolver(src: str) -> int:
             return get_multimedia_duration(html, src)
 
-    text: str = extract_text(html)
-    word_count: int = get_word_count(text)
+    raw_html: str = html.read_text("utf-8")
+    soup: BeautifulSoup = BeautifulSoup(raw_html, "lxml")
+    text: str | None = trafilatura.extract(raw_html)
+    word_count: int = get_word_count(text or "")
     reading_time: int = calculate_reading_time(word_count, words_per_minute)
 
-    image_count: int = get_image_count(html)
+    image_count: int = len(soup("img"))
     image_time: int = calculate_viewing_time(image_count)
 
-    multimedias: list[str] = extract_multimedias(html)
+    multimedias: list[str] = extract_multimedias(soup)
     multimedia_time: int = 0
 
     with ThreadPoolExecutor() as e:

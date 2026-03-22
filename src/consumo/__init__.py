@@ -9,10 +9,6 @@ from consumo.lib.file.html import (
 from consumo.lib.file.html import (
     extract_multimedias,
     get_custom_player_duration,
-    get_image_count,
-)
-from consumo.lib.file.html import (
-    extract_text as extract_html_text,
 )
 from consumo.lib.file.html import (
     get_multimedia_duration as get_html_multimedia_duration,
@@ -42,13 +38,11 @@ __all__: list[str] = [
     "calculate_text_consumption_time",
     "calculate_url_consumption_time",
     "calculate_viewing_time",
-    "extract_html_text",
     "extract_mass_media_text",
     "extract_multimedias",
     "format_time",
     "get_custom_player_duration",
     "get_html_multimedia_duration",
-    "get_image_count",
     "get_multimedia_duration",
     "get_url_multimedia_duration",
     "get_word_count",
