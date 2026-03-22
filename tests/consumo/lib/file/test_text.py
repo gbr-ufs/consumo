@@ -45,7 +45,7 @@ def test_get_word_count(text: str, expected_word_count: int) -> None:
 冒着敌人的炮火， 前进！
 前进！ 前进！ 进！
 """,
-            101,
+            62,
         ),
         (
             """
@@ -55,7 +55,7 @@ def test_get_word_count(text: str, expected_word_count: int) -> None:
 巌となりて
 苔のむすまで
 """,
-            32,
+            20,
         ),
         (
             """
@@ -70,7 +70,7 @@ def test_get_word_count(text: str, expected_word_count: int) -> None:
 이 기상과 이 맘으로 충성을 다하여
 괴로우나 즐거우나 나라 사랑하세.
 """,
-            186,
+            123,
         ),
     ],
 )
@@ -104,7 +104,7 @@ Gave proof through the night that our flag was still there;
 O say does that star-spangled banner yet wave,
 ⁠O'er the land of the free and the home of the brave?
 """,
-            181,
+            142,
         ),
     ],
 )

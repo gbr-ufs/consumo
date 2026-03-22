@@ -12,9 +12,9 @@ def get_word_count(text: str) -> int:
     """Get the number of words from text.
 
     Supports Chinese, Japanese, and Korean (CJK) by counting a CJK character as
-    a word. Note that this differs from the Medium formula as what it does
-    would be difficult to implement (it has 500 characters per minute by default
-    for CJK text).
+    a approximately half a word (0.53). This is done because, in the Medium
+    formula, the average reading speed for words is 265 per minute, while the
+    average for non-alphabetical languages is 500 per character.
 
     Args:
         text: Text where the number of words will be counted from.
@@ -27,7 +27,11 @@ def get_word_count(text: str) -> int:
 
     for char in text:
         if cjk.match(char):
-            raw_result += 1
+            # The default reading speed for alphabetical languages in the Medium
+            # formula is 265 words per minute. In non-alphabetical ones, it's
+            # 500 characters per minute.
+            # 265 / 500 = 0.53
+            raw_result += 0.53
 
     return math.ceil(raw_result)
 
