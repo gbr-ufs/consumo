@@ -68,7 +68,7 @@ def calculate_consumption_time(
     """Calculate the consumption time of a URL in seconds.
 
     Avoids code duplication by downloading the HTML of the URL to a temporary
-    file, to use the HTML backend `calculate_html_consumption_time`.
+    file, to use the HTML backend [`calculate_html_consumption_time`][consumo.calculate_html_consumption_time].
 
     Args:
         url: URL pointing to the content whose consumption time will be analyzed.
