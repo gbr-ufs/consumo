@@ -1,3 +1,22 @@
+## 0.5.0 (2026-03-22)
+
+### BREAKING CHANGE
+
+- remove `get_image_count`
+- modify the value of cjk characters, changing the result for content with these characters
+
+### Fix
+
+- modify cjk character value to be about half a word
+
+### Refactor
+
+- calculate_html_consumption_time
+
+### Perf
+
+- **text.py**: use findall method instead of a loop
+
 ## 0.4.2 (2026-03-20)
 
 ### Fix
