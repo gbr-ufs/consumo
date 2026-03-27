@@ -44,7 +44,7 @@ O say does that star-spangled banner yet wave,
 
 @pytest.mark.parametrize(
     "word_count, cjk_character_count, words_per_minute",
-    [(265, 0, 265), (0, 60, 1000)],
+    [(265, 0, 265), (0, 500, 265)],
 )
 def test_calculate_reading_time(
     word_count: int, cjk_character_count: int, words_per_minute: int
