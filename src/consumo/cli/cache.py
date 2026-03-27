@@ -7,7 +7,6 @@ import sqlite3
 import sys
 from pathlib import Path
 from sqlite3 import Cursor
-from typing import Optional
 
 
 def get_cache_directory(program_name: str) -> Path:
@@ -87,6 +86,8 @@ def get_cached_result(
     The cache is implemented as SQLite database because it is serverless.
 
     Args:
+        program_name: The name of the CLI program whose result will be returned
+            from cache.
         key: The key to search for in the database to look for a stored value.
         current_time: The time when this function was called for cache
             validation. If this time is generally in line with the one on the
