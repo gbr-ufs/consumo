@@ -40,7 +40,9 @@ def calculate_consumption_time(
         The time in seconds to consume the content of the file.
     """
     text: str = extract_text(container)
-    word_count: int = get_word_count(text)
-    reading_time: int = calculate_reading_time(word_count, words_per_minute)
+    word_count, cjk_character_count = get_word_count(text)
+    reading_time: int = calculate_reading_time(
+        word_count, cjk_character_count, words_per_minute
+    )
 
     return reading_time

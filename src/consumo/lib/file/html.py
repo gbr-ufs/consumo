@@ -177,8 +177,10 @@ def calculate_consumption_time(
     raw_html: str = html.read_text("utf-8")
     soup: BeautifulSoup = BeautifulSoup(raw_html, "lxml")
     text: str | None = trafilatura.extract(raw_html)
-    word_count: int = get_word_count(text or "")
-    reading_time: int = calculate_reading_time(word_count, words_per_minute)
+    word_count, cjk_character_count = get_word_count(text or "")
+    reading_time: int = calculate_reading_time(
+        word_count, cjk_character_count, words_per_minute
+    )
 
     image_count: int = len(soup("img"))
     image_time: int = calculate_viewing_time(image_count)
