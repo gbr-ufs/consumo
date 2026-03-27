@@ -1,3 +1,9 @@
+## 0.6.1 (2026-03-27)
+
+### Fix
+
+- calculate_reading_time cjk implementation
+
 ## 0.6.0 (2026-03-27)
 
 ### BREAKING CHANGE
