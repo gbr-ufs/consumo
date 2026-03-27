@@ -1,3 +1,22 @@
+## 0.6.0 (2026-03-27)
+
+### BREAKING CHANGE
+
+- modify return type of get_word_count from int to tuple[int, int]
+
+### Feat
+
+- implement caching for the url command
+- implement caching for the file command
+
+### Refactor
+
+- (attempt to?) improve precision for text with cjk
+
+### Perf
+
+- add caching module
+
 ## 0.5.0 (2026-03-22)
 
 ### BREAKING CHANGE
