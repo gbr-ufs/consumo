@@ -2,14 +2,17 @@
 
 """File handler command module."""
 
+import os
 from pathlib import Path
+from sqlite3 import OperationalError
 from typing import Annotated, Callable
 
 import magic
 import typer
-from pydantic import NonNegativeInt, validate_call
+from pydantic import FilePath, NonNegativeInt, validate_call
 from typer import Typer
 
+from consumo.cli.cache import cache_result, get_cached_result
 from consumo.cli.config import (
     DEFAULT_SORT,
     DEFAULT_WORDS_PER_MINUTE,
@@ -36,10 +39,13 @@ app: Typer = Typer()
 
 
 @validate_call()
-def get_duration(file: Path, words_per_minute: NonNegativeInt = 265) -> int:
+def get_duration(file: FilePath, words_per_minute: NonNegativeInt = 265) -> int:
     """Get the duration or calculate the consumption time of a file in seconds.
 
     Support is based on MIME type.
+
+    Caching is implemented using a SQLite database using mtime for cache
+    invalidation.
 
     Supported types are:
 
@@ -66,14 +72,21 @@ def get_duration(file: Path, words_per_minute: NonNegativeInt = 265) -> int:
         The time in seconds to consume the content in the file.
 
     Raises:
-        IsADirectoryError: If the file path points to a directory.
         typer.Exit: Raised with exit code 1 if the MIME type is unsupported.
     """
-    if file.is_dir():
-        raise IsADirectoryError
+    absolute_filename: str = str(file.absolute)
+    current_time: int | float = os.path.getmtime(file)
 
-    # Cast to str because python-magic-bin is behind python-magic in version
-    # and thus doesn't support the Path type.
+    try:
+        cached_result: int | None = get_cached_result(
+            "consumo", absolute_filename, current_time
+        )
+
+        if cached_result is not None:
+            return cached_result
+    except OperationalError:
+        pass
+
     mime_type: str = magic.from_file(str(file), mime=True)
     type, subtype = mime_type.split("/", 1)
     multimedia_types = ("audio", "video")
@@ -101,7 +114,11 @@ def get_duration(file: Path, words_per_minute: NonNegativeInt = 265) -> int:
 
         raise typer.Exit(1)
 
-    return handler(file, words_per_minute)
+    result: int = handler(file, words_per_minute)
+
+    cache_result("consumo", absolute_filename, current_time, result)
+
+    return result
 
 
 @app.command(

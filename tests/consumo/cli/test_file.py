@@ -2,12 +2,17 @@
 
 """Test suite of the cli/file module."""
 
+import sqlite3
 from pathlib import Path
+from unittest.mock import Mock, patch
 
 import pytest
+import typer
+from pytest import MonkeyPatch
 from typer.testing import CliRunner, Result
 
-from consumo.cli.file import app
+from consumo.cli import file as file_mod
+from consumo.cli.file import app, get_duration
 from tests import FIXTURES_DIR
 
 runner: CliRunner = CliRunner()
@@ -55,8 +60,15 @@ def test_process_files_unsupported_file_type(tmp_path: Path) -> None:
     assert expected_result in actual_result.output
 
 
-def test_process_files_directory_error() -> None:
-    actual_result: Result = runner.invoke(app, [str(FIXTURES_DIR)])
-    expected_exit_code: int = 1
+@patch("consumo.cli.file.get_cached_result")
+def test_get_duration_returns_cached_value_and_skips_handlers(
+    mock_get_cached_result: Mock,
+) -> None:
+    blog_post_html: Path = FIXTURES_DIR / "blog_post.html"
 
-    assert actual_result.exit_code == expected_exit_code
+    mock_get_cached_result.return_value = 28
+
+    actual_result: int = get_duration(blog_post_html)
+    expected_result: int = 28
+
+    assert actual_result == expected_result
