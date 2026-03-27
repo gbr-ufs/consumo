@@ -2,15 +2,18 @@
 
 """Test suite of the cli/url module."""
 
-from unittest.mock import MagicMock, patch
+import sqlite3
+from unittest.mock import Mock, patch
 
 import pytest
-from av.error import InvalidDataError
+from av.error import FFmpegError, InvalidDataError
 from pydantic import HttpUrl
+from pytest import MonkeyPatch
+from sqlite3 import OperationalError
 from typer.testing import CliRunner, Result
 from yt_dlp.utils import DownloadError
 
-from consumo.cli.url import app
+from consumo.cli.url import app, get_duration
 from consumo.lib.exceptions import MissingMetadataError
 
 runner: CliRunner = CliRunner()
@@ -24,9 +27,9 @@ runner: CliRunner = CliRunner()
 @patch("consumo.cli.url.get_multimedia_duration")
 @patch("consumo.cli.url.calculate_consumption_time")
 def test_process_urls_downloaderror(
-    mock_calculate_consumption_time: MagicMock,
-    mock_get_multimedia_duration: MagicMock,
-    mock_get_hosted_multimedia_duration: MagicMock,
+    mock_calculate_consumption_time: Mock,
+    mock_get_multimedia_duration: Mock,
+    mock_get_hosted_multimedia_duration: Mock,
     url: HttpUrl,
     consumption_time: int,
     expected_result: str,
@@ -56,8 +59,8 @@ def test_process_urls_downloaderror(
 @patch("consumo.cli.url.get_multimedia_duration")
 @patch("consumo.cli.url.get_hosted_multimedia_duration")
 def test_process_urls_missingmetadataerror(
-    mock_get_hosted_multimedia_duration: MagicMock,
-    mock_get_multimedia_duration: MagicMock,
+    mock_get_hosted_multimedia_duration: Mock,
+    mock_get_multimedia_duration: Mock,
     url: HttpUrl,
     consumption_time: int,
     expected_result: str,
@@ -85,9 +88,9 @@ def test_process_urls_missingmetadataerror(
 @patch("consumo.cli.url.get_multimedia_duration")
 @patch("consumo.cli.url.calculate_consumption_time")
 def test_process_urls_invaliddataerror(
-    mock_calculate_consumption_time: MagicMock,
-    mock_get_multimedia_duration: MagicMock,
-    mock_get_hosted_multimedia_duration: MagicMock,
+    mock_calculate_consumption_time: Mock,
+    mock_get_multimedia_duration: Mock,
+    mock_get_hosted_multimedia_duration: Mock,
     url: HttpUrl,
     consumption_time: int,
     expected_result: str,
@@ -110,7 +113,7 @@ def test_process_urls_invaliddataerror(
 )
 @patch("consumo.cli.url.get_hosted_multimedia_duration")
 def test_process_urls_hosted(
-    mock_get_hosted_multimedia_duration: MagicMock,
+    mock_get_hosted_multimedia_duration: Mock,
     url: HttpUrl,
     consumption_time: int,
     expected_result: str,
@@ -124,7 +127,7 @@ def test_process_urls_hosted(
 
 
 @patch("consumo.cli.core.handle_multiple_args")
-def test_process_urls_multiple(mock_handle_multiple_args: MagicMock) -> None:
+def test_process_urls_multiple(mock_handle_multiple_args: Mock) -> None:
     mock_handle_multiple_args.return_value: dict[HttpUrl, int] = {
         "https://info.cern.ch/hypertext/WWW/TheProject.html": 43,
         "https://www.bbc.com/news/articles/c4g0dzg6e4mo": 297,
@@ -142,3 +145,61 @@ def test_process_urls_multiple(mock_handle_multiple_args: MagicMock) -> None:
 
     assert "43s" in actual_result.output
     assert "4m 57s" in actual_result.output
+
+
+class FakeDate:
+    @staticmethod
+    def today():
+        # Fixed date for assertions.
+        from datetime import date
+
+        return date(2026, 3, 27)
+
+
+@patch("consumo.cli.url.get_cached_result")
+def test_get_duration_cache_hit(
+    mock_get_cached_result: Mock,
+):
+    mock_get_cached_result.return_value = 43
+
+    actual_result: int = get_duration(
+        HttpUrl("https://info.cern.ch/hypertext/WWW/TheProject.html")
+    )
+    expected_result: int = 43
+
+    assert actual_result == expected_result
+
+
+@patch("consumo.cli.url.cache_result")
+@patch("consumo.cli.url.calculate_consumption_time")
+@patch("consumo.cli.url.get_multimedia_duration")
+@patch("consumo.cli.url.get_hosted_multimedia_duration")
+@patch("consumo.cli.url.get_cached_result")
+@patch("consumo.cli.url.date", new=FakeDate)
+def test_get_duration_hosted_success_and_cached(
+    mock_get_cached_result: Mock,
+    mock_get_hosted_multimedia_duration: Mock,
+    mock_get_multimedia_duration: Mock,
+    mock_calculate_consumption_time: Mock,
+    mock_cache_result: Mock,
+):
+    # No cache, hosted resolver succeeds.
+    mock_get_cached_result.side_effect = OperationalError
+    mock_get_hosted_multimedia_duration.side_effect = DownloadError("")
+    mock_get_multimedia_duration.side_effect = FFmpegError(1, "", "")
+    mock_calculate_consumption_time.return_value = 43
+
+    actual_result: int = get_duration(
+        HttpUrl("https://info.cern.ch/hypertext/WWW/TheProject.html")
+    )
+    expected_result: int = 43
+
+    assert actual_result == expected_result
+
+    # Inspect cache_result call args.
+    assert mock_cache_result.called
+    args: list[str] = mock_cache_result.call_args[0]
+    assert args[0] == "consumo"
+    assert args[1] == "https://info.cern.ch/hypertext/WWW/TheProject.html:265"
+    assert args[2] == "2026-03-27"
+    assert args[3] == 43

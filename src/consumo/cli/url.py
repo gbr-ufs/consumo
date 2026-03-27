@@ -2,8 +2,11 @@
 
 """URL handler command module."""
 
+from datetime import date
+from sqlite3 import OperationalError
 from typing import Annotated
 
+import courlan
 import typer
 from av.error import FFmpegError
 from pydantic import (
@@ -14,6 +17,7 @@ from pydantic import (
 from typer import Typer
 from yt_dlp.utils import DownloadError
 
+from consumo.cli.cache import cache_result, get_cached_result
 from consumo.cli.config import (
     DEFAULT_SORT,
     DEFAULT_WORDS_PER_MINUTE,
@@ -40,6 +44,9 @@ def get_duration(url: HttpUrl, words_per_minute: NonNegativeInt = 265) -> int:
     Gets the duration of media from hosting platforms or direct file
     links, and calculates the consumption time otherwise.
 
+    Caching is implemented using a SQLite database. A cache is valid for one
+    day.
+
     Args:
         url: The URL of the content whose duration or consumption time will be
             analyzed.
@@ -48,22 +55,44 @@ def get_duration(url: HttpUrl, words_per_minute: NonNegativeInt = 265) -> int:
     Returns:
         The time in seconds to consume the content the URL points to.
     """
-    # Fallback mechanism. First we try to get the duration as if its was hosted
+    # not_iterable is ignored for this line because courlan.check_url only
+    # returns None if there is no domain. This is unlikely to happen, as
+    # Pydantic would catch that before the url even reaches this part of the
+    # function.
+    normalized_url, _ = courlan.check_url(str(url))  # ty:ignore[not-iterable]
+    key: str = f"{normalized_url}:{words_per_minute}"
+    current_time: str = date.today().isoformat()
+
+    try:
+        cached: int | None = get_cached_result("consumo", key, current_time)
+
+        if cached is not None:
+            return cached
+    except OperationalError:
+        pass
+
+    # Fallback mechanism. First we try to get the duration as if it was hosted
     # on a platform, then as a hosted file, and when all else fails, we try to
     # calculate the consumption time.
-    try:
-        return get_hosted_multimedia_duration(url)
-    except DownloadError:
-        pass
-    except MissingMetadataError:
-        pass
+    result: int | None = None
 
     try:
-        return get_multimedia_duration(url)
-    except FFmpegError:
+        result: int = get_hosted_multimedia_duration(url)
+    except (DownloadError, MissingMetadataError):
         pass
 
-    return calculate_consumption_time(url, words_per_minute)
+    if result is None:
+        try:
+            result: int = get_multimedia_duration(url)
+        except FFmpegError:
+            pass
+
+    if result is None:
+        result: int = calculate_consumption_time(url, words_per_minute)
+
+    cache_result("consumo", key, current_time, result)
+
+    return result
 
 
 @app.command(

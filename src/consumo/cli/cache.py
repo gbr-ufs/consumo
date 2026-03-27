@@ -45,7 +45,9 @@ def get_cache_directory(program_name: str) -> Path:
     return base_directory / program_name
 
 
-def cache_result(program_name: str, key: str, time: int | float, value: int) -> None:
+def cache_result(
+    program_name: str, key: str, time: int | float | str, value: int
+) -> None:
     """Store CLI result on cache.
 
     The cache is implemented as SQLite database because it is serverless.
@@ -78,7 +80,7 @@ def cache_result(program_name: str, key: str, time: int | float, value: int) -> 
 
 
 def get_cached_result(
-    program_name: str, key: str, current_time: int | float
+    program_name: str, key: str, current_time: int | float | str
 ) -> int | None:
     """Get CLI result stored on cache.
 
