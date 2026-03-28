@@ -14,6 +14,7 @@ def reset_config_defaults() -> None:
     """Fixture to reset global configuration variables before each test."""
     config.DEFAULT_SORT = False
     config.DEFAULT_WORDS_PER_MINUTE = 265
+    config.DEFAULT_SKIP_ERRORS = False
 
 
 def test_load_configuration_valid(
@@ -25,6 +26,7 @@ def test_load_configuration_valid(
     [general]
     sort = true
     words_per_minute = 1000
+    skip_errors = true
     """)
 
     monkeypatch.setattr("typer.get_app_dir", lambda name: str(tmp_path))
@@ -33,6 +35,7 @@ def test_load_configuration_valid(
 
     assert config.DEFAULT_SORT is True
     assert config.DEFAULT_WORDS_PER_MINUTE == 1000
+    assert config.DEFAULT_SKIP_ERRORS is True
 
 
 def test_load_configuration_missing_sort(

@@ -10,8 +10,10 @@ import typer
 from typer import Typer
 
 from consumo.cli.config import (
+    DEFAULT_SKIP_ERRORS,
     DEFAULT_SORT,
     DEFAULT_WORDS_PER_MINUTE,
+    SkipErrorsOption,
     SortOption,
     WordsPerMinuteOption,
 )
@@ -31,6 +33,7 @@ def process_list(
     file: Annotated[Path, typer.Argument()],
     sort: SortOption = DEFAULT_SORT,
     words_per_minute: WordsPerMinuteOption = DEFAULT_WORDS_PER_MINUTE,
+    skip_errors: SkipErrorsOption = DEFAULT_SKIP_ERRORS,
 ) -> None:
     """Calculate the consumption time of all the links in a link list file in a *h *m *s format.
 
@@ -38,6 +41,8 @@ def process_list(
         file: The path to the file containing the list of links.
         sort: Whether to sort output in ascending order.
         words_per_minute: Reading speed in words per minute.
+        skip_errors: Whether to warn and return 0 in case an exception is raised
+            for an item in the list.
 
     Example:
         A "file with a list of links" is a plain text file that looks like this:
@@ -73,7 +78,7 @@ def process_list(
         # Filter out empty lines to prevent processing errors.
         urls: list[str] = [url.strip() for url in urls if url.strip()]
 
-        process_urls(urls, sort, words_per_minute)
+        process_urls(urls, sort, words_per_minute, skip_errors)
     else:
         unsupported_mime_type_error(mime_type)
 

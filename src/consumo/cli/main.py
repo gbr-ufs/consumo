@@ -31,10 +31,9 @@ def version_callback(value: bool) -> None:
     """
     if value:
         metadata: PackageMetadata = importlib.metadata.metadata("consumo")
-        name: str = metadata["name"]
         version: str = metadata["version"]
 
-        print(f"{name} {version}")
+        print(f"consumo {version}")
 
         raise typer.Exit()
 

@@ -19,8 +19,10 @@ from yt_dlp.utils import DownloadError
 
 from consumo.cli.cache import cache_result, get_cached_result
 from consumo.cli.config import (
+    DEFAULT_SKIP_ERRORS,
     DEFAULT_SORT,
     DEFAULT_WORDS_PER_MINUTE,
+    SkipErrorsOption,
     SortOption,
     WordsPerMinuteOption,
 )
@@ -103,6 +105,7 @@ def process_urls(
     urls: Annotated[list[str], typer.Argument()],
     sort: SortOption = DEFAULT_SORT,
     words_per_minute: WordsPerMinuteOption = DEFAULT_WORDS_PER_MINUTE,
+    skip_errors: SkipErrorsOption = DEFAULT_SKIP_ERRORS,
 ) -> None:
     """Calculate the consumption time of URLs concurrently in a *h *m *s format.
 
@@ -111,11 +114,17 @@ def process_urls(
             will be analyzed.
         sort: Whether to sort output in ascending order.
         words_per_minute: Reading speed in words per minute.
+        skip_errors: Whether to warn and return 0 in case an exception is raised
+            for an URL..
     """
 
     def duration_resolver(url: str) -> int:
         return get_duration(HttpUrl(url), words_per_minute)
 
     execute_concurrent_command(
-        urls, duration_resolver, "Processing URL(s)...", sort=sort
+        urls,
+        duration_resolver,
+        "Processing URL(s)...",
+        sort=sort,
+        skip_errors=skip_errors,
     )
