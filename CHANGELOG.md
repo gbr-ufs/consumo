@@ -1,3 +1,9 @@
+## 0.7.0 (2026-03-28)
+
+### Feat
+
+- implement --skip-errors flag
+
 ## 0.6.1 (2026-03-27)
 
 ### Fix
