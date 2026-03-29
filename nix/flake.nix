@@ -26,7 +26,6 @@
             packages = with pkgs; [
               ffmpeg # For PyAV and yt-dlp.
               file # For libmagic1.
-              python312
               uv
             ];
           };
