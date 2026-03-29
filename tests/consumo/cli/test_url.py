@@ -2,14 +2,12 @@
 
 """Test suite of the cli/url module."""
 
-import sqlite3
-from unittest.mock import Mock, patch
+from sqlite3 import OperationalError
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 from av.error import FFmpegError, InvalidDataError
 from pydantic import HttpUrl
-from pytest import MonkeyPatch
-from sqlite3 import OperationalError
 from typer.testing import CliRunner, Result
 from yt_dlp.utils import DownloadError
 
@@ -128,7 +126,7 @@ def test_process_urls_hosted(
 
 @patch("consumo.cli.core.handle_multiple_args")
 def test_process_urls_multiple(mock_handle_multiple_args: Mock) -> None:
-    mock_handle_multiple_args.return_value: dict[HttpUrl, int] = {
+    mock_handle_multiple_args.return_value = {
         "https://info.cern.ch/hypertext/WWW/TheProject.html": 43,
         "https://www.bbc.com/news/articles/c4g0dzg6e4mo": 297,
     }
@@ -200,12 +198,12 @@ def test_get_duration_hosted_success_and_cached(
     assert mock_cache_result.called
     args: list[str] = mock_cache_result.call_args[0]
     assert args[0] == "consumo"
-    assert args[1] == "https://info.cern.ch/hypertext/WWW/TheProject.html:265"
+    assert args[1] == "https://info.cern.ch/hypertext/WWW/TheProject.html:265:0"
     assert args[2] == "2026-03-27"
     assert args[3] == 43
 
 
-def test_process_files_not_a_url_skip_errors() -> None:
+def test_process_urls_not_a_url_skip_errors() -> None:
     actual_result: Result = runner.invoke(app, [str("file.txt"), "--skip-errors"])
     expected_exit_code: int = 0
     expected_warning: str = "Warning:"
@@ -214,3 +212,53 @@ def test_process_files_not_a_url_skip_errors() -> None:
     assert actual_result.exit_code == expected_exit_code
     assert expected_warning in actual_result.output
     assert expected_error in actual_result.output
+
+
+@patch("consumo.cli.url.get_multimedia_duration")
+@patch("consumo.cli.url.get_hosted_multimedia_duration")
+@patch("consumo.cli.url.urllib.request.urlopen")
+@patch("consumo.cli.url.calculate_consumption_time")
+def test_process_urls_depth(
+    mock_calculate_consumption_time: Mock,
+    mock_urllib_request_urlopen: Mock,
+    mock_get_hosted_multimedia_duration: Mock,
+    mock_get_multimedia_duration: Mock,
+) -> None:
+    original_url: str = "https://info.cern.ch/"
+
+    mock_get_hosted_multimedia_duration.side_effect = DownloadError("")
+    mock_get_multimedia_duration.side_effect = FFmpegError(1, "", "")
+
+    def calc_side_effect(url, *args, **kwargs):
+        url_result = {
+            original_url: 10,
+            "https://info.cern.ch/hypertext/WWW/TheProject.html": 43,
+            "http://line-mode.cern.ch/www/hypertext/WWW/TheProject.html": 43,
+            "http://home.web.cern.ch/topics/birth-web": 103,
+            "http://home.web.cern.ch/about": 121,
+        }
+        return url_result.get(str(url))
+
+    mock_calculate_consumption_time.side_effect = calc_side_effect
+
+    fake_html = b"""
+    <html>
+        <body>
+            <a href="/hypertext/WWW/TheProject.html">Relative Link</a>
+            <a href="http://line-mode.cern.ch/www/hypertext/WWW/TheProject.html">Absolute 1</a>
+            <a href="http://home.web.cern.ch/topics/birth-web">Absolute 2</a>
+            <a href="http://home.web.cern.ch/about">Absolute 3</a>
+        </body>
+    </html>
+    """
+
+    mock_response = MagicMock()
+    mock_response.read.return_value = fake_html
+    mock_response.__enter__.return_value = mock_response
+    mock_urllib_request_urlopen.return_value = mock_response
+
+    actual_result = runner.invoke(app, [original_url, "--depth", "1"])
+    expected_exit_code = 0
+
+    assert actual_result.exit_code == expected_exit_code
+    assert "5m 20s" in actual_result.output

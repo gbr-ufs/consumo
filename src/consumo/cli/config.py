@@ -14,6 +14,7 @@ from pydantic import NonNegativeInt
 DEFAULT_SORT: bool = False
 DEFAULT_WORDS_PER_MINUTE: NonNegativeInt = 265
 DEFAULT_SKIP_ERRORS: bool = False
+DEFAULT_DEPTH: NonNegativeInt = 0
 
 SortOption = Annotated[
     bool,
@@ -27,6 +28,10 @@ SkipErrorsOption = Annotated[
     typer.Option(
         help="Whether to warn and show 0s in case an exception is raised for an item in the list."
     ),
+]
+DepthOption = Annotated[
+    NonNegativeInt,
+    typer.Option(help="How many levels to recursively follow URLs on the page."),
 ]
 
 
@@ -46,6 +51,7 @@ def load_configuration() -> None:
     global DEFAULT_SORT
     global DEFAULT_WORDS_PER_MINUTE
     global DEFAULT_SKIP_ERRORS
+    global DEFAULT_DEPTH
 
     app_dir: str = typer.get_app_dir("consumo")
     config_path: Path = Path(app_dir) / "config.toml"
@@ -55,13 +61,22 @@ def load_configuration() -> None:
             try:
                 config_data: dict[str, Any] = tomllib.load(c)
                 general: Any = config_data.get("general", {})
+                url: Any = config_data.get("url", {})
+                key_section_global_type: list[tuple[str, Any, str, Any]] = [
+                    ("sort", general, "DEFAULT_SORT", bool),
+                    ("words_per_minute", general, "DEFAULT_WORDS_PER_MINUTE", int),
+                    ("skip_errors", general, "DEFAULT_SKIP_ERRORS", bool),
+                    ("depth", url, "DEFAULT_DEPTH", int),
+                ]
 
-                if "sort" in general:
-                    DEFAULT_SORT = bool(general["sort"])
-                if "words_per_minute" in general:
-                    DEFAULT_WORDS_PER_MINUTE = int(general["words_per_minute"])
-                if "skip_errors" in general:
-                    DEFAULT_SKIP_ERRORS = bool(general["sort"])
+                for (
+                    key,
+                    section,
+                    global_variable_name,
+                    type_cast,
+                ) in key_section_global_type:
+                    if key in section:
+                        globals()[global_variable_name] = type_cast(section[key])
             except TOMLDecodeError:
                 configuration_parsing_warning(config_path)
 

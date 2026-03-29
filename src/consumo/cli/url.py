@@ -2,13 +2,17 @@
 
 """URL handler command module."""
 
+import urllib.request
 from datetime import date
 from sqlite3 import OperationalError
 from typing import Annotated
+from urllib.parse import urljoin
 
 import courlan
 import typer
 from av.error import FFmpegError
+from bs4 import BeautifulSoup, ResultSet, Tag
+from bs4.element import AttributeValueList
 from pydantic import (
     HttpUrl,
     NonNegativeInt,
@@ -19,9 +23,11 @@ from yt_dlp.utils import DownloadError
 
 from consumo.cli.cache import cache_result, get_cached_result
 from consumo.cli.config import (
+    DEFAULT_DEPTH,
     DEFAULT_SKIP_ERRORS,
     DEFAULT_SORT,
     DEFAULT_WORDS_PER_MINUTE,
+    DepthOption,
     SkipErrorsOption,
     SortOption,
     WordsPerMinuteOption,
@@ -40,7 +46,11 @@ app: Typer = Typer()
 
 
 @validate_call
-def get_duration(url: HttpUrl, words_per_minute: NonNegativeInt = 265) -> int:
+def get_duration(
+    url: HttpUrl,
+    words_per_minute: NonNegativeInt = 265,
+    depth: NonNegativeInt = 0,
+) -> int:
     """Get the duration or calculate the consumption time of a URL in seconds.
 
     Gets the duration of media from hosting platforms or direct file
@@ -62,7 +72,7 @@ def get_duration(url: HttpUrl, words_per_minute: NonNegativeInt = 265) -> int:
     # Pydantic would catch that before the url even reaches this part of the
     # function.
     normalized_url, _ = courlan.check_url(str(url))  # ty:ignore[not-iterable]
-    key: str = f"{normalized_url}:{words_per_minute}"
+    key: str = f"{normalized_url}:{words_per_minute}:{depth}"
     current_time: str = date.today().isoformat()
 
     try:
@@ -94,6 +104,24 @@ def get_duration(url: HttpUrl, words_per_minute: NonNegativeInt = 265) -> int:
 
     cache_result("consumo", key, current_time, result)
 
+    if depth > 0:
+        with urllib.request.urlopen(str(url)) as response:
+            raw_html: str = response.read()
+
+        soup: BeautifulSoup = BeautifulSoup(raw_html, "lxml")
+        tags: ResultSet[Tag] = soup("a")
+
+        def recursive(tag: Tag) -> int:
+            href: str | AttributeValueList | None = tag.get("href")
+
+            absolute_url: HttpUrl = HttpUrl(urljoin(str(url), href))
+
+            return get_duration(
+                absolute_url, words_per_minute=words_per_minute, depth=depth - 1
+            )
+
+        result += sum(map(recursive, tags))
+
     return result
 
 
@@ -106,6 +134,7 @@ def process_urls(
     sort: SortOption = DEFAULT_SORT,
     words_per_minute: WordsPerMinuteOption = DEFAULT_WORDS_PER_MINUTE,
     skip_errors: SkipErrorsOption = DEFAULT_SKIP_ERRORS,
+    depth: DepthOption = DEFAULT_DEPTH,
 ) -> None:
     """Calculate the consumption time of URLs concurrently in a *h *m *s format.
 
@@ -119,7 +148,7 @@ def process_urls(
     """
 
     def duration_resolver(url: str) -> int:
-        return get_duration(HttpUrl(url), words_per_minute)
+        return get_duration(HttpUrl(url), words_per_minute, depth=depth)
 
     execute_concurrent_command(
         urls,
