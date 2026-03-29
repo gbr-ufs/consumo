@@ -7,6 +7,9 @@ consumo supports a [TOML](https://toml.io/en/) configuration file under your sys
 sort = false
 words_per_minute = 265
 skip_errors = false
+
+[url]
+depth = 0
 ```
 
 ## `general`
@@ -22,3 +25,9 @@ Equivalent to the `--words-per-minute` flag of [the commands](cli.md). Determine
 ### `skip_errors`
 
 Equivalent to the `--skip-errors` flag of [the commands](cli.md). Determines whether to show zero seconds for arguments that otherwise would make the program exit with an error.
+
+## `url`
+
+### `depth`
+
+Equivalent to the `--depth` flag of [the url command](cli.md). Determines how many levels to recursively follow URLs on the page. It is recommended that one pairs it with `skip_errors` at high levels, as the availability of unvisited URLs is unknown (as in, you can't know if you can follow a URL if you haven't clicked it).
