@@ -16,7 +16,7 @@
 
 ## Introduction
 
-`consumo` is a command-line interface (CLI) built with [Typer](https://typer.tiangolo.com/) that **calculates the time to consume either online or offline media**. It can be used for sorting media by duration for later consumption or by deciding if something can be viewed today or at a later date.
+consumo is a command-line interface (CLI) built with [Typer](https://typer.tiangolo.com/) that **calculates the time to consume either online or offline media**. It can be used for sorting media by duration for later consumption or by deciding if something can be viewed today or at a later date.
 
 It's designed with **broad support** in mind. When it comes to online media, it supports video platforms by directly getting the duration of the linked video; online hosted files by extracting the duration from their metadata; articles and text in general by using the **Medium formula** to calculate the total consumption time based on text, using a (customizable) words per minute (WPM) count; image count; video duration of the videos on the page. For further details, see: [How Medium Calculates Read Time](https://mediumcourse.com/how-is-medium-article-read-time-calculated/).
 
