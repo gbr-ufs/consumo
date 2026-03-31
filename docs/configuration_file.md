@@ -7,6 +7,7 @@ consumo supports a [TOML](https://toml.io/en/) configuration file under your sys
 sort = false
 words_per_minute = 265
 skip_errors = false
+cache = true
 
 [url]
 depth = 0
@@ -25,6 +26,10 @@ Equivalent to the `--words-per-minute` flag of [the commands](cli.md). Determine
 ### `skip_errors`
 
 Equivalent to the `--skip-errors` flag of [the commands](cli.md). Determines whether to show zero seconds for arguments that otherwise would make the program exit with an error.
+
+### `cache`
+
+Equivalent to the `--cache` flag of [the commands](cli.md). Determines whether to cache results in a database for later reuse.
 
 ## `url`
 
