@@ -1,3 +1,10 @@
+## 0.9.0 (2026-03-30)
+
+### Feat
+
+- implement --cache flag
+- **list.py**: support --depth for list command
+
 ## 0.8.0 (2026-03-28)
 
 ### Feat
