@@ -23,10 +23,12 @@ from yt_dlp.utils import DownloadError
 
 from consumo.cli.cache import cache_result, get_cached_result
 from consumo.cli.config import (
+    DEFAULT_CACHE,
     DEFAULT_DEPTH,
     DEFAULT_SKIP_ERRORS,
     DEFAULT_SORT,
     DEFAULT_WORDS_PER_MINUTE,
+    CacheOption,
     DepthOption,
     SkipErrorsOption,
     SortOption,
@@ -50,6 +52,7 @@ def get_duration(
     url: HttpUrl,
     words_per_minute: NonNegativeInt = 265,
     depth: NonNegativeInt = 0,
+    cache: bool = True,
 ) -> int:
     """Get the duration or calculate the consumption time of a URL in seconds.
 
@@ -63,25 +66,28 @@ def get_duration(
         url: The URL of the content whose duration or consumption time will be
             analyzed.
         words_per_minute: Reading speed in words per minute.
+        cache: Whether to cache results in a database for later reuse.
+            Values are invalidated based on time.
 
     Returns:
         The time in seconds to consume the content the URL points to.
     """
-    # not_iterable is ignored for this line because courlan.check_url only
-    # returns None if there is no domain. This is unlikely to happen, as
-    # Pydantic would catch that before the url even reaches this part of the
-    # function.
-    normalized_url, _ = courlan.check_url(str(url))  # ty:ignore[not-iterable]
-    key: str = f"{normalized_url}:{words_per_minute}:{depth}"
-    current_time: str = date.today().isoformat()
 
-    try:
-        cached: int | None = get_cached_result("consumo", key, current_time)
+    if cache:
+        try:
+            # not_iterable is ignored for this line because courlan.check_url only
+            # returns None if there is no domain. This is unlikely to happen, as
+            # Pydantic would catch that before the url even reaches this part of the
+            # function.
+            normalized_url, _ = courlan.check_url(str(url))  # ty:ignore[not-iterable]
+            key: str = f"{normalized_url}:{words_per_minute}:{depth}"
+            current_time: str = date.today().isoformat()
+            cached: int | None = get_cached_result("consumo", key, current_time)
 
-        if cached is not None:
-            return cached
-    except OperationalError:
-        pass
+            if cached is not None:
+                return cached
+        except OperationalError:
+            pass
 
     # Fallback mechanism. First we try to get the duration as if it was hosted
     # on a platform, then as a hosted file, and when all else fails, we try to
@@ -102,7 +108,8 @@ def get_duration(
     if result is None:
         result: int = calculate_consumption_time(url, words_per_minute)
 
-    cache_result("consumo", key, current_time, result)
+    if cache:
+        cache_result("consumo", key, current_time, result)
 
     if depth > 0:
         with urllib.request.urlopen(str(url)) as response:
@@ -135,6 +142,7 @@ def process_urls(
     words_per_minute: WordsPerMinuteOption = DEFAULT_WORDS_PER_MINUTE,
     skip_errors: SkipErrorsOption = DEFAULT_SKIP_ERRORS,
     depth: DepthOption = DEFAULT_DEPTH,
+    cache: CacheOption = DEFAULT_CACHE,
 ) -> None:
     """Calculate the consumption time of URLs concurrently in a *h *m *s format.
 
@@ -146,10 +154,12 @@ def process_urls(
         skip_errors: Whether to warn and return 0 in case an exception is raised
             for an URL.
         depth: How many levels to recursively follow URLs on the page.
+        cache: Whether to cache results in a database for later reuse.
+            Values are invalidated based on time.
     """
 
     def duration_resolver(url: str) -> int:
-        return get_duration(HttpUrl(url), words_per_minute, depth=depth)
+        return get_duration(HttpUrl(url), words_per_minute, depth, cache)
 
     execute_concurrent_command(
         urls,

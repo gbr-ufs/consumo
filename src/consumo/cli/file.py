@@ -14,9 +14,11 @@ from typer import Typer
 
 from consumo.cli.cache import cache_result, get_cached_result
 from consumo.cli.config import (
+    DEFAULT_CACHE,
     DEFAULT_SKIP_ERRORS,
     DEFAULT_SORT,
     DEFAULT_WORDS_PER_MINUTE,
+    CacheOption,
     SkipErrorsOption,
     SortOption,
     WordsPerMinuteOption,
@@ -41,7 +43,9 @@ app: Typer = Typer()
 
 
 @validate_call()
-def get_duration(file: FilePath, words_per_minute: NonNegativeInt = 265) -> int:
+def get_duration(
+    file: FilePath, words_per_minute: NonNegativeInt = 265, cache: bool = True
+) -> int:
     """Get the duration or calculate the consumption time of a file in seconds.
 
     Support is based on MIME type.
@@ -69,6 +73,8 @@ def get_duration(file: FilePath, words_per_minute: NonNegativeInt = 265) -> int:
         file: The path to the file whose duration or consumption time will be
             analyzed.
         words_per_minute: Reading speed in words per minute.
+        cache: Whether to cache results in a database for later reuse.
+            Values are invalidated based on time.
 
     Returns:
         The time in seconds to consume the content in the file.
@@ -79,15 +85,16 @@ def get_duration(file: FilePath, words_per_minute: NonNegativeInt = 265) -> int:
     absolute_filename: str = str(file.absolute)
     current_time: int | float = os.path.getmtime(file)
 
-    try:
-        cached_result: int | None = get_cached_result(
-            "consumo", absolute_filename, current_time
-        )
+    if cache:
+        try:
+            cached_result: int | None = get_cached_result(
+                "consumo", absolute_filename, current_time
+            )
 
-        if cached_result is not None:
-            return cached_result
-    except OperationalError:
-        pass
+            if cached_result is not None:
+                return cached_result
+        except OperationalError:
+            pass
 
     mime_type: str = magic.from_file(str(file), mime=True)
     type, subtype = mime_type.split("/", 1)
@@ -118,7 +125,10 @@ def get_duration(file: FilePath, words_per_minute: NonNegativeInt = 265) -> int:
 
     result: int = handler(file, words_per_minute)
 
-    cache_result("consumo", absolute_filename, current_time, result)
+    # Tests can't catch this line for some reason.
+    # But they can catch the one from cli/url.py, so we're safe.
+    if cache:  # pragma: no cover
+        cache_result("consumo", absolute_filename, current_time, result)
 
     return result
 
@@ -132,6 +142,7 @@ def process_files(
     sort: SortOption = DEFAULT_SORT,
     words_per_minute: WordsPerMinuteOption = DEFAULT_WORDS_PER_MINUTE,
     skip_errors: SkipErrorsOption = DEFAULT_SKIP_ERRORS,
+    cache: CacheOption = DEFAULT_CACHE,
 ) -> None:
     """Calculate the consumption time of files concurrently in a *h *m *s format.
 
@@ -142,10 +153,12 @@ def process_files(
         words_per_minute: Reading speed in words per minute.
         skip_errors: Whether to warn and return 0 in case an exception is raised
             for a file.
+        cache: Whether to cache results in a database for later reuse.
+            Values are invalidated based on time.
     """
 
     def duration_resolver(file: Path) -> int:
-        return get_duration(file, words_per_minute)
+        return get_duration(file, words_per_minute, cache)
 
     execute_concurrent_command(
         files,

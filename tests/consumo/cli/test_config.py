@@ -27,6 +27,7 @@ def test_load_configuration_valid(
     sort = true
     words_per_minute = 1000
     skip_errors = true
+    cache = false
     """)
 
     monkeypatch.setattr("typer.get_app_dir", lambda name: str(tmp_path))

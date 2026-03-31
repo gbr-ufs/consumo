@@ -2,16 +2,14 @@
 
 """Test suite of the cli/file module."""
 
-import sqlite3
+import os
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
-import typer
-from pytest import MonkeyPatch
 from typer.testing import CliRunner, Result
 
-from consumo.cli import file as file_mod
+from consumo.cli.cache import get_cached_result
 from consumo.cli.file import app, get_duration
 from tests import FIXTURES_DIR
 
@@ -38,7 +36,9 @@ runner: CliRunner = CliRunner()
 def test_process_files_get_standard_files(
     filename: str, expected_exit_code: int, expected_result: str
 ) -> None:
-    actual_result: Result = runner.invoke(app, [str(FIXTURES_DIR / filename)])
+    actual_result: Result = runner.invoke(
+        app, [str(FIXTURES_DIR / filename), "--cache"]
+    )
 
     assert actual_result.exit_code == expected_exit_code
     assert expected_result in actual_result.output
@@ -72,3 +72,13 @@ def test_get_duration_returns_cached_value_and_skips_handlers(
     expected_result: int = 28
 
     assert actual_result == expected_result
+
+
+def test_process_files_no_cache() -> None:
+    audio_mp3: Path = FIXTURES_DIR / "audio.mp3"
+    actual_result: Result = runner.invoke(app, [str(audio_mp3), "--no-cache"])
+    expected_exit_code: int = 0
+    expected_result: str = "1"
+
+    assert actual_result.exit_code == expected_exit_code
+    assert expected_result in actual_result.output

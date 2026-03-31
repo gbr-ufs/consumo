@@ -65,7 +65,7 @@ def test_process_urls_missingmetadataerror(
 ) -> None:
     mock_get_hosted_multimedia_duration.side_effect = MissingMetadataError
     mock_get_multimedia_duration.return_value = consumption_time
-    actual_result: Result = runner.invoke(app, [str(url)])
+    actual_result: Result = runner.invoke(app, [str(url), "--no-cache"])
     expected_exit_code: int = 0
 
     assert actual_result.exit_code == expected_exit_code

@@ -15,6 +15,8 @@ DEFAULT_SORT: bool = False
 DEFAULT_WORDS_PER_MINUTE: NonNegativeInt = 265
 DEFAULT_SKIP_ERRORS: bool = False
 DEFAULT_DEPTH: NonNegativeInt = 0
+DEFAULT_CACHE: bool = True
+
 
 SortOption = Annotated[
     bool,
@@ -32,6 +34,12 @@ SkipErrorsOption = Annotated[
 DepthOption = Annotated[
     NonNegativeInt,
     typer.Option(help="How many levels to recursively follow URLs on the page."),
+]
+CacheOption = Annotated[
+    bool,
+    typer.Option(
+        help="Whether to cache results in a database for later reuse. Values are invalidated based on time."
+    ),
 ]
 
 
@@ -62,10 +70,11 @@ def load_configuration() -> None:
                 config_data: dict[str, Any] = tomllib.load(c)
                 general: Any = config_data.get("general", {})
                 url: Any = config_data.get("url", {})
-                key_section_global_type: list[tuple[str, Any, str, Any]] = [
+                key_section_global_type: list[tuple[str, Any, str, type]] = [
                     ("sort", general, "DEFAULT_SORT", bool),
                     ("words_per_minute", general, "DEFAULT_WORDS_PER_MINUTE", int),
                     ("skip_errors", general, "DEFAULT_SKIP_ERRORS", bool),
+                    ("cache", general, "DEFAULT_CACHE", bool),
                     ("depth", url, "DEFAULT_DEPTH", int),
                 ]
 
