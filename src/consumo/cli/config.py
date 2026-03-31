@@ -2,6 +2,7 @@
 
 """Configuration loader module."""
 
+import os
 import tomllib
 from pathlib import Path
 from tomllib import TOMLDecodeError
@@ -11,47 +12,97 @@ import rich
 import typer
 from pydantic import NonNegativeInt
 
-DEFAULT_SORT: bool = False
-DEFAULT_WORDS_PER_MINUTE: NonNegativeInt = 265
-DEFAULT_SKIP_ERRORS: bool = False
-DEFAULT_DEPTH: NonNegativeInt = 0
-DEFAULT_CACHE: bool = True
+
+def environment_variable_interpretation_warning(
+    environment_variable: str, type: type
+) -> None:
+    """Print a message warning that an environment variable could not be interpreted as the desired type.
+
+    Args:
+        environment_variable: Name of the environment variable.
+        type: The type the environment variable should've been interpreted as.
+    """
+    message: str = f"Could not interpret {environment_variable} as {type.__name__}"
+
+    rich.print(f"[bold yellow]Warning[/bold yellow]: {message}")
+
+
+def set_default_value(environment_variable: str, value: Any) -> Any:
+    """Set the value of a variable based on an environment variable or default.
+
+    Args:
+        environment_variable: The environment variable whose value will be
+            attempted to be interpreted as one compatible with the variable's
+            supposed type.
+        value: The fallback value in case the environment variable couldn't be
+            correctly interpreted.
+    """
+    environment_variable_value: Any = os.getenv(environment_variable)
+
+    if environment_variable_value is None:
+        return value
+
+    type_cast: type = type(value)
+
+    if type_cast is bool:
+        # Words that should be equivalent to True when dealing with booleans.
+        truthy_words: tuple = ("true", "1", "yes", "y", "on")
+
+        return environment_variable_value.lower() in truthy_words
+
+    try:
+        return type_cast(environment_variable_value)
+    except ValueError:
+        environment_variable_interpretation_warning(environment_variable, type_cast)
+        return value
+
+
+DEFAULT_SORT: bool = set_default_value("CONSUMO_SORT", False)
+DEFAULT_WORDS_PER_MINUTE: NonNegativeInt = set_default_value("CONSUMO_WPM", 265)
+DEFAULT_SKIP_ERRORS: bool = set_default_value("CONSUMO_SKIP_ERRORS", False)
+DEFAULT_DEPTH: NonNegativeInt = set_default_value("CONSUMO_DEPTH", 0)
+DEFAULT_CACHE: bool = set_default_value("CONSUMO_CACHE", True)
 
 
 SortOption = Annotated[
     bool,
-    typer.Option(help="Whether to sort the output by duration in ascending order."),
+    typer.Option(
+        help="Whether to sort the output by duration in ascending order. [env: CONSUMO_SORT=]"
+    ),
 ]
 WordsPerMinuteOption = Annotated[
-    NonNegativeInt, typer.Option(help="Reading speed in words per minute.")
+    NonNegativeInt,
+    typer.Option(help="Reading speed in words per minute. [env: CONSUMO_WPM=]"),
 ]
 SkipErrorsOption = Annotated[
     bool,
     typer.Option(
-        help="Whether to warn and show 0s in case an exception is raised for an item in the list."
+        help="Whether to warn and show 0s in case an exception is raised for an item in the list. [env: CONSUMO_SKIP_ERRORS=]"
     ),
 ]
 DepthOption = Annotated[
     NonNegativeInt,
-    typer.Option(help="How many levels to recursively follow URLs on the page."),
+    typer.Option(
+        help="How many levels to recursively follow URLs on the page. [env: CONSUMO_DEPTH=]"
+    ),
 ]
 CacheOption = Annotated[
     bool,
     typer.Option(
-        help="Whether to cache results in a database for later reuse. Values are invalidated based on time."
+        help="Whether to cache results in a database for later reuse. Values are invalidated based on time. [env: CONSUMO_CACHE=]"
     ),
 ]
 
 
 def configuration_parsing_warning(config_path: Path) -> None:
-    """Print a message warning that the configuration filed could not be parsed.
+    """Print a message warning that the configuration file could not be parsed.
 
     Args:
         config_path: Path to the configuration file.
     """
-    rich.print(
-        f"[bold yellow]Could not parse configuration file at {config_path}[/bold yellow]"
-    )
+    message: str = f"Could not parse configuration file at {config_path}"
+
+    rich.print(f"[bold yellow]Warning[/bold yellow]: {message}")
 
 
 def load_configuration() -> None:

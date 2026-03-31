@@ -5,8 +5,11 @@
 from pathlib import Path
 
 import pytest
+from pydantic import NonNegativeInt
+from pytest import CaptureFixture, MonkeyPatch
 
 import consumo.cli.config as config
+from consumo.cli.config import set_default_value
 
 
 @pytest.fixture(autouse=True)
@@ -17,9 +20,7 @@ def reset_config_defaults() -> None:
     config.DEFAULT_SKIP_ERRORS = False
 
 
-def test_load_configuration_valid(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_load_configuration_valid(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
     config_file: Path = tmp_path / "config.toml"
 
     config_file.write_text("""
@@ -76,7 +77,7 @@ def test_load_configuration_missing_words_per_minute(
 
 
 def test_load_configuration_invalid_toml(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: CaptureFixture
 ) -> None:
     config_file: Path = tmp_path / "config.toml"
 
@@ -106,3 +107,28 @@ def test_load_configuration_missing_file(
 
     assert config.DEFAULT_SORT is False
     assert config.DEFAULT_WORDS_PER_MINUTE == 265
+
+
+def test_set_default_value_interpretation_warning(
+    monkeypatch: MonkeyPatch, capsys: CaptureFixture
+) -> None:
+    monkeypatch.setenv("CONSUMO_WPM", "foo")
+    actual_result: bool = set_default_value("CONSUMO_WPM", 265)
+    expected_result: NonNegativeInt = 265
+    expected_output: str = "Warning"
+
+    captured = capsys.readouterr()
+
+    assert expected_output in captured.out
+
+    assert actual_result == expected_result
+
+
+def test_set_default_value_bool(
+    monkeypatch: MonkeyPatch, capsys: CaptureFixture
+) -> None:
+    monkeypatch.setenv("CONSUMO_SORT", "1")
+    actual_result: bool = set_default_value("CONSUMO_SORT", False)
+    expected_result: bool = True
+
+    assert actual_result == expected_result
