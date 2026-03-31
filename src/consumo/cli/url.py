@@ -72,14 +72,11 @@ def get_duration(
     Returns:
         The time in seconds to consume the content the URL points to.
     """
-
     if cache:
         try:
-            # not_iterable is ignored for this line because courlan.check_url only
-            # returns None if there is no domain. This is unlikely to happen, as
-            # Pydantic would catch that before the url even reaches this part of the
-            # function.
-            normalized_url, _ = courlan.check_url(str(url))  # ty:ignore[not-iterable]
+            # Not really None, as Pydantic would catch if the URL is malformed
+            # before it even reaches this bit of the code.
+            normalized_url: str | None = courlan.clean_url(str(url))
             key: str = f"{normalized_url}:{words_per_minute}:{depth}"
             current_time: str = date.today().isoformat()
             cached: int | None = get_cached_result("consumo", key, current_time)
