@@ -144,7 +144,8 @@ def process_urls(
         sort: Whether to sort output in ascending order.
         words_per_minute: Reading speed in words per minute.
         skip_errors: Whether to warn and return 0 in case an exception is raised
-            for an URL..
+            for an URL.
+        depth: How many levels to recursively follow URLs on the page.
     """
 
     def duration_resolver(url: str) -> int:
