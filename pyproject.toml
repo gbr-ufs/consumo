@@ -66,7 +66,7 @@ requires-python = ">=3.12"
 version = "0.9.0"
 
 [project.scripts]
-consumo = "consumo.cli.main:app"
+consumo = "consumo.cli.main:run"
 
 [tool.commitizen]
 breaking_change_exclamation_in_title = true

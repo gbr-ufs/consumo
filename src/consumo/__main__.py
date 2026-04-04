@@ -2,6 +2,6 @@
 
 """Library module entrypoint."""
 
-from consumo.cli.main import app
+from consumo.cli.main import run
 
-app()
+run()

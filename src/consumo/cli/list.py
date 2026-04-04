@@ -2,6 +2,8 @@
 
 """Link list file handler command module."""
 
+import consumo.lib.exceptions
+
 from pathlib import Path
 from typing import Annotated
 
@@ -21,10 +23,8 @@ from consumo.cli.config import (
     SortOption,
     WordsPerMinuteOption,
 )
-from consumo.cli.core import (
-    unsupported_mime_type_error,
-)
 from consumo.cli.url import process_urls
+from consumo.lib.exceptions import UnsupportedMIMETypeError
 
 app: Typer = Typer()
 
@@ -34,7 +34,7 @@ app: Typer = Typer()
     help="Calculate the consumption time of all the links in a link list file in a *h *m *s format.",
 )
 def process_list(
-    file: Annotated[Path, typer.Argument()],
+    file: Annotated[Path, typer.Argument(dir_okay=False, exists=True)],
     sort: SortOption = DEFAULT_SORT,
     words_per_minute: WordsPerMinuteOption = DEFAULT_WORDS_PER_MINUTE,
     skip_errors: SkipErrorsOption = DEFAULT_SKIP_ERRORS,
@@ -73,12 +73,8 @@ def process_list(
         ```
 
     Raises:
-        IsADirectoryError: If the file path points to a directory.
         typer.Exit: Raised with exit code 1 if the file isn't a plain text file.
     """
-    if file.is_dir():
-        raise IsADirectoryError
-
     mime_type: str = magic.from_file(str(file), mime=True)
 
     if mime_type == "text/plain":
@@ -89,6 +85,4 @@ def process_list(
 
         process_urls(urls, sort, words_per_minute, skip_errors, depth, cache)
     else:
-        unsupported_mime_type_error(mime_type)
-
-        raise typer.Exit(1)
+        raise UnsupportedMIMETypeError("Not a plain text file")

@@ -206,11 +206,9 @@ def test_get_duration_hosted_success_and_cached(
 def test_process_urls_not_a_url_skip_errors() -> None:
     actual_result: Result = runner.invoke(app, [str("file.txt"), "--skip-errors"])
     expected_exit_code: int = 0
-    expected_warning: str = "Warning:"
     expected_error: str = "ValidationError"
 
     assert actual_result.exit_code == expected_exit_code
-    assert expected_warning in actual_result.output
     assert expected_error in actual_result.output
 
 

@@ -9,3 +9,7 @@ class ConsumoError(Exception):
 
 class MissingMetadataError(ConsumoError):
     """Raised when a backend can't get the duration of a file from its metadata."""
+
+
+class UnsupportedMIMETypeError(ConsumoError):
+    """Raised when a file doesn't have the expected MIME type."""

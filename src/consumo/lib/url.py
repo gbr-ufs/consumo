@@ -83,7 +83,7 @@ def calculate_consumption_time(
     html_content: str | None = trafilatura.fetch_url(str(url))
 
     if html_content is None:
-        raise ConnectionError
+        raise ConnectionError("No network connection or program blocked by Cloudflare")
 
     with TemporaryDirectory() as tmp_dir:
         html: Path = Path(tmp_dir) / "temp.html"

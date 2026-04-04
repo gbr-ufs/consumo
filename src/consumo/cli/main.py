@@ -3,17 +3,27 @@
 """Main program module."""
 
 import importlib.metadata
+import sys
 from importlib.metadata import PackageMetadata
 from typing import Annotated
 
 import typer
+from pydantic import ValidationError
+from rich.console import Console
+from rich.panel import Panel
 from typer import Typer
 
+from consumo import MissingMetadataError
 from consumo.cli.file import app as file_app
 from consumo.cli.list import app as list_app
 from consumo.cli.url import app as url_app
+from consumo.lib.exceptions import UnsupportedMIMETypeError
 
-app: Typer = Typer(no_args_is_help=True, help="Content Consumption Analyzer.")
+app: Typer = Typer(
+    no_args_is_help=True,
+    help="Content Consumption Analyzer.",
+    pretty_exceptions_enable=False,
+)
 
 app.add_typer(file_app)
 app.add_typer(list_app)
@@ -55,3 +65,29 @@ def main(
     Args:
         version: Whether to print the program's version and exit.
     """
+
+
+def run() -> None:
+    """Wrapper for `app` to handle exceptions."""
+    exceptions = (
+        ConnectionError,
+        MissingMetadataError,
+        UnsupportedMIMETypeError,
+        ValidationError,
+    )
+
+    try:
+        app()
+    except exceptions as e:
+        error_console: Console = Console(stderr=True)
+
+        error_console.print(
+            Panel(
+                f"[red]{e.__class__.__name__}:[/red] {e}",
+                border_style="red",
+                title="Error",
+                title_align="left",
+            )
+        )
+
+        sys.exit(1)

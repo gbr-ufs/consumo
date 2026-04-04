@@ -2,6 +2,8 @@
 
 """File handler command module."""
 
+from consumo.lib.exceptions import UnsupportedMIMETypeError
+
 import os
 from pathlib import Path
 from sqlite3 import OperationalError
@@ -25,7 +27,6 @@ from consumo.cli.config import (
 )
 from consumo.cli.core import (
     execute_concurrent_command,
-    unsupported_mime_type_error,
 )
 from consumo.lib.file.html import (
     calculate_consumption_time as calculate_html_consumption_time,
@@ -119,9 +120,7 @@ def get_duration(
     )
 
     if handler is None:
-        unsupported_mime_type_error(mime_type)
-
-        raise typer.Exit(1)
+        raise UnsupportedMIMETypeError("File type not supported")
 
     result: int = handler(file, words_per_minute)
 
@@ -138,7 +137,7 @@ def get_duration(
     help="Calculate the consumption time of files concurrently in a *h *m *s format.",
 )
 def process_files(
-    files: Annotated[list[Path], typer.Argument(exists=True, readable=True)],
+    files: Annotated[list[Path], typer.Argument(dir_okay=False, exists=True)],
     sort: SortOption = DEFAULT_SORT,
     words_per_minute: WordsPerMinuteOption = DEFAULT_WORDS_PER_MINUTE,
     skip_errors: SkipErrorsOption = DEFAULT_SKIP_ERRORS,
