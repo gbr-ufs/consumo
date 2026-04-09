@@ -1,3 +1,14 @@
+## 0.10.0 (2026-04-09)
+
+### Feat
+
+- **config.py**: implement environment variable-based configuration
+
+### Fix
+
+- error handling
+- **cli/url.py**: use courlan.clean_url instead of courlan.check_url
+
 ## 0.9.0 (2026-03-30)
 
 ### Feat
