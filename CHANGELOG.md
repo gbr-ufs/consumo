@@ -1,3 +1,13 @@
+## 0.11.1 (2026-04-09)
+
+### Refactor
+
+- unhard code beautiful soup parser
+
+### Perf
+
+- cut down on url time
+
 ## 0.11.0 (2026-04-09)
 
 ### Feat
