@@ -60,7 +60,7 @@ def cache_result(
     """
     cache_directory: Path = get_cache_directory(program_name)
 
-    cache_directory.mkdir(exist_ok=True)
+    cache_directory.mkdir(exist_ok=True, parents=True)
 
     database_path: Path = cache_directory / f"{program_name}.db"
 
