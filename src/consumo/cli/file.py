@@ -104,7 +104,12 @@ def get_duration(
         return calculate_viewing_time(1)
 
     if type in multimedia_types:
-        return get_multimedia_duration(file)
+        result: int = get_multimedia_duration(file)
+
+        if cache:
+            cache_result("consumo", absolute_filename, current_time, result)
+
+        return result
 
     mime_type_handler: dict[str, Callable[[Path, NonNegativeInt], int]] = {
         "application/epub+zip": calculate_mass_media_consumption_time,
