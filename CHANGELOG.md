@@ -1,3 +1,13 @@
+## 0.11.0 (2026-04-09)
+
+### Feat
+
+- **file.py**: add caching for multimedia files
+
+### Fix
+
+- **cache.py**: create parent directories for cache
+
 ## 0.10.0 (2026-04-09)
 
 ### Feat
