@@ -20,7 +20,6 @@ from pydantic import (
     validate_call,
 )
 
-from consumo import beautiful_soup_parser
 from consumo.lib.file.image import calculate_viewing_time
 from consumo.lib.file.multimedia import (
     get_duration as get_absolute_path_multimedia_duration,
@@ -122,7 +121,7 @@ def get_custom_player_duration(html: FilePath) -> int:
         seconds.
     """
     raw_html: str = html.read_text("utf-8")
-    soup: BeautifulSoup = BeautifulSoup(raw_html, beautiful_soup_parser)
+    soup: BeautifulSoup = BeautifulSoup(raw_html, "lxml")
     script_attrs = {"data-schema": "video-object"}
 
     found_script_tags: ResultSet[Tag] = soup("script", script_attrs)
@@ -176,7 +175,7 @@ def calculate_consumption_time(
             return get_multimedia_duration(html, src)
 
     raw_html: str = html.read_text("utf-8")
-    soup: BeautifulSoup = BeautifulSoup(raw_html, beautiful_soup_parser)
+    soup: BeautifulSoup = BeautifulSoup(raw_html, "lxml")
     text: str | None = trafilatura.extract(raw_html)
     word_count, cjk_character_count = get_word_count(text or "")
     reading_time: int = calculate_reading_time(

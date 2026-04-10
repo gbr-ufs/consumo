@@ -21,7 +21,6 @@ from pydantic import (
 from typer import Typer
 from yt_dlp.utils import DownloadError
 
-from consumo import beautiful_soup_parser
 from consumo.cli.cache import cache_result, get_cached_result
 from consumo.cli.config import (
     DEFAULT_CACHE,
@@ -117,7 +116,7 @@ def get_duration(
         with urllib.request.urlopen(str(url)) as response:
             raw_html: str = response.read()
 
-        soup: BeautifulSoup = BeautifulSoup(raw_html, beautiful_soup_parser)
+        soup: BeautifulSoup = BeautifulSoup(raw_html, "lxml")
         tags: ResultSet[Tag] = soup("a")
 
         def recursive(tag: Tag) -> int:

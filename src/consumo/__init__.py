@@ -47,5 +47,3 @@ __all__: list[str] = [
     "get_url_multimedia_duration",
     "get_word_count",
 ]
-
-beautiful_soup_parser: str = "lxml"

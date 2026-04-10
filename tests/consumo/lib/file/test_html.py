@@ -9,7 +9,6 @@ import pytest
 from bs4 import BeautifulSoup
 from pydantic import FilePath
 
-from consumo import beautiful_soup_parser
 from consumo.lib.file.html import (
     calculate_consumption_time,
     extract_multimedias,
@@ -34,7 +33,7 @@ from tests import FIXTURES_DIR
 def test_extract_multimedias(filename: str, expected_multimedias: list[str]) -> None:
     html: FilePath = FIXTURES_DIR / filename
     raw_html: str = html.read_text("utf-8")
-    soup: BeautifulSoup = BeautifulSoup(raw_html, beautiful_soup_parser)
+    soup: BeautifulSoup = BeautifulSoup(raw_html, "lxml")
     actual_multimedias: list[str] = extract_multimedias(soup)
 
     assert actual_multimedias == expected_multimedias
