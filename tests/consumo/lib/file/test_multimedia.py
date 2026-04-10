@@ -14,6 +14,7 @@ from consumo.lib.file.multimedia import (
     get_duration,
     get_hosted_multimedia_duration,
     get_multimedia_duration,
+    is_hosted,
 )
 from tests import FIXTURES_DIR
 
@@ -153,3 +154,11 @@ def test_get_duration_downloaderror(
 
     with pytest.raises(FileNotFoundError):
         get_duration(url)
+
+
+def test_is_hosted() -> None:
+    url: HttpUrl = HttpUrl("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+    actual_result: bool = is_hosted(url)
+    expected_result: bool = True
+
+    assert actual_result == expected_result

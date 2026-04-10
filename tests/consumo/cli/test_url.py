@@ -21,18 +21,15 @@ runner: CliRunner = CliRunner()
     "url, consumption_time, expected_result",
     [("https://info.cern.ch/hypertext/WWW/TheProject.html", 43, "43s")],
 )
-@patch("consumo.cli.url.get_hosted_multimedia_duration")
 @patch("consumo.cli.url.get_multimedia_duration")
 @patch("consumo.cli.url.calculate_consumption_time")
 def test_process_urls_downloaderror(
     mock_calculate_consumption_time: Mock,
     mock_get_multimedia_duration: Mock,
-    mock_get_hosted_multimedia_duration: Mock,
     url: HttpUrl,
     consumption_time: int,
     expected_result: str,
 ) -> None:
-    mock_get_hosted_multimedia_duration.side_effect = DownloadError("")
     mock_get_multimedia_duration.side_effect: InvalidDataError = InvalidDataError(
         1094995529, "Invalid data found when processing input", str(url)
     )
@@ -55,15 +52,12 @@ def test_process_urls_downloaderror(
     ],
 )
 @patch("consumo.cli.url.get_multimedia_duration")
-@patch("consumo.cli.url.get_hosted_multimedia_duration")
 def test_process_urls_missingmetadataerror(
-    mock_get_hosted_multimedia_duration: Mock,
     mock_get_multimedia_duration: Mock,
     url: HttpUrl,
     consumption_time: int,
     expected_result: str,
 ) -> None:
-    mock_get_hosted_multimedia_duration.side_effect = MissingMetadataError
     mock_get_multimedia_duration.return_value = consumption_time
     actual_result: Result = runner.invoke(app, [str(url), "--no-cache"])
     expected_exit_code: int = 0
@@ -82,18 +76,15 @@ def test_process_urls_missingmetadataerror(
         )
     ],
 )
-@patch("consumo.cli.url.get_hosted_multimedia_duration")
 @patch("consumo.cli.url.get_multimedia_duration")
 @patch("consumo.cli.url.calculate_consumption_time")
 def test_process_urls_invaliddataerror(
     mock_calculate_consumption_time: Mock,
     mock_get_multimedia_duration: Mock,
-    mock_get_hosted_multimedia_duration: Mock,
     url: HttpUrl,
     consumption_time: int,
     expected_result: str,
 ) -> None:
-    mock_get_hosted_multimedia_duration.side_effect = MissingMetadataError
     mock_get_multimedia_duration.side_effect: InvalidDataError = InvalidDataError(
         1094995529, "Invalid data found when processing input", str(url)
     )
@@ -105,21 +96,45 @@ def test_process_urls_invaliddataerror(
     assert expected_result in actual_result.output
 
 
+class FakeDate:
+    @staticmethod
+    def today():
+        # Fixed date for assertions.
+        from datetime import date
+
+        return date(2026, 3, 27)
+
+
 @pytest.mark.parametrize(
     "url, consumption_time, expected_result",
     [("https://www.youtube.com/watch?v=H91BxkBXttE", 5717, "1h 35m 17s")],
 )
+@patch("consumo.cli.url.cache_result")
 @patch("consumo.cli.url.get_hosted_multimedia_duration")
+@patch("consumo.cli.url.is_hosted")
+@patch("consumo.cli.url.get_cached_result")
+@patch("consumo.cli.url.date", new=FakeDate)
 def test_process_urls_hosted(
+    mock_get_cached_result: Mock,
+    mock_is_hosted: Mock,
     mock_get_hosted_multimedia_duration: Mock,
+    mock_cache_result: Mock,
     url: HttpUrl,
     consumption_time: int,
     expected_result: str,
 ) -> None:
+    mock_get_cached_result.side_effect = OperationalError
+    mock_is_hosted.return_value = True
     mock_get_hosted_multimedia_duration.return_value = consumption_time
     actual_result: Result = runner.invoke(app, [str(url)])
     expected_exit_code: int = 0
 
+    assert mock_cache_result.called
+    args: list[str] = mock_cache_result.call_args[0]
+    assert args[0] == "consumo"
+    assert args[1] == f"{url}:265:0"
+    assert args[2] == "2026-03-27"
+    assert args[3] == consumption_time
     assert actual_result.exit_code == expected_exit_code
     assert expected_result in actual_result.output
 
@@ -148,15 +163,6 @@ def test_process_urls_multiple(mock_handle_multiple_args: Mock) -> None:
     assert "4m 57s" in actual_result.output
 
 
-class FakeDate:
-    @staticmethod
-    def today():
-        # Fixed date for assertions.
-        from datetime import date
-
-        return date(2026, 3, 27)
-
-
 @patch("consumo.cli.url.get_cached_result")
 def test_get_duration_cache_hit(
     mock_get_cached_result: Mock,
@@ -174,19 +180,16 @@ def test_get_duration_cache_hit(
 @patch("consumo.cli.url.cache_result")
 @patch("consumo.cli.url.calculate_consumption_time")
 @patch("consumo.cli.url.get_multimedia_duration")
-@patch("consumo.cli.url.get_hosted_multimedia_duration")
 @patch("consumo.cli.url.get_cached_result")
 @patch("consumo.cli.url.date", new=FakeDate)
 def test_get_duration_hosted_success_and_cached(
     mock_get_cached_result: Mock,
-    mock_get_hosted_multimedia_duration: Mock,
     mock_get_multimedia_duration: Mock,
     mock_calculate_consumption_time: Mock,
     mock_cache_result: Mock,
 ):
     # No cache, hosted resolver succeeds.
     mock_get_cached_result.side_effect = OperationalError
-    mock_get_hosted_multimedia_duration.side_effect = DownloadError("")
     mock_get_multimedia_duration.side_effect = FFmpegError(1, "", "")
     mock_calculate_consumption_time.return_value = 43
 
@@ -216,18 +219,15 @@ def test_process_urls_not_a_url_skip_errors() -> None:
 
 
 @patch("consumo.cli.url.get_multimedia_duration")
-@patch("consumo.cli.url.get_hosted_multimedia_duration")
 @patch("consumo.cli.url.urllib.request.urlopen")
 @patch("consumo.cli.url.calculate_consumption_time")
 def test_process_urls_depth(
     mock_calculate_consumption_time: Mock,
     mock_urllib_request_urlopen: Mock,
-    mock_get_hosted_multimedia_duration: Mock,
     mock_get_multimedia_duration: Mock,
 ) -> None:
     original_url: str = "https://info.cern.ch/"
 
-    mock_get_hosted_multimedia_duration.side_effect = DownloadError("")
     mock_get_multimedia_duration.side_effect = FFmpegError(1, "", "")
 
     def calc_side_effect(url, *args, **kwargs):

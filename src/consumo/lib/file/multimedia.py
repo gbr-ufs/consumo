@@ -4,9 +4,10 @@
 
 import math
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Iterator
+from typing import Any, Iterator, Set
 
 import av
+import yt_dlp
 from pydantic import FilePath, HttpUrl, validate_call
 from yt_dlp import DownloadError, YoutubeDL
 
@@ -127,3 +128,27 @@ def get_duration(url: HttpUrl) -> int:
         duration: int = get_multimedia_duration(url)
 
     return duration
+
+
+def is_hosted(url: HttpUrl, excluded_hosts: list[str] | None = None) -> bool:
+    """Determine whether a multimedia container is from a hosting platform.
+
+    Args:
+        url: The URL pointing to where the multimedia container is hosted.
+        excluded_hosts: Hosts that shouldn't be considered hosting platforms.
+
+    Returns: Whether a multimedia container is from a hosting platform.
+    """
+    if excluded_hosts is None:
+        excluded_hosts: list[str] = ["generic"]
+
+    excluded_set: Set = set(excluded_hosts)
+
+    for ie in yt_dlp.extractor.gen_extractors():
+        if ie.IE_NAME in excluded_set:
+            continue
+
+        if ie.suitable(str(url)):
+            return True
+
+    return False

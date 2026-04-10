@@ -41,6 +41,7 @@ from consumo.lib.exceptions import MissingMetadataError
 from consumo.lib.file.multimedia import (
     get_hosted_multimedia_duration,
     get_multimedia_duration,
+    is_hosted,
 )
 from consumo.lib.url import calculate_consumption_time
 
@@ -86,21 +87,24 @@ def get_duration(
         except OperationalError:
             pass
 
-    # Fallback mechanism. First we try to get the duration as if it was hosted
-    # on a platform, then as a hosted file, and when all else fails, we try to
-    # calculate the consumption time.
+    excluded_hosts: list[str] = ["abc", "AlJazeera", "ant1newsgr", "bbc", "generic"]
+
+    if is_hosted(url, excluded_hosts):
+        result: int = get_hosted_multimedia_duration(url)
+
+        if cache:
+            cache_result("consumo", key, current_time, result)
+
+        return result
+
+    # Fallback mechanism. First we try to get the duration as if it was
+    # a hosted file. If it is not, we calculate the consumption time.
     result: int | None = None
 
     try:
-        result: int = get_hosted_multimedia_duration(url)
-    except (DownloadError, MissingMetadataError):
+        result: int = get_multimedia_duration(url)
+    except FFmpegError:
         pass
-
-    if result is None:
-        try:
-            result: int = get_multimedia_duration(url)
-        except FFmpegError:
-            pass
 
     if result is None:
         result: int = calculate_consumption_time(url, words_per_minute)
