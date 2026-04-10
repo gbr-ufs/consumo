@@ -25,7 +25,7 @@ def exception_warning(argument: Any, exception: Exception) -> None:
 
 def handle_multiple_args(
     args: list[Any], duration_resolver: Callable[[Any], int], skip_errors: bool = False
-) -> dict[Any, int]:
+) -> tuple[dict[Any, int], dict[Any, Exception]]:
     """Get the duration/consumption time of multiple command-line arguments.
 
     Args:
@@ -36,7 +36,8 @@ def handle_multiple_args(
             for an argument.
 
     Returns:
-        A dictionary of argument-duration pairs.
+        A dictionary of argument-duration pairs and a dictionary of
+        argument-exception pairs.
     """
     results: dict[Any, int] = {}
     errors: dict[Any, Exception] = {}

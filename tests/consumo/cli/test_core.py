@@ -17,13 +17,16 @@ def test_execute_concurrent_command_sorted(
     monkeypatch: MonkeyPatch,
     capsys: CaptureFixture,
 ) -> None:
-    mock_handle_multiple_args.return_value: dict[str, int] = {
-        "https://info.cern.ch/hypertext/WWW/TheProject.html": 43,
-        "https://dn710704.ca.archive.org/0/items/night_of_the_living_dead_dvd/Night.mp4": 5732,
-        "https://www.bbc.com/news/articles/c4g0dzg6e4mo": 297,
-    }
+    mock_handle_multiple_args.return_value = (
+        {
+            "https://info.cern.ch/hypertext/WWW/TheProject.html": 43,
+            "https://dn710704.ca.archive.org/0/items/night_of_the_living_dead_dvd/Night.mp4": 5732,
+            "https://www.bbc.com/news/articles/c4g0dzg6e4mo": 297,
+        },
+        {},
+    )
 
-    mock_args: list[str] = list(mock_handle_multiple_args.return_value.keys())
+    mock_args = list(mock_handle_multiple_args.return_value[0].keys())
     duration_resolver: Mock = Mock()
 
     execute_concurrent_command(mock_args, duration_resolver, sort=True)
