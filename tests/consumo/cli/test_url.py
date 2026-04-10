@@ -126,10 +126,13 @@ def test_process_urls_hosted(
 
 @patch("consumo.cli.core.handle_multiple_args")
 def test_process_urls_multiple(mock_handle_multiple_args: Mock) -> None:
-    mock_handle_multiple_args.return_value = {
-        "https://info.cern.ch/hypertext/WWW/TheProject.html": 43,
-        "https://www.bbc.com/news/articles/c4g0dzg6e4mo": 297,
-    }
+    mock_handle_multiple_args.return_value = (
+        {
+            "https://info.cern.ch/hypertext/WWW/TheProject.html": 43,
+            "https://www.bbc.com/news/articles/c4g0dzg6e4mo": 297,
+        },
+        {},
+    )
     actual_result: Result = runner.invoke(
         app,
         [

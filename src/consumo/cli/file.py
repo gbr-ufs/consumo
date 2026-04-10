@@ -2,8 +2,6 @@
 
 """File handler command module."""
 
-from consumo.lib.exceptions import UnsupportedMIMETypeError
-
 import os
 from pathlib import Path
 from sqlite3 import OperationalError
@@ -28,6 +26,7 @@ from consumo.cli.config import (
 from consumo.cli.core import (
     execute_concurrent_command,
 )
+from consumo.lib.exceptions import UnsupportedMIMETypeError
 from consumo.lib.file.html import (
     calculate_consumption_time as calculate_html_consumption_time,
 )

@@ -2,15 +2,14 @@
 
 """Test suite of the cli/file module."""
 
-import os
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
 from typer.testing import CliRunner, Result
 
-from consumo.cli.cache import get_cached_result
 from consumo.cli.file import app, get_duration
+from consumo.lib.exceptions import UnsupportedMIMETypeError
 from tests import FIXTURES_DIR
 
 runner: CliRunner = CliRunner()
@@ -52,12 +51,8 @@ def test_process_files_unsupported_file_type(tmp_path: Path) -> None:
         b"\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00"
     )
 
-    actual_result: Result = runner.invoke(app, [str(mock_executable)])
-    expected_exit_code: int = 1
-    expected_result: str = "Unsupported MIME type"
-
-    assert actual_result.exit_code == expected_exit_code
-    assert expected_result in actual_result.output
+    with pytest.raises(UnsupportedMIMETypeError):
+        runner.invoke(app, [str(mock_executable)], catch_exceptions=False)
 
 
 @patch("consumo.cli.file.get_cached_result")

@@ -11,18 +11,6 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 from consumo.lib.formatting import format_time
 
 
-def exception_warning(argument: Any, exception: Exception) -> None:
-    """Print a warning message for an exception.
-
-    Args:
-        argument: Original argument that caused the exception.
-        exception: The exception caused by the argument.
-    """
-    message: str = f"{argument} # {exception.__class__.__name__}: {exception}"
-
-    print(message)
-
-
 def handle_multiple_args(
     args: list[Any], duration_resolver: Callable[[Any], int], skip_errors: bool = False
 ) -> tuple[dict[Any, int], dict[Any, Exception]]:
