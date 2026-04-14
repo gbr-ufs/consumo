@@ -6,9 +6,13 @@
   "customizations": {
     "vscode": {
       "settings": {
+        "editor.formatOnSave": true,
         "python.defaultInterpreterPath": ".venv/bin/python",
         "python.testing.pytestEnabled": true
-      }
+      },
+      "extensions": [
+        "charliermarsh.ruff"
+      ]
     }
   },
   "postCreateCommand": "uv sync --dev"
