@@ -2,12 +2,10 @@
 
 """Test suite of the cli/core module."""
 
-from typing import Any
 from unittest.mock import Mock, patch
 
 from pytest import CaptureFixture, MonkeyPatch
 
-import consumo.cli.core as core
 from consumo.cli.core import execute_concurrent_command
 
 

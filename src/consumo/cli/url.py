@@ -5,7 +5,7 @@
 import urllib.request
 from datetime import date
 from sqlite3 import OperationalError
-from typing import Annotated
+from typing import Annotated, Any, Callable
 from urllib.parse import urljoin
 
 import courlan
@@ -19,7 +19,6 @@ from pydantic import (
     validate_call,
 )
 from typer import Typer
-from yt_dlp.utils import DownloadError
 
 from consumo.cli.cache import cache_result, get_cached_result
 from consumo.cli.config import (
@@ -37,7 +36,6 @@ from consumo.cli.config import (
 from consumo.cli.core import (
     execute_concurrent_command,
 )
-from consumo.lib.exceptions import MissingMetadataError
 from consumo.lib.file.multimedia import (
     get_hosted_multimedia_duration,
     get_multimedia_duration,
@@ -54,6 +52,8 @@ def get_duration(
     words_per_minute: NonNegativeInt = 265,
     depth: NonNegativeInt = 0,
     cache: bool = True,
+    get_cached_resolver: Callable[[str, str, Any], int | None] = get_cached_result,
+    cache_resolver: Callable[[str, str, int, Any], None] = cache_result,
 ) -> int:
     """Get the duration or calculate the consumption time of a URL in seconds.
 
@@ -67,8 +67,15 @@ def get_duration(
         url: The URL of the content whose duration or consumption time will be
             analyzed.
         words_per_minute: Reading speed in words per minute.
+        depth: How many levels to recursively follow URLs on the page.
         cache: Whether to cache results in a database for later reuse.
             Values are invalidated based on time.
+        get_cached_resolver: Function for getting a value from a cache system
+            whose signature consists of program name, key, and time for cache
+            invalidation.
+        cache_resolver: Function for storing a value in a cache system  whose
+            signature consists of program name, key, value, and time for cache
+            invalidation.
 
     Returns:
         The time in seconds to consume the content the URL points to.
@@ -77,10 +84,10 @@ def get_duration(
         try:
             # Not really None, as Pydantic would catch if the URL is malformed
             # before it even reaches this bit of the code.
-            normalized_url: str | None = courlan.clean_url(str(url))
+            normalized_url: str = courlan.clean_url(str(url))  # ty:ignore[invalid-assignment]
             key: str = f"{normalized_url}:{words_per_minute}:{depth}"
             current_time: str = date.today().isoformat()
-            cached: int | None = get_cached_result("consumo", key, current_time)
+            cached: int | None = get_cached_resolver("consumo", key, current_time)
 
             if cached is not None:
                 return cached
@@ -93,7 +100,7 @@ def get_duration(
         result: int = get_hosted_multimedia_duration(url)
 
         if cache:
-            cache_result("consumo", key, current_time, result)
+            cache_resolver("consumo", key, result, current_time)
 
         return result
 
@@ -110,7 +117,7 @@ def get_duration(
         result: int = calculate_consumption_time(url, words_per_minute)
 
     if cache:
-        cache_result("consumo", key, current_time, result)
+        cache_resolver("consumo", key, result, current_time)
 
     if depth > 0:
         with urllib.request.urlopen(str(url)) as response:

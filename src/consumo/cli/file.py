@@ -5,7 +5,7 @@
 import os
 from pathlib import Path
 from sqlite3 import OperationalError
-from typing import Annotated, Callable
+from typing import Annotated, Any, Callable
 
 import magic
 import typer
@@ -44,7 +44,11 @@ app: Typer = Typer()
 
 @validate_call()
 def get_duration(
-    file: FilePath, words_per_minute: NonNegativeInt = 265, cache: bool = True
+    file: FilePath,
+    words_per_minute: NonNegativeInt = 265,
+    cache: bool = True,
+    get_cached_resolver: Callable[[str, str, Any], int | None] = get_cached_result,
+    cache_resolver: Callable[[str, str, int, Any], None] = cache_result,
 ) -> int:
     """Get the duration or calculate the consumption time of a file in seconds.
 
@@ -75,6 +79,12 @@ def get_duration(
         words_per_minute: Reading speed in words per minute.
         cache: Whether to cache results in a database for later reuse.
             Values are invalidated based on time.
+        get_cached_resolver: Function for getting a value from a cache system
+            whose signature consists of program name, key, and time for cache
+            invalidation.
+        cache_resolver: Function for storing a value in a cache system  whose
+            signature consists of program name, key, value, and time for cache
+            invalidation.
 
     Returns:
         The time in seconds to consume the content in the file.
@@ -87,7 +97,7 @@ def get_duration(
 
     if cache:
         try:
-            cached_result: int | None = get_cached_result(
+            cached_result: int | None = get_cached_resolver(
                 "consumo", absolute_filename, current_time
             )
 
@@ -107,7 +117,7 @@ def get_duration(
         result: int = get_multimedia_duration(file)
 
         if cache:
-            cache_result("consumo", absolute_filename, current_time, result)
+            cache_resolver("consumo", absolute_filename, result, current_time)
 
         return result
 
@@ -128,9 +138,7 @@ def get_duration(
 
     result: int = handler(file, words_per_minute)
 
-    # Tests can't catch this line for some reason.
-    # But they can catch the one from cli/url.py, so we're safe.
-    if cache:  # pragma: no cover
+    if cache:
         cache_result("consumo", absolute_filename, current_time, result)
 
     return result

@@ -13,11 +13,11 @@ def get_cache_directory(program_name: str) -> Path:
     """Get the program's cache directory on the system.
 
     Args:
-        program_name: The name of the program whose cache path directory will
+         program_name: The name of the program whose cache path directory will
             be resolved.
 
     Returns:
-        The path to the cache directory of the program on the current system.
+         The path to the cache directory of the program on the current system.
     """
     home: Path = Path.home()
 
@@ -45,7 +45,7 @@ def get_cache_directory(program_name: str) -> Path:
 
 
 def cache_result(
-    program_name: str, key: str, time: int | float | str, value: int
+    program_name: str, key: str, value: int, time: int | float | str
 ) -> None:
     """Store CLI result on cache.
 

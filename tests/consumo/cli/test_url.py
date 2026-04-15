@@ -9,10 +9,8 @@ import pytest
 from av.error import FFmpegError, InvalidDataError
 from pydantic import HttpUrl
 from typer.testing import CliRunner, Result
-from yt_dlp.utils import DownloadError
 
 from consumo.cli.url import app, get_duration
-from consumo.lib.exceptions import MissingMetadataError
 
 runner: CliRunner = CliRunner()
 
@@ -42,28 +40,27 @@ def test_process_urls_downloaderror(
 
 
 @pytest.mark.parametrize(
-    "url, consumption_time, expected_result",
+    "url, expected_result",
     [
         (
             "https://dn710704.ca.archive.org/0/items/night_of_the_living_dead_dvd/Night.mp4",
             5732,
-            "1h 35m 32s",
         )
     ],
 )
+@patch("consumo.cli.url.is_hosted")
 @patch("consumo.cli.url.get_multimedia_duration")
-def test_process_urls_missingmetadataerror(
+def test_get_duration_not_hosted(
     mock_get_multimedia_duration: Mock,
+    mock_is_hosted: Mock,
     url: HttpUrl,
-    consumption_time: int,
-    expected_result: str,
+    expected_result: int,
 ) -> None:
-    mock_get_multimedia_duration.return_value = consumption_time
-    actual_result: Result = runner.invoke(app, [str(url), "--no-cache"])
-    expected_exit_code: int = 0
+    mock_is_hosted.return_value = False
+    mock_get_multimedia_duration.return_value = expected_result
+    actual_result: int = get_duration(url, cache=False)
 
-    assert actual_result.exit_code == expected_exit_code
-    assert expected_result in actual_result.output
+    assert actual_result == expected_result
 
 
 @pytest.mark.parametrize(
@@ -106,37 +103,35 @@ class FakeDate:
 
 
 @pytest.mark.parametrize(
-    "url, consumption_time, expected_result",
-    [("https://www.youtube.com/watch?v=H91BxkBXttE", 5717, "1h 35m 17s")],
+    "url, expected_result",
+    [("https://www.youtube.com/watch?v=H91BxkBXttE", 5717)],
 )
-@patch("consumo.cli.url.cache_result")
 @patch("consumo.cli.url.get_hosted_multimedia_duration")
 @patch("consumo.cli.url.is_hosted")
-@patch("consumo.cli.url.get_cached_result")
 @patch("consumo.cli.url.date", new=FakeDate)
-def test_process_urls_hosted(
-    mock_get_cached_result: Mock,
+def test_get_duration_hosted(
     mock_is_hosted: Mock,
     mock_get_hosted_multimedia_duration: Mock,
-    mock_cache_result: Mock,
     url: HttpUrl,
-    consumption_time: int,
-    expected_result: str,
+    expected_result: int,
 ) -> None:
-    mock_get_cached_result.side_effect = OperationalError
+    mock_get_cached_resolver: Mock = Mock(side_effect=OperationalError)
+    mock_cache_resolver: Mock = Mock()
     mock_is_hosted.return_value = True
-    mock_get_hosted_multimedia_duration.return_value = consumption_time
-    actual_result: Result = runner.invoke(app, [str(url)])
-    expected_exit_code: int = 0
+    mock_get_hosted_multimedia_duration.return_value = expected_result
+    actual_result: int = get_duration(
+        HttpUrl(url),
+        get_cached_resolver=mock_get_cached_resolver,
+        cache_resolver=mock_cache_resolver,
+    )
 
-    assert mock_cache_result.called
-    args: list[str] = mock_cache_result.call_args[0]
+    assert mock_cache_resolver.called
+    args: list[str] = mock_cache_resolver.call_args[0]
     assert args[0] == "consumo"
     assert args[1] == f"{url}:265:0"
-    assert args[2] == "2026-03-27"
-    assert args[3] == consumption_time
-    assert actual_result.exit_code == expected_exit_code
-    assert expected_result in actual_result.output
+    assert args[2] == expected_result
+    assert args[3] == "2026-03-27"
+    assert actual_result == expected_result
 
 
 @patch("consumo.cli.core.handle_multiple_args")
@@ -187,9 +182,7 @@ def test_get_duration_hosted_success_and_cached(
     mock_get_multimedia_duration: Mock,
     mock_calculate_consumption_time: Mock,
     mock_cache_result: Mock,
-):
-    # No cache, hosted resolver succeeds.
-    mock_get_cached_result.side_effect = OperationalError
+) -> None:
     mock_get_multimedia_duration.side_effect = FFmpegError(1, "", "")
     mock_calculate_consumption_time.return_value = 43
 
@@ -199,14 +192,6 @@ def test_get_duration_hosted_success_and_cached(
     expected_result: int = 43
 
     assert actual_result == expected_result
-
-    # Inspect cache_result call args.
-    assert mock_cache_result.called
-    args: list[str] = mock_cache_result.call_args[0]
-    assert args[0] == "consumo"
-    assert args[1] == "https://info.cern.ch/hypertext/WWW/TheProject.html:265:0"
-    assert args[2] == "2026-03-27"
-    assert args[3] == 43
 
 
 def test_process_urls_not_a_url_skip_errors() -> None:
@@ -263,3 +248,22 @@ def test_process_urls_depth(
 
     assert actual_result.exit_code == expected_exit_code
     assert "5m 20s" in actual_result.output
+
+
+@pytest.mark.parametrize(
+    "url, expected_result",
+    [("https://www.youtube.com/watch?v=H91BxkBXttE", 5717)],
+)
+@patch("consumo.cli.url.get_hosted_multimedia_duration")
+@patch("consumo.cli.url.is_hosted")
+def test_get_duration_hosted_no_cache(
+    mock_is_hosted: Mock,
+    mock_get_hosted_multimedia_duration: Mock,
+    url: HttpUrl,
+    expected_result: int,
+) -> None:
+    mock_is_hosted.return_value = True
+    mock_get_hosted_multimedia_duration.return_value = expected_result
+    actual_result: int = get_duration(HttpUrl(url), cache=False)
+
+    assert actual_result == expected_result

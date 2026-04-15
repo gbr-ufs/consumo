@@ -12,7 +12,6 @@ import pytest
 from pytest import MonkeyPatch
 
 from consumo.cli.cache import cache_result, get_cache_directory, get_cached_result
-from tests import FIXTURES_DIR
 
 
 @pytest.mark.parametrize(
@@ -70,7 +69,7 @@ def test_cache_result_and_get_cached_result_roundtrip(
     mock_get_cache_directory.return_value = tmp_path
 
     # Write a value.
-    cache_result("consumo", "/home/mock/consumo/LICENSE", 1774002905.3478081, 1278)
+    cache_result("consumo", "/home/mock/consumo/LICENSE", 1278, 1774002905.3478081)
 
     # Read it back with matching time.
     actual_result: int | None = get_cached_result(

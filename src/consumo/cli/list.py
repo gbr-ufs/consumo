@@ -2,7 +2,6 @@
 
 """Link list file handler command module."""
 
-import consumo.lib.exceptions
 
 from pathlib import Path
 from typing import Annotated
