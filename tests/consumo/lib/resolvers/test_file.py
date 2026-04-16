@@ -1,59 +1,16 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""Test suite of the cli/file module."""
-
-from coverage.files import abs_file
+"""Test suite of the lib/resolvers/file module."""
 
 from pathlib import Path
 from sqlite3 import OperationalError
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import pytest
-from typer.testing import CliRunner, Result
 
-from consumo.cli.file import app, get_duration
 from consumo.lib.exceptions import UnsupportedMIMETypeError
+from consumo.lib.resolvers.file import get_duration
 from tests import FIXTURES_DIR
-
-runner: CliRunner = CliRunner()
-
-
-@pytest.mark.parametrize(
-    "filename, expected_exit_code, expected_result",
-    [
-        ("audio.mp3", 0, "1s"),
-        ("audio_no_extension", 0, "1s"),
-        ("blog_post.html", 0, "28s"),
-        ("cool.png", 0, "12s"),
-        ("empty.epub", 0, "0s"),
-    ],
-    ids=[
-        "get_multimedia_duration",
-        "get_multimedia_duration_no_extension",
-        "calculate_html_consumption_time",
-        "calculate_viewing_time",
-        "calculate_mass_media_consumption_time",
-    ],
-)
-def test_process_files_get_standard_files(
-    filename: str, expected_exit_code: int, expected_result: str
-) -> None:
-    actual_result: Result = runner.invoke(app, [str(FIXTURES_DIR / filename)])
-
-    assert actual_result.exit_code == expected_exit_code
-    assert expected_result in actual_result.output
-
-
-def test_process_files_unsupported_file_type(tmp_path: Path) -> None:
-    mock_executable: Path = tmp_path / "executable"
-
-    # Standard magic bytes for a Unix executable.
-    mock_executable.write_bytes(
-        b"\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-    )
-
-    with pytest.raises(UnsupportedMIMETypeError):
-        runner.invoke(app, [str(mock_executable)], catch_exceptions=False)
 
 
 def test_get_duration_cache_hit() -> None:
@@ -103,3 +60,26 @@ def test_get_duration_cache_result() -> None:
     assert args[2] == expected_result
     assert args[3] == 1773603896.6067152
     assert actual_result == expected_result
+
+
+def test_get_duration_cache_none() -> None:
+    cool_png: Path = FIXTURES_DIR / "cool.png"
+    mock_get_cached_resolver: Mock = Mock(return_value=None)
+    actual_result: int = get_duration(
+        cool_png, get_cached_resolver=mock_get_cached_resolver
+    )
+    expected_result: int = 12
+
+    assert actual_result == expected_result
+
+
+def test_process_list_unsupported_mime_type_error(tmp_path: Path) -> None:
+    mock_executable: Path = tmp_path / "executable"
+
+    # Standard magic bytes for a Unix executable.
+    mock_executable.write_bytes(
+        b"\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+    )
+
+    with pytest.raises(UnsupportedMIMETypeError):
+        get_duration(mock_executable)

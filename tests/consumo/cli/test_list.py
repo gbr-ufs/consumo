@@ -38,7 +38,7 @@ def test_process_list(mock_handle_multiple_args: MagicMock) -> None:
         assert expected_result in actual_result.output
 
 
-def test_process_list_unsupported_file_type(tmp_path: Path) -> None:
+def test_process_list_unsupported_mime_type_error(tmp_path: Path) -> None:
     mock_executable: Path = tmp_path / "executable"
 
     # Standard magic bytes for a Unix executable.

@@ -24,6 +24,8 @@ from consumo.lib.file.text import (
 )
 from consumo.lib.file.text import calculate_reading_time, get_word_count
 from consumo.lib.formatting import format_time
+from consumo.lib.resolvers.file import get_duration as get_file_duration
+from consumo.lib.resolvers.url import get_duration as get_url_duration
 from consumo.lib.url import (
     calculate_consumption_time as calculate_url_consumption_time,
 )
@@ -42,8 +44,10 @@ __all__: list[str] = [
     "extract_multimedias",
     "format_time",
     "get_custom_player_duration",
+    "get_file_duration",
     "get_html_multimedia_duration",
     "get_multimedia_duration",
+    "get_url_duration",
     "get_url_multimedia_duration",
     "get_word_count",
 ]
