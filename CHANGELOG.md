@@ -1,3 +1,10 @@
+## 0.12.0 (2026-04-16)
+
+### Feat
+
+- make get_duration functions public
+- implement dependency injection for caching
+
 ## 0.11.1 (2026-04-09)
 
 ### Refactor
