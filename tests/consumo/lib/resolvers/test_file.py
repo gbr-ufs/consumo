@@ -4,7 +4,7 @@
 
 from pathlib import Path
 from sqlite3 import OperationalError
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -42,8 +42,10 @@ def test_get_duration_no_cache_multimedia() -> None:
     assert actual_result == expected_result
 
 
-def test_get_duration_cache_result() -> None:
+@patch("consumo.lib.resolvers.file.os.path.getmtime")
+def test_get_duration_cache_result(mock_os_path_getmtime: Mock) -> None:
     audio_mp3: Path = FIXTURES_DIR / "audio.mp3"
+    mock_os_path_getmtime.return_value = 1
     mock_get_cached_resolver: Mock = Mock(side_effect=OperationalError)
     mock_cache_resolver: Mock = Mock()
     actual_result: int = get_duration(
@@ -58,22 +60,11 @@ def test_get_duration_cache_result() -> None:
     assert args[0] == "consumo"
     assert args[1] == str(audio_mp3.absolute)
     assert args[2] == expected_result
-    assert args[3] == 1773603896.6067152
+    assert args[3] == 1
     assert actual_result == expected_result
 
 
-def test_get_duration_cache_none() -> None:
-    cool_png: Path = FIXTURES_DIR / "cool.png"
-    mock_get_cached_resolver: Mock = Mock(return_value=None)
-    actual_result: int = get_duration(
-        cool_png, get_cached_resolver=mock_get_cached_resolver
-    )
-    expected_result: int = 12
-
-    assert actual_result == expected_result
-
-
-def test_process_list_unsupported_mime_type_error(tmp_path: Path) -> None:
+def test_get_duration_unsupported_mime_type_error(tmp_path: Path) -> None:
     mock_executable: Path = tmp_path / "executable"
 
     # Standard magic bytes for a Unix executable.
@@ -83,3 +74,11 @@ def test_process_list_unsupported_mime_type_error(tmp_path: Path) -> None:
 
     with pytest.raises(UnsupportedMIMETypeError):
         get_duration(mock_executable)
+
+
+def test_get_duration_image() -> None:
+    cool_png: Path = FIXTURES_DIR / "cool.png"
+    actual_result: int = get_duration(cool_png)
+    expected_result: int = 12
+
+    assert actual_result == expected_result

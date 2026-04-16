@@ -33,9 +33,7 @@ def get_duration(
     words_per_minute: NonNegativeInt = 265,
     depth: NonNegativeInt = 0,
     cache: bool = True,
-    get_cached_resolver: Callable[
-        [str, str, Any], int | None
-    ] = dummy_get_cached_resolver,
+    get_cached_resolver: Callable[[str, str, Any], int] = dummy_get_cached_resolver,
     cache_resolver: Callable[[str, str, int, Any], None] = dummy_cache_resolver,
 ) -> int:
     """Get the duration or calculate the consumption time of a URL in seconds.
@@ -75,10 +73,9 @@ def get_duration(
             normalized_url: str = courlan.clean_url(str(url))  # ty:ignore[invalid-assignment]
             key: str = f"{normalized_url}:{words_per_minute}:{depth}"
             current_time: str = date.today().isoformat()
-            cached: int | None = get_cached_resolver("consumo", key, current_time)
+            cached: int = get_cached_resolver("consumo", key, current_time)
 
-            if cached is not None:
-                return cached
+            return cached
         except OperationalError:
             pass
 

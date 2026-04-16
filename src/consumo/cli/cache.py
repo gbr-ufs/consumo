@@ -6,7 +6,7 @@ import os
 import sqlite3
 import sys
 from pathlib import Path
-from sqlite3 import Cursor
+from sqlite3 import Cursor, OperationalError
 
 
 def get_cache_directory(program_name: str) -> Path:
@@ -80,7 +80,7 @@ def cache_result(
 
 def get_cached_result(
     program_name: str, key: str, current_time: int | float | str
-) -> int | None:
+) -> int:
     """Get CLI result stored on cache.
 
     The cache is implemented as SQLite database because it is serverless.
@@ -94,8 +94,7 @@ def get_cached_result(
             database, then the value is returned.
 
     Returns:
-        The integer value corresponding to the key in the database. Returns
-        None if nothing was found.
+        The integer value corresponding to the key in the database.
     """
     cache_directory: Path = get_cache_directory(program_name)
     database_path: Path = cache_directory / f"{program_name}.db"
@@ -109,12 +108,14 @@ def get_cached_result(
             (key,),
         )
 
-        row: tuple[int | float, int] | None = cursor.fetchone()
+        row: tuple[int | float, int] = cursor.fetchone()
 
         if row is None:
-            return row
+            raise OperationalError("Value not found")
 
         cached_time, cached_value = row
 
-        if current_time == cached_time:
-            return cached_value
+        if current_time != cached_time:
+            raise OperationalError("Value matching current time not found")
+
+        return cached_value

@@ -124,23 +124,6 @@ def test_get_duration_hosted_no_cache(
     assert actual_result == expected_result
 
 
-@patch("consumo.lib.resolvers.url.calculate_consumption_time")
-@patch("consumo.lib.resolvers.url.get_multimedia_duration")
-def test_get_duration_cache_none(
-    mock_get_multimedia_duration: Mock, mock_calculate_consumption_time: Mock
-) -> None:
-    mock_get_multimedia_duration.side_effect = FFmpegError(0, "", "")
-    mock_calculate_consumption_time.return_value = 43
-    mock_get_cached_resolver: Mock = Mock(return_value=None)
-    actual_result: int = get_duration(
-        HttpUrl("https://info.cern.ch/hypertext/WWW/TheProject.html"),
-        get_cached_resolver=mock_get_cached_resolver,
-    )
-    expected_result: int = 43
-
-    assert actual_result == expected_result
-
-
 @patch("consumo.lib.resolvers.url.urllib.request.urlopen")
 @patch("consumo.lib.resolvers.url.calculate_consumption_time")
 @patch("consumo.lib.resolvers.url.get_multimedia_duration")
@@ -149,21 +132,21 @@ def test_get_duration_depth(
     mock_calculate_consumption_time: Mock,
     mock_urllib_request_urlopen: Mock,
 ) -> None:
-    original_url: str = "https://info.cern.ch/"
+    original_url: HttpUrl = HttpUrl("https://info.cern.ch/")
     mock_get_multimedia_duration.side_effect = FFmpegError(1, "", "")
 
     def calculate_consumption_time_side_effect(
         url: HttpUrl, words_per_minute: NonNegativeInt = 265
     ) -> int:
         url_result: dict[str, int] = {
-            original_url: 10,
+            str(original_url): 10,
             "https://info.cern.ch/hypertext/WWW/TheProject.html": 43,
             "http://line-mode.cern.ch/www/hypertext/WWW/TheProject.html": 43,
             "http://home.web.cern.ch/topics/birth-web": 103,
             "http://home.web.cern.ch/about": 121,
         }
 
-        return url_result.get(str(url))
+        return url_result[str(url)]
 
     mock_calculate_consumption_time.side_effect = calculate_consumption_time_side_effect
 

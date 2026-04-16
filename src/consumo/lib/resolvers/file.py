@@ -30,9 +30,7 @@ def get_duration(
     file: FilePath,
     words_per_minute: NonNegativeInt = 265,
     cache: bool = True,
-    get_cached_resolver: Callable[
-        [str, str, Any], int | None
-    ] = dummy_get_cached_resolver,
+    get_cached_resolver: Callable[[str, str, Any], int] = dummy_get_cached_resolver,
     cache_resolver: Callable[[str, str, int, Any], None] = dummy_cache_resolver,
 ) -> int:
     """Get the duration or calculate the consumption time of a file in seconds.
@@ -87,12 +85,11 @@ def get_duration(
 
     if cache:
         try:
-            cached_result: int | None = get_cached_resolver(
+            cached_result: int = get_cached_resolver(
                 "consumo", absolute_filename, current_time
             )
 
-            if cached_result is not None:
-                return cached_result
+            return cached_result
         except OperationalError:
             pass
 

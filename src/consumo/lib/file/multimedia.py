@@ -130,7 +130,7 @@ def get_duration(url: HttpUrl) -> int:
     return duration
 
 
-def is_hosted(url: HttpUrl, excluded_hosts: list[str] | None = None) -> bool:
+def is_hosted(url: HttpUrl, excluded_hosts: list[str] = ["generic"]) -> bool:
     """Determine whether a multimedia container is from a hosting platform.
 
     Args:
@@ -139,9 +139,6 @@ def is_hosted(url: HttpUrl, excluded_hosts: list[str] | None = None) -> bool:
 
     Returns: Whether a multimedia container is from a hosting platform.
     """
-    if excluded_hosts is None:
-        excluded_hosts: list[str] = ["generic"]
-
     excluded_set: Set = set(excluded_hosts)
 
     for ie in yt_dlp.extractor.gen_extractors():

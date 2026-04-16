@@ -5,7 +5,7 @@
 import os
 import sqlite3
 from pathlib import Path
-from sqlite3 import Cursor
+from sqlite3 import Cursor, OperationalError
 from unittest.mock import Mock, patch
 
 import pytest
@@ -72,7 +72,7 @@ def test_cache_result_and_get_cached_result_roundtrip(
     cache_result("consumo", "/home/mock/consumo/LICENSE", 1278, 1774002905.3478081)
 
     # Read it back with matching time.
-    actual_result: int | None = get_cached_result(
+    actual_result: int = get_cached_result(
         "consumo", "/home/mock/consumo/LICENSE", 1774002905.3478081
     )
 
@@ -81,57 +81,13 @@ def test_cache_result_and_get_cached_result_roundtrip(
     assert actual_result == expected_result
 
     # Read it back with a mismatched time.
-    actual_result: int | None = get_cached_result(
-        "consumo", "/home/mock/consumo/LICENSE", 1774646308.3631928
-    )
-
-    assert actual_result is None
+    with pytest.raises(OperationalError):
+        actual_result: int = get_cached_result(
+            "consumo", "/home/mock/consumo/LICENSE", 1774646308.3631928
+        )
 
     # Read non-existent key.
-    actual_result: int | None = get_cached_result(
-        "consumo", "/home/mock/consumo/.editorconfig", 1773603896.6039917
-    )
-
-    assert actual_result is None
-
-
-@patch("consumo.cli.cache.get_cache_directory")
-def test_get_cached_result_no_row_returns_none(
-    mock_get_cache_directory: Mock, monkeypatch: MonkeyPatch, tmp_path: Path
-):
-    mock_get_cache_directory.return_value = tmp_path
-
-    database_path: Path = tmp_path / "consumo.db"
-
-    with sqlite3.connect(database_path, autocommit=True) as connection:
-        cursor: Cursor = connection.cursor()
-
-        cursor.execute(
-            """
-        CREATE TABLE IF NOT EXISTS cache (
-            key TEXT PRIMARY KEY,
-            time REAL NOT NULL,
-            value INTEGER NOT NULL
+    with pytest.raises(OperationalError):
+        actual_result: int = get_cached_result(
+            "consumo", "/home/mock/consumo/.editorconfig", 1773603896.6039917
         )
-        """
-        )
-
-    actual_result: int | None = get_cached_result(
-        "consumo", "/home/mock/consumo/LICENSE", 1774002905.3478081
-    )
-
-    assert actual_result is None
-
-    # Insert a different key with unmatched time to still return None.
-    with sqlite3.connect(database_path, autocommit=True) as connection:
-        cursor: Cursor = connection.cursor()
-        cursor.execute(
-            "INSERT INTO cache (key, time, value) VALUES (?, ?, ?)",
-            ("/home/mock/consumo/.editorconfig", 1774002905.3478081, 7),
-        )
-
-    actual_result: int | None = get_cached_result(
-        "consumo", "another", 1774646866.0746272
-    )
-
-    assert actual_result is None
