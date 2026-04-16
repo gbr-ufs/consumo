@@ -1,3 +1,9 @@
+## 0.12.1 (2026-04-16)
+
+### Fix
+
+- make cache functions error out instead of returning none
+
 ## 0.12.0 (2026-04-16)
 
 ### Feat
