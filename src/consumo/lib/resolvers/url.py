@@ -41,9 +41,6 @@ def get_duration(
     Gets the duration of media from hosting platforms or direct file
     links, and calculates the consumption time otherwise.
 
-    Caching is implemented using a SQLite database. A cache is valid for one
-    day.
-
     Args:
         url: The URL of the content whose duration or consumption time will be
             analyzed.
@@ -52,11 +49,11 @@ def get_duration(
         cache: Whether to cache results in a database for later reuse.
             Values are invalidated based on time.
         get_cached_resolver: Function for getting a value from a cache system
-            whose signature consists of program name, key, and time for cache
-            invalidation.
+            whose signature consists of program name, key, and time (date) for
+            cache invalidation.
         cache_resolver: Function for storing a value in a cache system  whose
-            signature consists of program name, key, value, and time for cache
-            invalidation.
+            signature consists of program name, key, value, and time (date) for
+            cache invalidation.
 
     !!! warning
 

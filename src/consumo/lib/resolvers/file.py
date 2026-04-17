@@ -37,9 +37,6 @@ def get_duration(
 
     Support is based on MIME type.
 
-    Caching is implemented using a SQLite database using mtime for cache
-    invalidation.
-
     Supported types are:
 
     - "audio": `get_multimedia_duration`.
@@ -63,11 +60,11 @@ def get_duration(
         cache: Whether to cache results in a database for later reuse.
             Values are invalidated based on time.
         get_cached_resolver: Function for getting a value from a cache system
-            whose signature consists of program name, key, and time for cache
-            invalidation.
+            whose signature consists of program name, key, and time (mtime)
+            for cache invalidation.
         cache_resolver: Function for storing a value in a cache system  whose
-            signature consists of program name, key, value, and time for cache
-            invalidation.
+            signature consists of program name, key, value, and time (mtime) for
+            cache invalidation.
 
     !!! warning
 
