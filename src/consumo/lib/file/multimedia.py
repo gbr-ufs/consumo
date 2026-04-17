@@ -14,6 +14,9 @@ from yt_dlp import DownloadError, YoutubeDL
 from consumo.lib.classes import SilentLogger
 from consumo.lib.exceptions import MissingMetadataError
 
+# Generate yt_dlp extractors once.
+EXTRACTORS: list[Any] = yt_dlp.extractor.gen_extractors()
+
 
 def duration_resolver(entry: dict[str, Any]) -> int:
     """Get the duration of multimedia from a dictionary.
@@ -141,7 +144,7 @@ def is_hosted(url: HttpUrl, excluded_hosts: list[str] = ["generic"]) -> bool:
     """
     excluded_set: Set = set(excluded_hosts)
 
-    for ie in yt_dlp.extractor.gen_extractors():
+    for ie in EXTRACTORS:
         if ie.IE_NAME in excluded_set:
             continue
 
