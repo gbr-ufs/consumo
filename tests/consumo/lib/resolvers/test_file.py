@@ -3,12 +3,11 @@
 """Test suite of the lib/resolvers/file module."""
 
 from pathlib import Path
-from sqlite3 import OperationalError
 from unittest.mock import Mock, patch
 
 import pytest
 
-from consumo.lib.exceptions import UnsupportedMIMETypeError
+from consumo.lib.exceptions import NoCacheError, UnsupportedMIMETypeError
 from consumo.lib.resolvers.file import get_duration
 from tests import FIXTURES_DIR
 
@@ -46,7 +45,7 @@ def test_get_duration_no_cache_multimedia() -> None:
 def test_get_duration_cache_result(mock_os_path_getmtime: Mock) -> None:
     audio_mp3: Path = FIXTURES_DIR / "audio.mp3"
     mock_os_path_getmtime.return_value = 1
-    mock_get_cached_resolver: Mock = Mock(side_effect=OperationalError)
+    mock_get_cached_resolver: Mock = Mock(side_effect=NoCacheError)
     mock_cache_resolver: Mock = Mock()
     actual_result: int = get_duration(
         audio_mp3,

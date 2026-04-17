@@ -5,13 +5,14 @@
 import os
 import sqlite3
 from pathlib import Path
-from sqlite3 import Cursor, OperationalError
+from sqlite3 import Cursor
 from unittest.mock import Mock, patch
 
 import pytest
 from pytest import MonkeyPatch
 
 from consumo.cli.cache import cache_result, get_cache_directory, get_cached_result
+from consumo.lib.exceptions import NoCacheError
 
 
 @pytest.mark.parametrize(
@@ -81,13 +82,13 @@ def test_cache_result_and_get_cached_result_roundtrip(
     assert actual_result == expected_result
 
     # Read it back with a mismatched time.
-    with pytest.raises(OperationalError):
+    with pytest.raises(NoCacheError):
         actual_result: int = get_cached_result(
             "consumo", "/home/mock/consumo/LICENSE", 1774646308.3631928
         )
 
     # Read non-existent key.
-    with pytest.raises(OperationalError):
+    with pytest.raises(NoCacheError):
         actual_result: int = get_cached_result(
             "consumo", "/home/mock/consumo/.editorconfig", 1773603896.6039917
         )

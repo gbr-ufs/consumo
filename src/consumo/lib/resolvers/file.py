@@ -4,13 +4,12 @@
 
 import os
 from pathlib import Path
-from sqlite3 import OperationalError
 from typing import Any, Callable
 
 import magic
 from pydantic import FilePath, NonNegativeInt, validate_call
 
-from consumo.lib.exceptions import UnsupportedMIMETypeError
+from consumo.lib.exceptions import NoCacheError, UnsupportedMIMETypeError
 from consumo.lib.file.html import (
     calculate_consumption_time as calculate_html_consumption_time,
 )
@@ -87,7 +86,7 @@ def get_duration(
             )
 
             return cached_result
-        except OperationalError:
+        except NoCacheError:
             pass
 
     mime_type: str = magic.from_file(str(file), mime=True)

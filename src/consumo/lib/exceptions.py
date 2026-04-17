@@ -13,3 +13,7 @@ class MissingMetadataError(ConsumoError):
 
 class UnsupportedMIMETypeError(ConsumoError):
     """Raised when a file doesn't have the expected MIME type."""
+
+
+class NoCacheError(ConsumoError):
+    """Raised when an argument doesn't have a cache key assigned to it."""

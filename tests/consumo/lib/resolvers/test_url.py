@@ -2,13 +2,13 @@
 
 """Test suite of the lib/resolvers/url module."""
 
-from sqlite3 import OperationalError
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 from av.error import FFmpegError
 from pydantic import HttpUrl, NonNegativeInt
 
+from consumo.lib.exceptions import NoCacheError
 from consumo.lib.resolvers.url import get_duration
 
 
@@ -56,7 +56,7 @@ def test_get_duration_hosted(
     url: HttpUrl,
     expected_result: int,
 ) -> None:
-    mock_get_cached_resolver: Mock = Mock(side_effect=OperationalError)
+    mock_get_cached_resolver: Mock = Mock(side_effect=NoCacheError)
     mock_cache_resolver: Mock = Mock()
     mock_get_hosted_multimedia_duration.return_value = expected_result
     actual_result: int = get_duration(
@@ -93,7 +93,7 @@ def test_get_duration_hosted_success_and_cached(
     mock_get_multimedia_duration: Mock,
     mock_calculate_consumption_time: Mock,
 ) -> None:
-    mock_get_cached_resolver: Mock = Mock(side_effect=OperationalError)
+    mock_get_cached_resolver: Mock = Mock(side_effect=NoCacheError)
     mock_get_multimedia_duration.side_effect = FFmpegError(0, "", "")
     mock_cache_resolver: Mock = Mock()
     mock_calculate_consumption_time.return_value = 43

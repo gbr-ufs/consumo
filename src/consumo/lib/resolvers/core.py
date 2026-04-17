@@ -2,11 +2,11 @@
 
 """Core module for general consumption time processing."""
 
-from sqlite3 import OperationalError
+from consumo.lib.exceptions import NoCacheError
 
 
 def dummy_get_cached_resolver(program_name: str, key: str, current_time: float) -> int:
-    raise OperationalError
+    raise NoCacheError
 
 
 def dummy_cache_resolver(

@@ -4,7 +4,6 @@
 
 import urllib.request
 from datetime import date
-from sqlite3 import OperationalError
 from typing import Any, Callable
 from urllib.parse import urljoin
 
@@ -18,6 +17,7 @@ from pydantic import (
     validate_call,
 )
 
+from consumo.lib.exceptions import NoCacheError
 from consumo.lib.file.multimedia import (
     get_hosted_multimedia_duration,
     get_multimedia_duration,
@@ -73,7 +73,7 @@ def get_duration(
             cached: int = get_cached_resolver("consumo", key, current_time)
 
             return cached
-        except OperationalError:
+        except NoCacheError:
             pass
 
     excluded_hosts: list[str] = ["abc", "AlJazeera", "ant1newsgr", "bbc", "generic"]

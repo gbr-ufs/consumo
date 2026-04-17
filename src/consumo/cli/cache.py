@@ -6,7 +6,9 @@ import os
 import sqlite3
 import sys
 from pathlib import Path
-from sqlite3 import Cursor, OperationalError
+from sqlite3 import Cursor
+
+from consumo.lib.exceptions import NoCacheError
 
 
 def get_cache_directory(program_name: str) -> Path:
@@ -111,11 +113,11 @@ def get_cached_result(
         row: tuple[int | float, int] = cursor.fetchone()
 
         if row is None:
-            raise OperationalError("Value not found")
+            raise NoCacheError("Value not found")
 
         cached_time, cached_value = row
 
         if current_time != cached_time:
-            raise OperationalError("Value matching current time not found")
+            raise NoCacheError("Value matching current time not found")
 
         return cached_value
