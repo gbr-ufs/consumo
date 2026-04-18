@@ -25,5 +25,9 @@ jobs:
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
     - name: Test
       uses: ./.github/actions/tests
-    - name: Codecov
+    - name: Codecov Coverage
       uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de
+    - name: Codecov Tests
+      uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de
+      with:
+        report_type: test_results
