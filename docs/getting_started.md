@@ -38,6 +38,8 @@ Open your terminal and run the `consumo url` command. It takes a link (or multip
 consumo url https://example.com
 ```
 
+![GIF showcasing the result of running the instructions. It would take 4 seconds to consume the contents of the URL.](https://vhs.charm.sh/vhs-3C8gYyhKXlXruP3yklzt2k.gif)
+
 consumo will then analyze the contents of the page and return the estimated reading time based on the standard reading speed.
 
 Let's see how it does with files. From your terminal, write the following commands to create a simple "Hello, World!" file:
@@ -52,6 +54,8 @@ Now, let's throw consumo at it:
 consumo file hello_world.txt
 ```
 
+![GIF showcasing the result of running the instructions. It would take 1 second to read the resulting file.](https://vhs.charm.sh/vhs-6AZXQnvTSsQnZXrL3ESSjU.gif)
+
 consumo also has a third parameter, `list`, that allows us to calculate the consumption time of a text file full of links:
 
 ```shell
@@ -62,3 +66,5 @@ echo "https://example.org" >> links.txt
 ```shell
 consumo list links.txt
 ```
+
+![GIF showcasing the result of running the instructions. It would take 4 seconds to consume the contents of both URLs.](https://vhs.charm.sh/vhs-3tf8V9PxC27bNtK4j5VDMb.gif)
