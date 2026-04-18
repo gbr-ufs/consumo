@@ -57,7 +57,7 @@ def test_get_duration_cache_result(mock_os_path_getmtime: Mock) -> None:
     assert mock_cache_resolver.called
     args: list[str] = mock_cache_resolver.call_args[0]
     assert args[0] == "consumo"
-    assert args[1] == str(audio_mp3.absolute)
+    assert args[1] == f"{str(audio_mp3.absolute)}:265"
     assert args[2] == expected_result
     assert args[3] == 1
     assert actual_result == expected_result

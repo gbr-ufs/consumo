@@ -77,13 +77,12 @@ def get_duration(
         typer.Exit: Raised with exit code 1 if the MIME type is unsupported.
     """
     absolute_filename: str = str(file.absolute)
+    key: str = f"{absolute_filename}:{words_per_minute}"
     current_time: int | float = os.path.getmtime(file)
 
     if cache:
         try:
-            cached_result: int = get_cached_resolver(
-                "consumo", absolute_filename, current_time
-            )
+            cached_result: int = get_cached_resolver("consumo", key, current_time)
 
             return cached_result
         except NoCacheError:
@@ -100,7 +99,7 @@ def get_duration(
         result: int = get_multimedia_duration(file)
 
         if cache:
-            cache_resolver("consumo", absolute_filename, result, current_time)
+            cache_resolver("consumo", key, result, current_time)
 
         return result
 
@@ -123,6 +122,6 @@ def get_duration(
 
     # Covered in `test_get_duration_cache_result`.
     if cache:  # pragma: no cover
-        cache_resolver("consumo", absolute_filename, result, current_time)
+        cache_resolver("consumo", key, result, current_time)
 
     return result
