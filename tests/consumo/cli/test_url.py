@@ -2,6 +2,7 @@
 
 """Test suite of the cli/url module."""
 
+import sys
 from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch
 
@@ -55,7 +56,7 @@ def test_app(
         mock_response: MagicMock = MagicMock()
 
         if url == "https://gbr-ufs.github.io/consumo/url":
-            mock_response.read.return_value = url_html.read_bytes()
+            mock_response.read.return_value = url_html.read_text("utf-8")
         else:
             mock_response.read.return_value = b""
 
@@ -86,7 +87,17 @@ def test_app(
     )
     expected_exit_code: int = 0
     expected_error: str = "ValidationError"
-    expected_results: list[str] = ["0s", "1h 35m 13s", "1h 35m 32s", "1h 37m 46s"]
+    # Line breaks on Windows are "\r\n" instead of "\n", which ends up breaking
+    # count.
+    url_html_expected_result: str = (
+        "1h 37m 49s" if sys.platform == "win32" else "1h 37m 46s"
+    )
+    expected_results: list[str] = [
+        "0s",
+        "1h 35m 13s",
+        "1h 35m 32s",
+        url_html_expected_result,
+    ]
 
     assert actual_result.exit_code == expected_exit_code
     assert expected_error in actual_result.output
