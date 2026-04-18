@@ -120,8 +120,7 @@ def get_duration(
 
     result: int = handler(file, words_per_minute)
 
-    # Covered in `test_get_duration_cache_result`.
-    if cache:  # pragma: no cover
+    if cache:
         cache_resolver("consumo", key, result, current_time)
 
     return result

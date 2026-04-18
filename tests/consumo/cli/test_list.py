@@ -3,7 +3,7 @@
 """Test suite of the cli/list module."""
 
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 from typer.testing import CliRunner, Result
@@ -16,7 +16,7 @@ runner: CliRunner = CliRunner()
 
 
 @patch("consumo.cli.core.handle_multiple_args")
-def test_process_list(mock_handle_multiple_args: MagicMock) -> None:
+def test_process_list(mock_handle_multiple_args: Mock) -> None:
     mock_handle_multiple_args.return_value = (
         {
             "https://github.com/gbr-ufs/pf": 13,

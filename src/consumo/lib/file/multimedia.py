@@ -112,28 +112,10 @@ def get_multimedia_duration(container: FilePath | HttpUrl) -> int:
         return math.ceil(raw_seconds)
 
 
-def get_duration(url: HttpUrl) -> int:
-    """Get the duration of a multimedia container hosted online.
-
-    Tries to treat the URL as if it was from a hosting platform, then tries to
-    get the duration from the container as if the URL pointed directly to it if
-    that fails.
-
-    Args:
-        url: URL pointing to where the multimedia container is hosted.
-
-    Returns:
-        The duration of the content in seconds.
-    """
-    try:
-        duration: int = get_hosted_multimedia_duration(url)
-    except (DownloadError, MissingMetadataError):
-        duration: int = get_multimedia_duration(url)
-
-    return duration
-
-
-def is_hosted(url: HttpUrl, excluded_hosts: list[str] = ["generic"]) -> bool:
+def is_hosted(
+    url: HttpUrl,
+    excluded_hosts: list[str] = ["abc", "AlJazeera", "ant1newsgr", "bbc", "generic"],
+) -> bool:
     """Determine whether a multimedia container is from a hosting platform.
 
     Args:
@@ -152,3 +134,18 @@ def is_hosted(url: HttpUrl, excluded_hosts: list[str] = ["generic"]) -> bool:
             return True
 
     return False
+
+
+def get_duration(url: HttpUrl) -> int:
+    """Get the duration of a multimedia container hosted online.
+
+    Args:
+        url: URL pointing to where the multimedia container is hosted.
+
+    Returns:
+        The duration of the content in seconds.
+    """
+    if is_hosted(url):
+        return get_hosted_multimedia_duration(url)
+
+    return get_multimedia_duration(url)

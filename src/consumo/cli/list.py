@@ -78,7 +78,6 @@ def process_list(
     if mime_type == "text/plain":
         urls: list[str] = file.read_text("utf-8").splitlines()
 
-        # Filter out empty lines to prevent processing errors.
         urls: list[str] = [url.strip() for url in urls if url.strip()]
 
         process_urls(urls, sort, words_per_minute, skip_errors, depth, cache)

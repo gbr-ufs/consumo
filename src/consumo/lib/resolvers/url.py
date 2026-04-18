@@ -76,9 +76,7 @@ def get_duration(
         except NoCacheError:
             pass
 
-    excluded_hosts: list[str] = ["abc", "AlJazeera", "ant1newsgr", "bbc", "generic"]
-
-    if is_hosted(url, excluded_hosts):
+    if is_hosted(url):
         result: int = get_hosted_multimedia_duration(url)
 
         if cache:

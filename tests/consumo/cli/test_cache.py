@@ -3,9 +3,7 @@
 """Test suite of the cli/cache module."""
 
 import os
-import sqlite3
 from pathlib import Path
-from sqlite3 import Cursor
 from unittest.mock import Mock, patch
 
 import pytest
@@ -27,7 +25,7 @@ from consumo.lib.exceptions import NoCacheError
 @patch("consumo.cli.cache.Path.home")
 @patch("consumo.cli.cache.sys")
 def test_get_cache_directory(
-    mock_sys, mock_path_home, platform: str, expected_suffix: Path
+    mock_sys: Mock, mock_path_home, platform: str, expected_suffix: Path
 ) -> None:
     mock_sys.platform = platform
 
@@ -41,7 +39,7 @@ def test_get_cache_directory(
 
 
 @patch("consumo.cli.cache.sys")
-def test_get_cache_directory_localappdata_set(mock_sys, tmp_path: Path):
+def test_get_cache_directory_localappdata_set(mock_sys: Mock, tmp_path: Path) -> None:
     # Point LOCALAPPDATA to tmp_path.
     os.environ["LOCALAPPDATA"]: str = str(tmp_path)
     mock_sys.platform = "win32"
@@ -53,7 +51,7 @@ def test_get_cache_directory_localappdata_set(mock_sys, tmp_path: Path):
 
 
 @patch("consumo.cli.cache.sys")
-def test_get_cache_directory_xdg_cache_set(mock_sys, tmp_path: Path):
+def test_get_cache_directory_xdg_cache_set(mock_sys: Mock, tmp_path: Path) -> None:
     os.environ["XDG_CACHE_HOME"]: str = str(tmp_path)
     mock_sys.platform = "linux"
 
@@ -66,7 +64,7 @@ def test_get_cache_directory_xdg_cache_set(mock_sys, tmp_path: Path):
 @patch("consumo.cli.cache.get_cache_directory")
 def test_cache_result_and_get_cached_result_roundtrip(
     mock_get_cache_directory: Mock, monkeypatch: MonkeyPatch, tmp_path: Path
-):
+) -> None:
     mock_get_cache_directory.return_value = tmp_path
 
     # Write a value.

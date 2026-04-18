@@ -82,13 +82,13 @@ def execute_concurrent_command(
             sorted(results.items(), key=lambda item: item[1])
         )
 
-    for arg, duration in results.items():
-        if skip_errors and errors:
-            for arg, exception in errors.items():
-                typer.secho(
-                    f"{arg} # {exception.__class__.__name__}: {exception}", err=True
-                )
+    if skip_errors and errors:
+        for arg, exception in errors.items():
+            typer.secho(
+                f"{arg} # {exception.__class__.__name__}: {exception}", err=True
+            )
 
+    for arg, duration in results.items():
         formatted_time: str = format_time(duration)
 
         if len(results) > 1:

@@ -21,10 +21,30 @@ not actually hosted in any place of the internet.</p>
         <iframe src="video.mkv"></iframe>
         <p>Continuing on the topic of videos, this one is like, online and stuff:</p>
         <video controls>
-          <source src="https://www.youtube.com/watch?v=dJG0jqhsa3c">
+          <source src="https://www.youtube.com/watch?v=l-FGlw6jWgQ">
         </video>
+        <p>I like audio too:</p>
+        <audio controls>
+          <source src="audio.mp3">
+        </audio>
+        <p>Here is a cool website:</p>
+        <p><a href="https://info.cern.ch/hypertext/WWW/TheProject.html">Cool Website</a></p>
       </section>
     </main>
+    <!-- Custom player duration. -->
+    <script type="application/ld+json" data-schema="video-object">
+      {"@type": "VideoObject", "duration": "PT1M6S"}
+    </script>
+    <!-- Empty script tag. -->
+    <script type="application/ld+json" data-schema="video-object"></script>
+    <!-- No duration. -->
+    <script type="application/ld+json" data-schema="video-object">
+      {"@type": "VideoObject", "name": "Just a video"}
+    </script>
+    <!-- Malformed JSON. -->
+    <script type="application/ld+json" data-schema="video-object">
+      {broken_json: "missing quotes}
+    </script>
     <footer>
       <a href="https://github.com/gbr-ufs/consumo">consumo</a> © 2026 by <a href="https://github.com/gbr-ufs">Gabriel Santos de Souza</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International</a><img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;">
     </footer>

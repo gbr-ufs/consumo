@@ -23,22 +23,6 @@ from consumo.lib.file.multimedia import (
 
 
 @validate_call
-def get_relative_path_multimedia_duration(url: HttpUrl, src: Path) -> int:
-    """Resolve a URL to get the duration of a multimedia file with a relative path.
-
-    Args:
-        url: URL where the multimedia file was originally found.
-        src: Relative path used for the multimedia file's "src" attribute.
-
-    Returns:
-        The duration of the content in seconds.
-    """
-    resolved: str = urljoin(str(url), str(src))
-
-    return get_absolute_path_multimedia_duration(HttpUrl(resolved))
-
-
-@validate_call
 def get_multimedia_duration(url: HttpUrl, src: str) -> int:
     """Get the duration of a multimedia hosted online.
 
@@ -53,12 +37,9 @@ def get_multimedia_duration(url: HttpUrl, src: str) -> int:
     Returns:
         The duration of the content in seconds.
     """
-    try:
-        return get_absolute_path_multimedia_duration(HttpUrl(src))
-    except ValidationError:
-        # If HttpUrl(src) fails validation, then src is likely a relative
-        # path rather than a URL.
-        return get_relative_path_multimedia_duration(url, Path(src))
+    resolved: str = urljoin(str(url), str(src))
+
+    return get_absolute_path_multimedia_duration(HttpUrl(resolved))
 
 
 @validate_call

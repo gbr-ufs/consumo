@@ -6,7 +6,7 @@ import os
 import sqlite3
 import sys
 from pathlib import Path
-from sqlite3 import Cursor
+from sqlite3 import Cursor, OperationalError
 
 from consumo.lib.exceptions import NoCacheError
 
@@ -51,7 +51,7 @@ def cache_result(
 ) -> None:
     """Store CLI result on cache.
 
-    The cache is implemented as SQLite database because it is serverless.
+    The cache is implemented as a SQLite database because it is serverless.
 
     Args:
         program_name: The name of the CLI program whose result will be cached.
@@ -85,7 +85,7 @@ def get_cached_result(
 ) -> int:
     """Get CLI result stored on cache.
 
-    The cache is implemented as SQLite database because it is serverless.
+    The cache is implemented as a SQLite database because it is serverless.
 
     Args:
         program_name: The name of the CLI program whose result will be returned
@@ -101,23 +101,26 @@ def get_cached_result(
     cache_directory: Path = get_cache_directory(program_name)
     database_path: Path = cache_directory / f"{program_name}.db"
 
-    with sqlite3.connect(database_path) as connection:
-        cursor: Cursor = connection.cursor()
+    try:
+        with sqlite3.connect(database_path) as connection:
+            cursor: Cursor = connection.cursor()
 
-        cursor.execute(
-            """
-            SELECT time, value FROM cache WHERE key = ?""",
-            (key,),
-        )
+            cursor.execute(
+                """
+                SELECT time, value FROM cache WHERE key = ?""",
+                (key,),
+            )
 
-        row: tuple[int | float, int] = cursor.fetchone()
+            row: tuple[int | float, int] = cursor.fetchone()
 
-        if row is None:
-            raise NoCacheError("Value not found")
+            if row is None:
+                raise NoCacheError("Value not found")
 
-        cached_time, cached_value = row
+            cached_time, cached_value = row
 
-        if current_time != cached_time:
-            raise NoCacheError("Value matching current time not found")
+            if current_time != cached_time:
+                raise NoCacheError("Value matching current time not found")
 
-        return cached_value
+            return cached_value
+    except OperationalError:
+        raise NoCacheError("Unable to open database file")

@@ -6,17 +6,10 @@
 ffmpeg -f lavfi -i anullsrc=r=8000:cl=mono -t 1 -c:a libmp3lame -b:a 8k audio.mp3
 ```
 
-## `video_no_duration.h264`
+## `single_char.pdf`
 
 ```
-ffmpeg -f lavfi -i color=c=black:s=2x2:r=1 -t 1 -c:v libx264 -f h264 no_duration.h264
-```
-
-## `audio_no_extension`
-
-```
-ffmpeg -f lavfi -i anullsrc=channel_layout=mono:sample_rate=8000 -t 1 -c:a flac no_extension.flac
-mv no_extension.flac no_extension
+gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=single_char.pdf -c "/Helvetica findfont 12 scalefont setfont 50 750 moveto (a) show showpage"
 ```
 
 ## `video.mkv`
@@ -25,27 +18,11 @@ mv no_extension.flac no_extension
 ffmpeg -f lavfi -i color=c=black:s=2x2:r=1 -t 1 -c:v libx264 -crf 51 video.mkv
 ```
 
-## `single_char.pdf`
+## `video_no_duration.h264`
 
 ```
-gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=single_char.pdf -c "/Helvetica findfont 12 scalefont setfont 50 750 moveto (a) show showpage"
+ffmpeg -f lavfi -i color=c=black:s=2x2:r=1 -t 1 -c:v libx264 -f h264 no_duration.h264
 ```
-
-## `empty.epub`
-
-```
-echo -N "" | pandoc -f markdown -t epub -o empty.epub
-```
-
-## `jumbled.mobi`
-
-```
-echo "Th3i1s 14214i1244is s4i24i14pposed t0 be 12 w0892415ords." | pandoc -f markdown -t epub -o jumbled.epub
-ebook-convert jumbled.epub jumbled.mobi
-rm jumbled.epub
-```
-
-This is supposed to be 12 words because `ebook-convert` automatically adds a Table of Contents to the file.
 
 # Version Information
 
@@ -79,37 +56,6 @@ libpostproc    58.  3.100 / 58.  3.100
 
 ```
 10.05.1
-```
-
-</details>
-
-## `pandoc`
-
-`pandoc --version`
-
-<details>
-
-```
-pandoc 3.6.4
-Features: +server +lua
-Scripting engine: Lua 5.4
-User data directory: /home/gabriel/.local/share/pandoc
-Copyright (C) 2006-2024 John MacFarlane. Web: https://pandoc.org
-This is free software; see the source for copying conditions. There is no
-warranty, not even for merchantability or fitness for a particular purpose.
-```
-
-</details>
-
-## `ebook-convert`
-
-`ebook-convert --version`
-
-<details>
-
-```
-ebook-convert (calibre 8.14.0)
-Created by: Kovid Goyal <kovid@kovidgoyal.net>
 ```
 
 </details>
