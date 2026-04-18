@@ -10,5 +10,5 @@ fi
 
 export UV_NO_DEV=1
 cp README.md docs/index.md
-uv run --group docs typer consumo.cli.main utils docs --name consumo --output docs/cli.md
+uv run --group docs typer consumo.cli.main utils docs --name consumo --output docs/references/cli.md
 uv run --only-group docs zensical $zensical_command
