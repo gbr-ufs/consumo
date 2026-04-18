@@ -3,8 +3,9 @@
 """Module for processing text files."""
 
 import math
+import re
+from re import Pattern
 
-import regex
 from pydantic import FilePath, NonNegativeInt, validate_call
 
 
@@ -18,7 +19,14 @@ def get_word_count(text: str) -> tuple[int, int]:
         The number of words in the text.
     """
     word_count: float = len(text.split())
-    cjk = regex.compile(r"\p{Script=Han}|\p{Hiragana}|\p{Katakana}|\p{Script=Hangul}")
+
+    # \u4e00-\u9fff = CJK Unified Ideographs (Han).
+    # \u3040-\u309f = Hiragana.
+    # \u30a0-\u30ff = Katakana.
+    # \uac00-\ud7af = Hangul Syllables.
+    cjk: Pattern[str] = re.compile(
+        r"[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]"
+    )
     cjk_character_count: int = len(cjk.findall(text))
 
     return word_count, cjk_character_count

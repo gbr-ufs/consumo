@@ -2,12 +2,12 @@
 
 """Module for processing URLs."""
 
+import urllib.parse
 import urllib.request
 from datetime import date
 from typing import Any, Callable
-from urllib.parse import urljoin
+from urllib.parse import ParseResult
 
-import courlan
 from av.error import FFmpegError
 from bs4 import BeautifulSoup, ResultSet, Tag
 from bs4.element import AttributeValueList
@@ -25,6 +25,34 @@ from consumo.lib.file.multimedia import (
 )
 from consumo.lib.resolvers.core import dummy_cache_resolver, dummy_get_cached_resolver
 from consumo.lib.url import calculate_consumption_time
+
+
+@validate_call
+def clean_url(url: HttpUrl) -> HttpUrl:
+    """Clean up a URL so it can be used as a cache key.
+
+    Args:
+        url: The url that will be cleaned up.
+
+    Returns:
+        A clean version of the URL.
+    """
+    parsed: ParseResult = urllib.parse.urlparse(str(url))
+    sorted_query: str = urllib.parse.urlencode(
+        sorted(urllib.parse.parse_qsl(parsed.query))
+    )
+    unparsed: str = urllib.parse.urlunparse(
+        (
+            parsed.scheme,
+            parsed.netloc,
+            parsed.path.rstrip("/") or "/",
+            parsed.params,
+            sorted_query,
+            "",
+        )
+    )
+
+    return HttpUrl(unparsed)
 
 
 @validate_call
@@ -65,10 +93,8 @@ def get_duration(
     """
     if cache:
         try:
-            # Not really None, as Pydantic would catch if the URL is malformed
-            # before it even reaches this bit of the code.
-            normalized_url: str = courlan.clean_url(str(url))  # ty:ignore[invalid-assignment]
-            key: str = f"{normalized_url}:{words_per_minute}:{depth}"
+            normalized_url: HttpUrl = clean_url(url)
+            key: str = f"{normalized_url.unicode_string()}:{words_per_minute}:{depth}"
             current_time: str = date.today().isoformat()
             cached: int = get_cached_resolver("consumo", key, current_time)
 
@@ -109,7 +135,7 @@ def get_duration(
         def recursive(tag: Tag) -> int:
             href: str | AttributeValueList | None = tag.get("href")
 
-            absolute_url: HttpUrl = HttpUrl(urljoin(str(url), href))
+            absolute_url: HttpUrl = HttpUrl(urllib.parse.urljoin(str(url), href))
 
             return get_duration(
                 absolute_url, words_per_minute=words_per_minute, depth=depth - 1
