@@ -1,3 +1,24 @@
+## 0.13.0 (2026-04-18)
+
+### BREAKING CHANGE
+
+- remove cache from file code
+- require cache functions to raise NoCacheError instead of OperationalError
+
+### Feat
+
+- further improve caching dependency injection
+- **NoCacheError**: add cache-specific error
+
+### Fix
+
+- file cache key
+- **__init__.py**: add missing exceptions
+
+### Perf
+
+- **multimedia.py**: try to make `is_hosted` a little bit faster
+
 ## 0.12.1 (2026-04-16)
 
 ### Fix
