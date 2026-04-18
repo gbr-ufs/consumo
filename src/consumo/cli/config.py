@@ -89,7 +89,7 @@ DepthOption = Annotated[
 CacheOption = Annotated[
     bool,
     typer.Option(
-        help="Whether to cache results in a database for later reuse. Values are invalidated based on time. [env: CONSUMO_CACHE=]"
+        help="Whether to cache results in a database for later reuse. [env: CONSUMO_CACHE=]"
     ),
 ]
 
@@ -125,7 +125,7 @@ def load_configuration() -> None:
                     ("sort", general, "DEFAULT_SORT", bool),
                     ("words_per_minute", general, "DEFAULT_WORDS_PER_MINUTE", int),
                     ("skip_errors", general, "DEFAULT_SKIP_ERRORS", bool),
-                    ("cache", general, "DEFAULT_CACHE", bool),
+                    ("cache", url, "DEFAULT_CACHE", bool),
                     ("depth", url, "DEFAULT_DEPTH", int),
                 ]
 

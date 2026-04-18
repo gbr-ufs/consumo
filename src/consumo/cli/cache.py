@@ -5,6 +5,7 @@
 import os
 import sqlite3
 import sys
+import time
 from pathlib import Path
 from sqlite3 import Cursor, OperationalError
 
@@ -46,9 +47,7 @@ def get_cache_directory(program_name: str) -> Path:
     return base_directory / program_name
 
 
-def cache_result(
-    program_name: str, key: str, value: int, time: int | float | str
-) -> None:
+def cache_result(program_name: str, key: str, value: int, time_to_live: int) -> None:
     """Store CLI result on cache.
 
     The cache is implemented as a SQLite database because it is serverless.
@@ -57,8 +56,8 @@ def cache_result(
         program_name: The name of the CLI program whose result will be cached.
         key: The input that was given to the program whose result will now be
             cached.
-        time: The current time for cache invalidation in the future.
         value: The result given by the program.
+        time_to_live: How many seconds this cache entry should remain valid.
     """
     cache_directory: Path = get_cache_directory(program_name)
 
@@ -66,40 +65,47 @@ def cache_result(
 
     database_path: Path = cache_directory / f"{program_name}.db"
 
+    expires_at: int | float = time.time() + time_to_live
+
     with sqlite3.connect(database_path, autocommit=True) as connection:
         cursor: Cursor = connection.cursor()
         cursor.execute(
             """
-            CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY,
-            time REAL NOT NULL, value INTEGER NOT NULL)
+            CREATE TABLE IF NOT EXISTS
+            cache (
+            key TEXT PRIMARY KEY,
+            value INTEGER NOT NULL,
+            expires_at REAL NOT NULL
+            )
             """
         )
         cursor.execute(
-            "INSERT OR REPLACE INTO cache (key, time, value) VALUES (?, ?, ?)",
-            (key, time, value),
+            """INSERT OR REPLACE INTO
+            cache (
+            key,
+            value,
+            expires_at
+            )
+            VALUES (?, ?, ?)""",
+            (key, value, expires_at),
         )
 
 
-def get_cached_result(
-    program_name: str, key: str, current_time: int | float | str
-) -> int:
+def get_cached_result(program_name: str, key: str) -> int:
     """Get CLI result stored on cache.
 
     The cache is implemented as a SQLite database because it is serverless.
 
     Args:
-        program_name: The name of the CLI program whose result will be returned
-            from cache.
-        key: The key to search for in the database to look for a stored value.
-        current_time: The time when this function was called for cache
-            validation. If this time is generally in line with the one on the
-            database, then the value is returned.
+        program_name: The name of the CLI program whose result will be returned.
+        key: The key to search for in the database.
 
     Returns:
         The integer value corresponding to the key in the database.
     """
     cache_directory: Path = get_cache_directory(program_name)
     database_path: Path = cache_directory / f"{program_name}.db"
+    current_time: int | float = time.time()
 
     try:
         with sqlite3.connect(database_path) as connection:
@@ -107,20 +113,23 @@ def get_cached_result(
 
             cursor.execute(
                 """
-                SELECT time, value FROM cache WHERE key = ?""",
-                (key,),
+                SELECT
+                value
+                FROM
+                cache
+                WHERE
+                key = ?
+                AND
+                expires_at > ?
+                """,
+                (key, current_time),
             )
 
-            row: tuple[int | float, int] = cursor.fetchone()
+            row: tuple[int] | None = cursor.fetchone()
 
             if row is None:
                 raise NoCacheError("Value not found")
 
-            cached_time, cached_value = row
-
-            if current_time != cached_time:
-                raise NoCacheError("Value matching current time not found")
-
-            return cached_value
+            return row[0]
     except OperationalError:
         raise NoCacheError("Unable to open database file")

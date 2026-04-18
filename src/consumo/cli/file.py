@@ -8,13 +8,10 @@ from typing import Annotated
 import typer
 from typer import Typer
 
-from consumo.cli.cache import cache_result, get_cached_result
 from consumo.cli.config import (
-    DEFAULT_CACHE,
     DEFAULT_SKIP_ERRORS,
     DEFAULT_SORT,
     DEFAULT_WORDS_PER_MINUTE,
-    CacheOption,
     SkipErrorsOption,
     SortOption,
     WordsPerMinuteOption,
@@ -36,7 +33,6 @@ def process_files(
     sort: SortOption = DEFAULT_SORT,
     words_per_minute: WordsPerMinuteOption = DEFAULT_WORDS_PER_MINUTE,
     skip_errors: SkipErrorsOption = DEFAULT_SKIP_ERRORS,
-    cache: CacheOption = DEFAULT_CACHE,
 ) -> None:
     """Calculate the consumption time of files concurrently in a *h *m *s format.
 
@@ -47,17 +43,12 @@ def process_files(
         words_per_minute: Reading speed in words per minute.
         skip_errors: Whether to warn and return 0 in case an exception is raised
             for a file.
-        cache: Whether to cache results in a database for later reuse.
-            Values are invalidated based on time.
     """
 
     def duration_resolver(file: Path) -> int:
         return get_duration(
             file,
             words_per_minute,
-            cache,
-            get_cached_resolver=get_cached_result,
-            cache_resolver=cache_result,
         )
 
     execute_concurrent_command(

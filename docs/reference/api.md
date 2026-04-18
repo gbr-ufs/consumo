@@ -1,7 +1,3 @@
----
-icon: lucide/code
----
-
 # API
 
 ## `consumo`

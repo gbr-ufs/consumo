@@ -4,12 +4,12 @@
 
 import os
 from pathlib import Path
-from typing import Any, Callable
+from typing import Callable
 
 import magic
 from pydantic import FilePath, NonNegativeInt, validate_call
 
-from consumo.lib.exceptions import NoCacheError, UnsupportedMIMETypeError
+from consumo.lib.exceptions import UnsupportedMIMETypeError
 from consumo.lib.file.html import (
     calculate_consumption_time as calculate_html_consumption_time,
 )
@@ -21,16 +21,12 @@ from consumo.lib.file.multimedia import get_multimedia_duration
 from consumo.lib.file.text import (
     calculate_consumption_time as calculate_text_consumption_time,
 )
-from consumo.lib.resolvers.core import dummy_cache_resolver, dummy_get_cached_resolver
 
 
 @validate_call
 def get_duration(
     file: FilePath,
     words_per_minute: NonNegativeInt = 265,
-    cache: bool = True,
-    get_cached_resolver: Callable[[str, str, Any], int] = dummy_get_cached_resolver,
-    cache_resolver: Callable[[str, str, int, Any], None] = dummy_cache_resolver,
 ) -> int:
     """Get the duration or calculate the consumption time of a file in seconds.
 
@@ -56,19 +52,6 @@ def get_duration(
         file: The path to the file whose duration or consumption time will be
             analyzed.
         words_per_minute: Reading speed in words per minute.
-        cache: Whether to cache results in a database for later reuse.
-            Values are invalidated based on time.
-        get_cached_resolver: Function for getting a value from a cache system
-            whose signature consists of program name, key, and time (mtime)
-            for cache invalidation.
-        cache_resolver: Function for storing a value in a cache system  whose
-            signature consists of program name, key, value, and time (mtime) for
-            cache invalidation.
-
-    !!! warning
-
-        `get_cached_resolver` and `cache_resolver` have dummy default values. You have
-        to implement your own cache functions if you want to use cache!
 
     Returns:
         The time in seconds to consume the content in the file.
@@ -80,14 +63,6 @@ def get_duration(
     key: str = f"{absolute_filename}:{words_per_minute}"
     current_time: int | float = os.path.getmtime(file)
 
-    if cache:
-        try:
-            cached_result: int = get_cached_resolver("consumo", key, current_time)
-
-            return cached_result
-        except NoCacheError:
-            pass
-
     mime_type: str = magic.from_file(str(file), mime=True)
     type, subtype = mime_type.split("/", 1)
     multimedia_types = ("audio", "video")
@@ -96,12 +71,7 @@ def get_duration(
         return calculate_viewing_time(1)
 
     if type in multimedia_types:
-        result: int = get_multimedia_duration(file)
-
-        if cache:
-            cache_resolver("consumo", key, result, current_time)
-
-        return result
+        return get_multimedia_duration(file)
 
     mime_type_handler: dict[str, Callable[[Path, NonNegativeInt], int]] = {
         "application/epub+zip": calculate_mass_media_consumption_time,
@@ -118,9 +88,4 @@ def get_duration(
     if handler is None:
         raise UnsupportedMIMETypeError("File type not supported")
 
-    result: int = handler(file, words_per_minute)
-
-    if cache:
-        cache_resolver("consumo", key, result, current_time)
-
-    return result
+    return handler(file, words_per_minute)

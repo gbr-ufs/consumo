@@ -27,11 +27,11 @@ Equivalent to the `--words-per-minute` flag of [the commands](cli.md). Determine
 
 Equivalent to the `--skip-errors` flag of [the commands](cli.md). Determines whether to show zero seconds for arguments that otherwise would make the program exit with an error.
 
+## `url`
+
 ### `cache`
 
 Equivalent to the `--cache` flag of [the commands](cli.md). Determines whether to cache results in a database for later reuse.
-
-## `url`
 
 ### `depth`
 

@@ -5,7 +5,7 @@
 import urllib.parse
 import urllib.request
 from datetime import date
-from typing import Any, Callable
+from typing import Callable
 from urllib.parse import ParseResult
 
 from av.error import FFmpegError
@@ -61,8 +61,8 @@ def get_duration(
     words_per_minute: NonNegativeInt = 265,
     depth: NonNegativeInt = 0,
     cache: bool = True,
-    get_cached_resolver: Callable[[str, str, Any], int] = dummy_get_cached_resolver,
-    cache_resolver: Callable[[str, str, int, Any], None] = dummy_cache_resolver,
+    get_cached_resolver: Callable[[str, str], int] = dummy_get_cached_resolver,
+    cache_resolver: Callable[[str, str, int, int], None] = dummy_cache_resolver,
 ) -> int:
     """Get the duration or calculate the consumption time of a URL in seconds.
 
@@ -91,14 +91,15 @@ def get_duration(
     Returns:
         The time in seconds to consume the content the URL points to.
     """
+    # 1 day in seconds.
+    time_to_live: int = 86400
+    normalized_url: HttpUrl = clean_url(url)
+    key: str = f"{normalized_url.unicode_string()}:{words_per_minute}:{depth}"
+    current_time: str = date.today().isoformat()
+
     if cache:
         try:
-            normalized_url: HttpUrl = clean_url(url)
-            key: str = f"{normalized_url.unicode_string()}:{words_per_minute}:{depth}"
-            current_time: str = date.today().isoformat()
-            cached: int = get_cached_resolver("consumo", key, current_time)
-
-            return cached
+            return get_cached_resolver("consumo", key)
         except NoCacheError:
             pass
 
@@ -106,7 +107,7 @@ def get_duration(
         result: int = get_hosted_multimedia_duration(url)
 
         if cache:
-            cache_resolver("consumo", key, result, current_time)
+            cache_resolver("consumo", key, result, time_to_live)
 
         return result
 

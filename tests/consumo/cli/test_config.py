@@ -33,6 +33,7 @@ def test_load_configuration(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
     sort = true
     words_per_minute = 1000
     skip_errors = true
+    [url]
     cache = false
     """)
 

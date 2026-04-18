@@ -66,27 +66,32 @@ def test_cache_result_and_get_cached_result_roundtrip(
     mock_get_cache_directory: Mock, monkeypatch: MonkeyPatch, tmp_path: Path
 ) -> None:
     mock_get_cache_directory.return_value = tmp_path
+    # 1 day in seconds.
+    time_to_live: int = 86400
 
     # Write a value.
-    cache_result("consumo", "/home/mock/consumo/LICENSE", 1278, 1774002905.3478081)
+    cache_result("consumo", "https://example.com", 1278, time_to_live)
 
-    # Read it back with matching time.
-    actual_result: int = get_cached_result(
-        "consumo", "/home/mock/consumo/LICENSE", 1774002905.3478081
-    )
-
+    # Read it back.
+    actual_result: int = get_cached_result("consumo", "https://example.com")
     expected_result: int = 1278
 
     assert actual_result == expected_result
 
-    # Read it back with a mismatched time.
-    with pytest.raises(NoCacheError):
-        actual_result: int = get_cached_result(
-            "consumo", "/home/mock/consumo/LICENSE", 1774646308.3631928
-        )
+    cache_result("consumo", "https://example.com", 1278, -1)
+
+    # Read it back after expiration.
+    with pytest.raises(
+        NoCacheError,
+    ):
+        actual_result: int = get_cached_result("consumo", "https://example.com")
 
     # Read non-existent key.
     with pytest.raises(NoCacheError):
-        actual_result: int = get_cached_result(
-            "consumo", "/home/mock/consumo/.editorconfig", 1773603896.6039917
-        )
+        actual_result: int = get_cached_result("consumo", "https://example.org")
+
+    mock_get_cache_directory.return_value = Path("/root/bogus")
+
+    # Inaccessible database path.
+    with pytest.raises(NoCacheError):
+        actual_result: int = get_cached_result("consumo", "https://example.com")

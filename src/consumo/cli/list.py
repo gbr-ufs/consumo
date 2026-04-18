@@ -49,7 +49,6 @@ def process_list(
             for an item in the list.
         depth: How many levels to recursively follow URLs on the page.
         cache: Whether to cache results in a database for later reuse.
-            Values are invalidated based on time.
 
     Example:
         A "file with a list of links" is a plain text file that looks like this:
