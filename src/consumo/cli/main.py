@@ -37,7 +37,7 @@ def version_callback(value: bool) -> None:
         value: Whether to print the program's version.
 
     Raises:
-        typer.Exit: Raised if printing the program's version.
+        typer.Exit: When printing the program's version.
     """
     if value:
         metadata: PackageMetadata = importlib.metadata.metadata("consumo")

@@ -74,7 +74,7 @@ def get_duration(
         The time in seconds to consume the content in the file.
 
     Raises:
-        typer.Exit: Raised with exit code 1 if the MIME type is unsupported.
+        UnsupportedMIMETypeError: When the MIME type is unsupported.
     """
     absolute_filename: str = str(file.absolute)
     key: str = f"{absolute_filename}:{words_per_minute}"

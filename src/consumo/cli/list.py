@@ -2,7 +2,6 @@
 
 """Link list file handler command module."""
 
-
 from pathlib import Path
 from typing import Annotated
 
@@ -72,7 +71,7 @@ def process_list(
         ```
 
     Raises:
-        typer.Exit: Raised with exit code 1 if the file isn't a plain text file.
+        UnsupportedMIMETypeError: When the file isn't a plain text file.
     """
     mime_type: str = magic.from_file(str(file), mime=True)
 

@@ -78,7 +78,7 @@ def calculate_consumption_time(
         The time in seconds to consume the content the URL points to.
 
     Raises:
-        ConnectionError: If the HTML content of the URL wasn't downloaded.
+        ConnectionError: When the HTML content of the URL wasn't downloaded.
     """
     html_content: str | None = trafilatura.fetch_url(str(url))
 
