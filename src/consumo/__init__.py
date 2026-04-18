@@ -2,7 +2,12 @@
 
 """Content Consumption Analyzer."""
 
-from consumo.lib.exceptions import ConsumoError, MissingMetadataError
+from consumo.lib.exceptions import (
+    ConsumoError,
+    MissingMetadataError,
+    NoCacheError,
+    UnsupportedMIMETypeError,
+)
 from consumo.lib.file.html import (
     calculate_consumption_time as calculate_html_consumption_time,
 )
@@ -50,4 +55,7 @@ __all__: list[str] = [
     "get_url_duration",
     "get_url_multimedia_duration",
     "get_word_count",
+    "MissingMetadataError",
+    "NoCacheError",
+    "UnsupportedMIMETypeError",
 ]
