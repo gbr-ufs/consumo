@@ -23,7 +23,12 @@ from consumo.lib.file.mass_media import (
     calculate_consumption_time as calculate_mass_media_consumption_time,
 )
 from consumo.lib.file.mass_media import extract_text as extract_mass_media_text
-from consumo.lib.file.multimedia import get_duration as get_multimedia_duration
+from consumo.lib.file.multimedia import (
+    get_duration as get_url_multimedia_duration,
+)
+from consumo.lib.file.multimedia import (
+    get_multimedia_duration,
+)
 from consumo.lib.file.text import (
     calculate_consumption_time as calculate_text_consumption_time,
 )
@@ -34,7 +39,6 @@ from consumo.lib.resolvers.url import get_duration as get_url_duration
 from consumo.lib.url import (
     calculate_consumption_time as calculate_url_consumption_time,
 )
-from consumo.lib.url import get_multimedia_duration as get_url_multimedia_duration
 
 __all__: list[str] = [
     "ConsumoError",

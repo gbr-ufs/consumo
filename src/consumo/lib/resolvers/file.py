@@ -34,17 +34,17 @@ def get_duration(
 
     Supported types are:
 
-    - "audio": `get_multimedia_duration`.
-    - "image": `calculate_viewing_time`.
-    - "video": `get_multimedia_duration`.
+    - "audio": [`get_multimedia_duration`][consumo.get_multimedia_duration].
+    - "image": [`calculate_viewing_time`][consumo.calculate_viewing_time].
+    - "video": [`get_multimedia_duration`][consumo.get_multimedia_duration].
 
     Supported types/subtypes are:
 
-    - "application/epub+zip": `calculate_mass_media_consumption_time`.
-    - "application/pdf": `calculate_mass_media_consumption_time`.
-    - "application/x-mobipocket-ebook": `calculate_mass_media_consumption_time`.
-    - "text/html": `calculate_html_consumption_time`.
-    - "text/plain": `calculate_text_consumption_time`.
+    - "application/epub+zip": [`calculate_mass_media_consumption_time`][consumo.calculate_mass_media_consumption_time].
+    - "application/pdf": [`calculate_mass_media_consumption_time`][consumo.calculate_mass_media_consumption_time].
+    - "application/x-mobipocket-ebook": [`calculate_mass_media_consumption_time`][consumo.calculate_mass_media_consumption_time].
+    - "text/html": [`calculate_html_consumption_time`][consumo.calculate_html_consumption_time].
+    - "text/plain": [`calculate_text_consumption_time`][consumo.calculate_text_consumption_time].
 
     Directories are unsupported.
 
