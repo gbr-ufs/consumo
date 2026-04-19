@@ -19,7 +19,7 @@ from consumo.cli.config import (
 from consumo.cli.core import (
     execute_concurrent_command,
 )
-from consumo.lib.resolvers.file import get_duration
+from consumo.lib.handlers.file import get_duration
 
 app: Typer = Typer()
 

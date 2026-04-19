@@ -16,11 +16,11 @@ from tests import FIXTURES_DIR
 runner: CliRunner = CliRunner()
 
 
-@patch("consumo.lib.resolvers.url.urllib.request.urlopen")
+@patch("consumo.lib.handlers.url.urllib.request.urlopen")
 @patch("consumo.lib.url.trafilatura.fetch_url")
-@patch("consumo.lib.resolvers.url.get_hosted_multimedia_duration")
+@patch("consumo.lib.handlers.url.get_hosted_multimedia_duration")
 @patch("consumo.lib.url.get_absolute_path_multimedia_duration")
-@patch("consumo.lib.resolvers.url.get_multimedia_duration")
+@patch("consumo.lib.handlers.url.get_multimedia_duration")
 def test_app(
     mock_get_multimedia_duration: Mock,
     mock_get_absolute_path_multimedia_duration: Mock,

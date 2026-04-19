@@ -1,13 +1,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""Test suite of the lib/resolvers/file module."""
+"""Test suite of the lib/handlers/file module."""
 
 from pathlib import Path
 
 import pytest
 
 from consumo.lib.exceptions import UnsupportedMIMETypeError
-from consumo.lib.resolvers.file import get_duration
+from consumo.lib.handlers.file import get_duration
 
 
 def test_get_duration_unsupported_mime_type_error(tmp_path: Path) -> None:

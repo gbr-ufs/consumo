@@ -1,13 +1,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""Test suite of the lib/resolvers/url module."""
+"""Test suite of the lib/handlers/url module."""
 
 from unittest.mock import Mock, patch
 
 from av.error import FFmpegError
 from pydantic import HttpUrl
 
-from consumo.lib.resolvers.url import get_duration
+from consumo.lib.handlers.url import get_duration
 
 
 def test_get_duration_cache_hit() -> None:
@@ -22,7 +22,7 @@ def test_get_duration_cache_hit() -> None:
     assert actual_result == expected_result
 
 
-@patch("consumo.lib.resolvers.url.get_hosted_multimedia_duration")
+@patch("consumo.lib.handlers.url.get_hosted_multimedia_duration")
 def test_get_duration_hosted_no_cache(
     mock_get_hosted_multimedia_duration: Mock,
 ) -> None:
@@ -34,8 +34,8 @@ def test_get_duration_hosted_no_cache(
     assert actual_result == expected_result
 
 
-@patch("consumo.lib.resolvers.url.calculate_consumption_time")
-@patch("consumo.lib.resolvers.url.get_multimedia_duration")
+@patch("consumo.lib.handlers.url.calculate_consumption_time")
+@patch("consumo.lib.handlers.url.get_multimedia_duration")
 def test_get_duration_not_hosted_no_cache(
     mock_get_multimedia_duration: Mock, mock_calculate_consumption_time: Mock
 ) -> None:

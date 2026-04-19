@@ -23,7 +23,7 @@ from consumo.lib.file.multimedia import (
     get_multimedia_duration,
     is_hosted,
 )
-from consumo.lib.resolvers.core import dummy_cache_resolver, dummy_get_cached_resolver
+from consumo.lib.handlers.core import dummy_cache_resolver, dummy_get_cached_resolver
 from consumo.lib.url import calculate_consumption_time
 
 

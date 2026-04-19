@@ -34,8 +34,8 @@ from consumo.lib.file.text import (
 )
 from consumo.lib.file.text import calculate_reading_time, get_word_count
 from consumo.lib.formatting import format_time
-from consumo.lib.resolvers.file import get_duration as get_file_duration
-from consumo.lib.resolvers.url import get_duration as get_url_duration
+from consumo.lib.handlers.file import get_duration as get_file_duration
+from consumo.lib.handlers.url import get_duration as get_url_duration
 from consumo.lib.url import (
     calculate_consumption_time as calculate_url_consumption_time,
 )

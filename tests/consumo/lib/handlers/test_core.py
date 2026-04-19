@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""Test suit of the lib/resolvers/core module."""
+"""Test suit of the lib/handlers/core module."""
 
 import pytest
 
 from consumo.lib.exceptions import NoCacheError
-from consumo.lib.resolvers.core import dummy_cache_resolver, dummy_get_cached_resolver
+from consumo.lib.handlers.core import dummy_cache_resolver, dummy_get_cached_resolver
 
 
 def test_dummy_cache_resolver() -> None:
