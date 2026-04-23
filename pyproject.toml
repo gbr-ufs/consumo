@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Gabriel Santos de Souza <gabriel.santosdesouza@dcomp.ufs.br>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 [build-system]
 build-backend = "uv_build"
 requires = ["uv_build>=0.10.0"]
@@ -9,6 +13,7 @@ build = [
 dev = [
     "commitizen>=4.13.8",
     "prek>=0.3.4",
+    "reuse>=6.2.0",
     "ruff>=0.15.2",
     "ty>=0.0.17",
 ]
@@ -34,7 +39,6 @@ classifiers = [
   "Framework :: Pytest",
   "Intended Audience :: End Users/Desktop",
   "Intended Audience :: Science/Research",
-  "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
   "Programming Language :: Python :: 3.12",
   "Topic :: Internet",
   "Topic :: Multimedia",
