@@ -1,0 +1,13 @@
+name: Commitizen
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install uv
+      uses: astral-sh/setup-uv@ed21f2f24f8dd64503750218de024bcf64c7250a
+      with:
+        enable-cache: true
+        version: "0.9.14"
+    - name: Commitizen Check
+      shell: bash
+      run: uvx cz check --rev-range ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
