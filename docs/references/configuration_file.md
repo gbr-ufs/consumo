@@ -36,3 +36,7 @@ Equivalent to the `--cache` flag of [the commands](references/cli.md). Determine
 ### `depth`
 
 Equivalent to the `--depth` flag of [the url command](references/cli.md#consumo-url). Determines how many levels to recursively follow URLs on the page. It is recommended that one pairs it with `skip_errors` at high levels, as the availability of unvisited URLs is unknown (as in, you can't know if you can follow a URL if you haven't clicked it).
+
+### `cache_dir`
+
+Equivalent to the `--cache-dir` flag of [the url command](references/cli.md#consumo-url). Determines the path to where the cache will be stored.
