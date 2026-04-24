@@ -113,16 +113,9 @@ def get_duration(
 
         return result
 
-    # Fallback mechanism. First we try to get the duration as if it was
-    # a hosted file. If it is not, we calculate the consumption time.
-    result: int | None = None
-
     try:
         result: int = get_multimedia_duration(url)
     except FFmpegError:
-        pass
-
-    if result is None:
         result: int = calculate_consumption_time(url, words_per_minute)
 
     if cache:
