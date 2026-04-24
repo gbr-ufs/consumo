@@ -62,9 +62,5 @@ def process_urls(
         return get_duration(HttpUrl(url), words_per_minute, depth, cache)
 
     execute_concurrent_command(
-        urls,
-        duration_resolver,
-        "Processing URL(s)...",
-        sort=sort,
-        skip_errors=skip_errors,
+        urls, duration_resolver, "Processing URL(s)...", sort, skip_errors
     )

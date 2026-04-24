@@ -54,9 +54,5 @@ def process_files(
         )
 
     execute_concurrent_command(
-        files,
-        duration_resolver,
-        "Processing file(s)...",
-        sort=sort,
-        skip_errors=skip_errors,
+        files, duration_resolver, "Processing file(s)...", sort, skip_errors
     )
