@@ -6,7 +6,6 @@
 
 from unittest.mock import Mock, patch
 
-from pydantic import HttpUrl
 from typer.testing import CliRunner, Result
 
 from consumo.cli.file import app

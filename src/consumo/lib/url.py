@@ -12,7 +12,6 @@ import trafilatura
 from pydantic import (
     HttpUrl,
     NonNegativeInt,
-    ValidationError,
     validate_call,
 )
 

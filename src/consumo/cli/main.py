@@ -85,6 +85,7 @@ def main(
     """Arguments and options of the main program.
 
     Args:
+        config_file: Set the configuration file of the program.
         version: Whether to print the program's version and exit.
     """
 

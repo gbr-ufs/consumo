@@ -12,9 +12,9 @@ from pydantic import HttpUrl
 
 from consumo.lib.exceptions import MissingMetadataError
 from consumo.lib.file.multimedia import (
+    duration_resolver,
     get_duration,
     get_multimedia_duration,
-    duration_resolver,
 )
 from tests import FIXTURES_DIR
 

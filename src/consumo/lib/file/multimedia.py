@@ -11,7 +11,7 @@ from typing import Any, Iterator, Set
 import av
 import yt_dlp
 from pydantic import FilePath, HttpUrl, validate_call
-from yt_dlp import DownloadError, YoutubeDL
+from yt_dlp import YoutubeDL
 
 from consumo.lib.classes import SilentLogger
 from consumo.lib.exceptions import MissingMetadataError
