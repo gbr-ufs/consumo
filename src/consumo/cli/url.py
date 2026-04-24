@@ -31,7 +31,7 @@ from consumo.cli.core import (
 )
 from consumo.lib.handlers.url import get_duration
 
-app: Typer = Typer()
+app: Typer = Typer(no_args_is_help=True)
 
 
 @app.command(

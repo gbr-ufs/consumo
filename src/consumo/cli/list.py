@@ -28,7 +28,7 @@ from consumo.cli.config import (
 from consumo.cli.url import process_urls
 from consumo.lib.exceptions import UnsupportedMIMETypeError
 
-app: Typer = Typer()
+app: Typer = Typer(no_args_is_help=True)
 
 
 @app.command(
