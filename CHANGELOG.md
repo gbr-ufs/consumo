@@ -1,3 +1,20 @@
+## 0.14.0 (2026-04-24)
+
+### Feat
+
+- add config_file option
+- enable no_args_is_help for all subcommands
+- add cache_dir option
+
+### Fix
+
+- expose the correct get_multimedia_duration
+
+### Refactor
+
+- **handlers/url.py**: simplify fallback mechanism
+- resolvers -> handlers
+
 ## 0.13.0 (2026-04-18)
 
 ### BREAKING CHANGE
