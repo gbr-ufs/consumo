@@ -22,4 +22,4 @@ if ZIP_NAME is None:
 with ZipFile(ZIP_NAME, "w", ZIP_DEFLATED) as z:
     z.write(EXE_PATH)
     z.write("README.md")
-    z.write("LICENSE")
+    z.write("LICENSES/GPL-3.0-or-later.txt")
