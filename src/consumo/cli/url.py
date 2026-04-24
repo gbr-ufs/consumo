@@ -40,12 +40,12 @@ app: Typer = Typer(no_args_is_help=True)
 )
 def process_urls(
     urls: Annotated[list[str], typer.Argument()],
-    sort: SortOption = DEFAULT_SORT,
-    words_per_minute: WordsPerMinuteOption = DEFAULT_WORDS_PER_MINUTE,
-    skip_errors: SkipErrorsOption = DEFAULT_SKIP_ERRORS,
-    depth: DepthOption = DEFAULT_DEPTH,
-    cache: CacheOption = DEFAULT_CACHE,
-    cache_dir: CacheDirOption = DEFAULT_CACHE_DIR,
+    sort: SortOption,
+    words_per_minute: WordsPerMinuteOption,
+    skip_errors: SkipErrorsOption,
+    depth: DepthOption,
+    cache: CacheOption,
+    cache_dir: CacheDirOption,
 ) -> None:
     """Calculate the consumption time of URLs concurrently in a *h *m *s format.
 

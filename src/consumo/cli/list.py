@@ -12,14 +12,8 @@ import typer
 from typer import Typer
 
 from consumo.cli.config import (
-    DEFAULT_CACHE,
-    DEFAULT_CACHE_DIR,
-    DEFAULT_DEPTH,
-    DEFAULT_SKIP_ERRORS,
-    DEFAULT_SORT,
-    DEFAULT_WORDS_PER_MINUTE,
-    CacheOption,
     CacheDirOption,
+    CacheOption,
     DepthOption,
     SkipErrorsOption,
     SortOption,
@@ -37,12 +31,12 @@ app: Typer = Typer(no_args_is_help=True)
 )
 def process_list(
     file: Annotated[Path, typer.Argument(dir_okay=False, exists=True)],
-    sort: SortOption = DEFAULT_SORT,
-    words_per_minute: WordsPerMinuteOption = DEFAULT_WORDS_PER_MINUTE,
-    skip_errors: SkipErrorsOption = DEFAULT_SKIP_ERRORS,
-    depth: DepthOption = DEFAULT_DEPTH,
-    cache: CacheOption = DEFAULT_CACHE,
-    cache_dir: CacheDirOption = DEFAULT_CACHE_DIR,
+    sort: SortOption,
+    words_per_minute: WordsPerMinuteOption,
+    skip_errors: SkipErrorsOption,
+    depth: DepthOption,
+    cache: CacheOption,
+    cache_dir: CacheDirOption,
 ) -> None:
     """Calculate the consumption time of all the links in a link list file in a *h *m *s format.
 

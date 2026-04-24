@@ -11,9 +11,6 @@ import typer
 from typer import Typer
 
 from consumo.cli.config import (
-    DEFAULT_SKIP_ERRORS,
-    DEFAULT_SORT,
-    DEFAULT_WORDS_PER_MINUTE,
     SkipErrorsOption,
     SortOption,
     WordsPerMinuteOption,
@@ -32,9 +29,9 @@ app: Typer = Typer(no_args_is_help=True)
 )
 def process_files(
     files: Annotated[list[Path], typer.Argument(dir_okay=False, exists=True)],
-    sort: SortOption = DEFAULT_SORT,
-    words_per_minute: WordsPerMinuteOption = DEFAULT_WORDS_PER_MINUTE,
-    skip_errors: SkipErrorsOption = DEFAULT_SKIP_ERRORS,
+    sort: SortOption,
+    words_per_minute: WordsPerMinuteOption,
+    skip_errors: SkipErrorsOption,
 ) -> None:
     """Calculate the consumption time of files concurrently in a *h *m *s format.
 

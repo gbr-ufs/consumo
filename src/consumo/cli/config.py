@@ -108,35 +108,43 @@ DEFAULT_CACHE_DIR: Path = set_default_value(
 SortOption = Annotated[
     bool,
     typer.Option(
-        help="Whether to sort the output by duration in ascending order. [env: CONSUMO_SORT=]"
+        default_factory=lambda: DEFAULT_SORT,
+        help="Whether to sort the output by duration in ascending order. [env: CONSUMO_SORT=]",
     ),
 ]
 WordsPerMinuteOption = Annotated[
     NonNegativeInt,
-    typer.Option(help="Reading speed in words per minute. [env: CONSUMO_WPM=]"),
+    typer.Option(
+        default_factory=lambda: DEFAULT_WORDS_PER_MINUTE,
+        help="Reading speed in words per minute. [env: CONSUMO_WPM=]",
+    ),
 ]
 SkipErrorsOption = Annotated[
     bool,
     typer.Option(
-        help="Whether to warn and show 0s in case an exception is raised for an item in the list. [env: CONSUMO_SKIP_ERRORS=]"
+        default_factory=lambda: DEFAULT_SKIP_ERRORS,
+        help="Whether to warn and show 0s in case an exception is raised for an item in the list. [env: CONSUMO_SKIP_ERRORS=]",
     ),
 ]
 DepthOption = Annotated[
     NonNegativeInt,
     typer.Option(
-        help="How many levels to recursively follow URLs on the page. [env: CONSUMO_DEPTH=]"
+        default_factory=lambda: DEFAULT_DEPTH,
+        help="How many levels to recursively follow URLs on the page. [env: CONSUMO_DEPTH=]",
     ),
 ]
 CacheOption = Annotated[
     bool,
     typer.Option(
-        help="Whether to cache results in a database for later reuse. [env: CONSUMO_CACHE=]"
+        default_factory=lambda: DEFAULT_CACHE,
+        help="Whether to cache results in a database for later reuse. [env: CONSUMO_CACHE=]",
     ),
 ]
 CacheDirOption = Annotated[
     Path,
     typer.Option(
-        help="The path to where the cache will be stored. [env: CONSUMO_CACHE_DIR=]"
+        default_factory=lambda: DEFAULT_CACHE_DIR,
+        help="The path to where the cache will be stored. [env: CONSUMO_CACHE_DIR=]",
     ),
 ]
 
@@ -152,7 +160,11 @@ def configuration_parsing_warning(config_path: Path) -> None:
     rich.print(f"[bold yellow]Warning[/bold yellow]: {message}")
 
 
-def load_configuration() -> None:
+def load_configuration(
+    config_file: Path = set_default_value(
+        "CONSUMO_CONFIG_FILE", Path(typer.get_app_dir("consumo")) / "config.toml"
+    ),
+) -> None:
     """Load the program's configuration file."""
     global DEFAULT_SORT
     global DEFAULT_WORDS_PER_MINUTE
@@ -161,11 +173,10 @@ def load_configuration() -> None:
     global DEFAULT_CACHE
     global DEFAULT_CACHE_DIR
 
-    app_dir: str = typer.get_app_dir("consumo")
-    config_path: Path = Path(app_dir) / "config.toml"
-
-    if config_path.is_file():
-        with config_path.open("rb") as c:
+    if config_file.is_file():
+        with config_file.open(
+            "rb",
+        ) as c:
             try:
                 config_data: dict[str, Any] = tomllib.load(c)
                 general: Any = config_data.get("general", {})
@@ -188,7 +199,4 @@ def load_configuration() -> None:
                     if key in section:
                         globals()[global_variable_name] = type_cast(section[key])
             except TOMLDecodeError:
-                configuration_parsing_warning(config_path)
-
-
-load_configuration()
+                configuration_parsing_warning(config_file)
