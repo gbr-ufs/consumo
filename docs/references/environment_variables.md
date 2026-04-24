@@ -16,6 +16,9 @@ Equivalent to the `--words-per-minute` flag of [the commands](references/cli.md)
 
 Equivalent to the `--skip-errors` flag of [the commands](references/cli.md). Determines whether to show zero seconds for arguments that otherwise would make the program exit with an error.
 
+### `CONSUMO_CONFIG_FILE`
+
+Sets the configuration file of the program.
 
 ## URL
 
