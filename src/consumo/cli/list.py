@@ -13,11 +13,13 @@ from typer import Typer
 
 from consumo.cli.config import (
     DEFAULT_CACHE,
+    DEFAULT_CACHE_DIR,
     DEFAULT_DEPTH,
     DEFAULT_SKIP_ERRORS,
     DEFAULT_SORT,
     DEFAULT_WORDS_PER_MINUTE,
     CacheOption,
+    CacheDirOption,
     DepthOption,
     SkipErrorsOption,
     SortOption,
@@ -40,6 +42,7 @@ def process_list(
     skip_errors: SkipErrorsOption = DEFAULT_SKIP_ERRORS,
     depth: DepthOption = DEFAULT_DEPTH,
     cache: CacheOption = DEFAULT_CACHE,
+    cache_dir: CacheDirOption = DEFAULT_CACHE_DIR,
 ) -> None:
     """Calculate the consumption time of all the links in a link list file in a *h *m *s format.
 
@@ -51,6 +54,7 @@ def process_list(
             for an item in the list.
         depth: How many levels to recursively follow URLs on the page.
         cache: Whether to cache results in a database for later reuse.
+        cache_dir: The path to where the cache will be stored.
 
     Example:
         A "file with a list of links" is a plain text file that looks like this:
@@ -81,6 +85,6 @@ def process_list(
 
         urls: list[str] = [url.strip() for url in urls if url.strip()]
 
-        process_urls(urls, sort, words_per_minute, skip_errors, depth, cache)
+        process_urls(urls, sort, words_per_minute, skip_errors, depth, cache, cache_dir)
     else:
         raise UnsupportedMIMETypeError("Not a plain text file")

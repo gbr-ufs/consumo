@@ -6,7 +6,7 @@
 
 import urllib.parse
 import urllib.request
-from datetime import date
+from pathlib import Path
 from typing import Callable
 from urllib.parse import ParseResult
 
@@ -63,8 +63,9 @@ def get_duration(
     words_per_minute: NonNegativeInt = 265,
     depth: NonNegativeInt = 0,
     cache: bool = True,
-    get_cached_resolver: Callable[[str, str], int] = dummy_get_cached_resolver,
-    cache_resolver: Callable[[str, str, int, int], None] = dummy_cache_resolver,
+    cache_dir: Path = Path.cwd(),
+    get_cached_resolver: Callable[[Path, str], int] = dummy_get_cached_resolver,
+    cache_resolver: Callable[[Path, str, int, int], None] = dummy_cache_resolver,
 ) -> int:
     """Get the duration or calculate the consumption time of a URL in seconds.
 
@@ -79,10 +80,10 @@ def get_duration(
         cache: Whether to cache results in a database for later reuse.
             Values are invalidated based on time.
         get_cached_resolver: Function for getting a value from a cache system
-            whose signature consists of program name, key, and time (date) for
+            whose signature consists of cache directory, key, and time (date) for
             cache invalidation.
         cache_resolver: Function for storing a value in a cache system  whose
-            signature consists of program name, key, value, and time (date) for
+            signature consists of cache directory, key, value, and time (date) for
             cache invalidation.
 
     !!! warning
@@ -97,11 +98,10 @@ def get_duration(
     time_to_live: int = 86400
     normalized_url: HttpUrl = clean_url(url)
     key: str = f"{normalized_url.unicode_string()}:{words_per_minute}:{depth}"
-    current_time: str = date.today().isoformat()
 
     if cache:
         try:
-            return get_cached_resolver("consumo", key)
+            return get_cached_resolver(cache_dir, key)
         except NoCacheError:
             pass
 
@@ -109,7 +109,7 @@ def get_duration(
         result: int = get_hosted_multimedia_duration(url)
 
         if cache:
-            cache_resolver("consumo", key, result, time_to_live)
+            cache_resolver(cache_dir, key, result, time_to_live)
 
         return result
 
@@ -119,7 +119,7 @@ def get_duration(
         result: int = calculate_consumption_time(url, words_per_minute)
 
     if cache:
-        cache_resolver("consumo", key, result, current_time)
+        cache_resolver(cache_dir, key, result, time_to_live)
 
     if depth > 0:
         with urllib.request.urlopen(str(url)) as response:

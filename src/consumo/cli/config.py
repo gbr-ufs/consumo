@@ -5,6 +5,7 @@
 """Configuration loader module."""
 
 import os
+import sys
 import tomllib
 from pathlib import Path
 from tomllib import TOMLDecodeError
@@ -13,6 +14,41 @@ from typing import Annotated, Any
 import rich
 import typer
 from pydantic import NonNegativeInt
+
+
+def get_cache_directory(program_name: str) -> Path:
+    """Get the program's cache directory on the system.
+
+    Args:
+         program_name: The name of the program whose cache path directory will
+            be resolved.
+
+    Returns:
+         The path to the cache directory of the program on the current system.
+    """
+    home: Path = Path.home()
+
+    if sys.platform == "darwin":
+        return home / "Library" / "Caches" / program_name
+
+    elif sys.platform == "win32":
+        local_app_data: str | None = os.getenv("LOCALAPPDATA")
+
+        if local_app_data:
+            base_directory: Path = Path(local_app_data)
+        else:
+            base_directory: Path = home / "AppData" / "Local"
+        return base_directory / program_name / "Cache"
+
+    # Unix-like.
+    xdg_cache: str | None = os.getenv("XDG_CACHE_HOME")
+
+    if xdg_cache:
+        base_directory = Path(xdg_cache)
+    else:
+        base_directory = home / ".cache"
+
+    return base_directory / program_name
 
 
 def environment_variable_interpretation_warning(
@@ -64,6 +100,9 @@ DEFAULT_WORDS_PER_MINUTE: NonNegativeInt = set_default_value("CONSUMO_WPM", 265)
 DEFAULT_SKIP_ERRORS: bool = set_default_value("CONSUMO_SKIP_ERRORS", False)
 DEFAULT_DEPTH: NonNegativeInt = set_default_value("CONSUMO_DEPTH", 0)
 DEFAULT_CACHE: bool = set_default_value("CONSUMO_CACHE", True)
+DEFAULT_CACHE_DIR: Path = set_default_value(
+    "CONSUMO_CACHE_DIR", get_cache_directory("consumo")
+)
 
 
 SortOption = Annotated[
@@ -94,6 +133,12 @@ CacheOption = Annotated[
         help="Whether to cache results in a database for later reuse. [env: CONSUMO_CACHE=]"
     ),
 ]
+CacheDirOption = Annotated[
+    Path,
+    typer.Option(
+        help="The path to where the cache will be stored. [env: CONSUMO_CACHE_DIR=]"
+    ),
+]
 
 
 def configuration_parsing_warning(config_path: Path) -> None:
@@ -113,6 +158,8 @@ def load_configuration() -> None:
     global DEFAULT_WORDS_PER_MINUTE
     global DEFAULT_SKIP_ERRORS
     global DEFAULT_DEPTH
+    global DEFAULT_CACHE
+    global DEFAULT_CACHE_DIR
 
     app_dir: str = typer.get_app_dir("consumo")
     config_path: Path = Path(app_dir) / "config.toml"
@@ -129,6 +176,7 @@ def load_configuration() -> None:
                     ("skip_errors", general, "DEFAULT_SKIP_ERRORS", bool),
                     ("cache", url, "DEFAULT_CACHE", bool),
                     ("depth", url, "DEFAULT_DEPTH", int),
+                    ("cache_dir", url, "DEFAULT_CACHE_DIR", Path),
                 ]
 
                 for (

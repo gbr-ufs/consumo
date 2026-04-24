@@ -4,7 +4,9 @@
 
 """Test suite of the cli/config module."""
 
+import os
 from pathlib import Path
+from unittest.mock import Mock, patch
 
 import pytest
 from pydantic import NonNegativeInt
@@ -12,9 +14,58 @@ from pytest import CaptureFixture, MonkeyPatch
 
 import consumo.cli.config as config
 from consumo.cli.config import (
+    get_cache_directory,
     load_configuration,
     set_default_value,
 )
+
+
+@pytest.mark.parametrize(
+    "platform, expected_suffix",
+    [
+        ("darwin", Path("Library/Caches/consumo")),
+        ("win32", Path("AppData/Local/consumo/Cache")),
+        ("linux", Path(".cache/consumo")),
+    ],
+)
+@patch.dict("os.environ", {}, clear=True)
+@patch("consumo.cli.config.Path.home")
+@patch("consumo.cli.config.sys")
+def test_get_cache_directory(
+    mock_sys: Mock, mock_path_home: Mock, platform: str, expected_suffix: Path
+) -> None:
+    mock_sys.platform = platform
+
+    mock_home: Path = Path("/home/mock")
+    mock_path_home.return_value = mock_home
+
+    actual_result: Path = get_cache_directory("consumo")
+    expected_result: Path = mock_home / expected_suffix
+
+    assert actual_result == expected_result
+
+
+@patch("consumo.cli.config.sys")
+def test_get_cache_directory_localappdata_set(mock_sys: Mock, tmp_path: Path) -> None:
+    # Point LOCALAPPDATA to tmp_path.
+    os.environ["LOCALAPPDATA"]: str = str(tmp_path)
+    mock_sys.platform = "win32"
+
+    actual_result: Path = get_cache_directory("consumo")
+    expected_result: Path = tmp_path / "consumo" / "Cache"
+
+    assert actual_result == expected_result
+
+
+@patch("consumo.cli.config.sys")
+def test_get_cache_directory_xdg_cache_set(mock_sys: Mock, tmp_path: Path) -> None:
+    os.environ["XDG_CACHE_HOME"]: str = str(tmp_path)
+    mock_sys.platform = "linux"
+
+    actual_result: Path = get_cache_directory("consumo")
+    expected_result: Path = tmp_path / "consumo"
+
+    assert actual_result == expected_result
 
 
 @pytest.fixture(autouse=True)

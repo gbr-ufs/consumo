@@ -14,10 +14,12 @@ from typer import Typer
 
 from consumo.cli.config import (
     DEFAULT_CACHE,
+    DEFAULT_CACHE_DIR,
     DEFAULT_DEPTH,
     DEFAULT_SKIP_ERRORS,
     DEFAULT_SORT,
     DEFAULT_WORDS_PER_MINUTE,
+    CacheDirOption,
     CacheOption,
     DepthOption,
     SkipErrorsOption,
@@ -43,6 +45,7 @@ def process_urls(
     skip_errors: SkipErrorsOption = DEFAULT_SKIP_ERRORS,
     depth: DepthOption = DEFAULT_DEPTH,
     cache: CacheOption = DEFAULT_CACHE,
+    cache_dir: CacheDirOption = DEFAULT_CACHE_DIR,
 ) -> None:
     """Calculate the consumption time of URLs concurrently in a *h *m *s format.
 
@@ -56,10 +59,11 @@ def process_urls(
         depth: How many levels to recursively follow URLs on the page.
         cache: Whether to cache results in a database for later reuse.
             Values are invalidated based on time.
+        cache_dir: The path to where the cache will be stored.
     """
 
     def duration_resolver(url: str) -> int:
-        return get_duration(HttpUrl(url), words_per_minute, depth, cache)
+        return get_duration(HttpUrl(url), words_per_minute, depth, cache, cache_dir)
 
     execute_concurrent_command(
         urls, duration_resolver, "Processing URL(s)...", sort, skip_errors
