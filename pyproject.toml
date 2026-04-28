@@ -87,6 +87,7 @@ fix = true
 
 [tool.ruff.lint]
 extend-select = ["ANN", "D", "I"]
+ignore = ["D103"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
