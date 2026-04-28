@@ -13,6 +13,12 @@ from pydantic import (
 from typer import Typer
 
 from consumo.cli.config import (
+    DEFAULT_CACHE,
+    DEFAULT_CACHE_DIR,
+    DEFAULT_DEPTH,
+    DEFAULT_SKIP_ERRORS,
+    DEFAULT_SORT,
+    DEFAULT_WORDS_PER_MINUTE,
     CacheDirOption,
     CacheOption,
     DepthOption,

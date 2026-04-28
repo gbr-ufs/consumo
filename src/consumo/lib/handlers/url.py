@@ -79,6 +79,7 @@ def get_duration(
         depth: How many levels to recursively follow URLs on the page.
         cache: Whether to cache results in a database for later reuse.
             Values are invalidated based on time.
+        cache_dir: The path to where the cache will be stored.
         get_cached_resolver: Function for getting a value from a cache system
             whose signature consists of cache directory, key, and time (date) for
             cache invalidation.
