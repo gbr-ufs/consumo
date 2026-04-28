@@ -7,7 +7,6 @@
 import importlib.metadata
 import sys
 from importlib.metadata import PackageMetadata
-from pathlib import Path
 from typing import Annotated
 
 import typer
@@ -17,7 +16,6 @@ from rich.panel import Panel
 from typer import Typer
 
 from consumo import MissingMetadataError
-from consumo.cli.config import load_configuration
 from consumo.cli.file import app as file_app
 from consumo.cli.list import app as list_app
 from consumo.cli.url import app as url_app
@@ -34,16 +32,7 @@ app.add_typer(list_app)
 app.add_typer(url_app)
 
 
-def config_file_callback(value: Path) -> None:
-    """Set the configuration file of the program.
-
-    Args:
-        value: The path to the configuration file.
-    """
-    load_configuration(value)
-
-
-def version_callback(value: bool = False) -> None:
+def version_callback(value: bool) -> None:
     """Print the program's version and exit.
 
     Args:
@@ -63,24 +52,15 @@ def version_callback(value: bool = False) -> None:
 
 @app.callback(help="Content Consumption Analyzer.")
 def main(
-    config_file: Annotated[
-        Path,
-        typer.Option(
-            callback=config_file_callback,
-            dir_okay=False,
-            exists=True,
-            help="Set the configuration file of the program.",
-            is_eager=True,
-        ),
-    ],
     version: Annotated[
         bool,
         typer.Option(
+            "--version",
             callback=version_callback,
             help="Print the program's version and exit.",
             is_eager=True,
         ),
-    ],
+    ] = False,
 ) -> None:
     """Arguments and options of the main program.
 

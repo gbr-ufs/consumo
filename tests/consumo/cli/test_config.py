@@ -78,7 +78,7 @@ def reset_configuration_defaults() -> None:
     config.DEFAULT_CACHE = True
 
 
-def test_load_configuration(tmp_path: Path) -> None:
+def test_load_configuration(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
     config_file: Path = tmp_path / "config.toml"
 
     config_file.write_text("""
@@ -90,7 +90,9 @@ def test_load_configuration(tmp_path: Path) -> None:
     cache = false
     """)
 
-    load_configuration(config_file)
+    monkeypatch.setattr("typer.get_app_dir", lambda name: str(tmp_path))
+
+    load_configuration()
 
     assert config.DEFAULT_SORT is True
     assert config.DEFAULT_WORDS_PER_MINUTE == 1000
@@ -99,7 +101,7 @@ def test_load_configuration(tmp_path: Path) -> None:
 
 
 def test_load_configuration_invalid_toml(
-    tmp_path: Path, capsys: CaptureFixture
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: CaptureFixture
 ) -> None:
     config_file: Path = tmp_path / "config.toml"
 
@@ -108,7 +110,9 @@ def test_load_configuration_invalid_toml(
     sort = true
     """)
 
-    load_configuration(config_file)
+    monkeypatch.setattr("typer.get_app_dir", lambda name: str(tmp_path))
+
+    load_configuration()
 
     captured = capsys.readouterr()
 
@@ -116,12 +120,6 @@ def test_load_configuration_invalid_toml(
 
     assert config.DEFAULT_SORT is False
     assert config.DEFAULT_WORDS_PER_MINUTE == 265
-
-
-def test_load_configuration_file_not_found(tmp_path: Path) -> None:
-    non_existent_file: Path = tmp_path / "does_not_exist.toml"
-
-    load_configuration(non_existent_file)
 
 
 def test_set_default_value_interpretation_warning(
