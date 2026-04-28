@@ -4,7 +4,6 @@
 
 """Module for processing files."""
 
-import os
 from pathlib import Path
 from typing import Callable
 
@@ -61,10 +60,6 @@ def get_duration(
     Raises:
         UnsupportedMIMETypeError: When the MIME type is unsupported.
     """
-    absolute_filename: str = str(file.absolute)
-    key: str = f"{absolute_filename}:{words_per_minute}"
-    current_time: int | float = os.path.getmtime(file)
-
     mime_type: str = magic.from_file(str(file), mime=True)
     type, subtype = mime_type.split("/", 1)
     multimedia_types = ("audio", "video")
